@@ -1,4 +1,5 @@
 <!-- ── FOOTER ── -->
+ 
 <footer class="main-footer">
   <div class="footer-container">
     <!-- Column 1: Brand & About -->
