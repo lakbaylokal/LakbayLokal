@@ -6,7 +6,7 @@
   <title>LakbayPH — Discover the Philippines</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
 
