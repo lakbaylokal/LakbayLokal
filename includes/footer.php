@@ -38,7 +38,7 @@
 
     <!-- Column 4: Newsletter -->
     <div class="footer-col">
-      <h4>Get Travel Updates</h4>
+      <h4>Get Travel Updates</h4><br>
       <p>Subscribe to get the best deals and travel tips.</p>
       <form class="footer-newsletter">
         <input type="email" placeholder="Enter your email">
