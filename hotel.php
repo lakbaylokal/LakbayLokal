@@ -211,7 +211,7 @@ $hotels = [
     'rooms'       => [
       ['type' => 'Deluxe Room',    'beds' => '1 King Bed',    'size' => '28 sqm', 'price' => 3500],
       ['type' => 'Junior Suite',   'beds' => '1 King + Sofa', 'size' => '45 sqm', 'price' => 5500],
-      ['type' => 'Executive Suite','beds' => '1 King Bed',    'size' => '58 sqm', 'price' => 7500],
+      ['type' => 'Executive Suite', 'beds' => '1 King Bed',    'size' => '58 sqm', 'price' => 7500],
     ],
   ],
   'dahilayan-forest-park' => [
@@ -232,7 +232,7 @@ $hotels = [
     'rooms'       => [
       ['type' => 'Forest Cabin',       'beds' => '2 Single Beds',  'size' => '24 sqm', 'price' => 4200],
       ['type' => 'Deluxe Cabin',       'beds' => '1 Queen Bed',    'size' => '30 sqm', 'price' => 5500],
-      ['type' => 'Family Forest Villa','beds' => '2 Queen Beds',   'size' => '52 sqm', 'price' => 8500],
+      ['type' => 'Family Forest Villa', 'beds' => '2 Queen Beds',   'size' => '52 sqm', 'price' => 8500],
     ],
   ],
   'citi-inn-bukidnon' => [
@@ -259,616 +259,113 @@ $hotels = [
 ];
 
 // ─── GET HOTEL ───────────────────────────────────────────────────────────────
-$id    = isset($_GET['id']) ? trim($_GET['id']) : '';
+$id = isset($_GET['id']) ? trim($_GET['id']) : '';
+
 $hotel = $hotels[$id] ?? null;
 
-// If no valid hotel id, show the listing page instead
-if (!$hotel) {
-  // redirect or show a generic error — for now, show first hotel as default
-  $id    = array_key_first($hotels);
-  $hotel = $hotels[$id];
-}
+if (!$hotel):
+?>
+  <div class="not-found">
+    <h2>Hotel Not Found</h2>
+    <p>The hotel you're looking for doesn't exist or may have been removed.</p>
+    <a href="index.php#hotels">← Back to hotels</a>
+  </div>
+<?php
+  exit;
+endif;
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
-function stars(int $n): string {
-  return str_repeat('★', $n) . str_repeat('☆', 5 - $n);
+function stars(int|float $rating): string
+{
+  $rating = min(5, max(0, $rating));
+  $full = (int) floor($rating);
+  return str_repeat('★', $full) . str_repeat('☆', 5 - $full);
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?= htmlspecialchars($hotel['name']) ?> — Lakbaylokal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <style>
-    /* ── RESET & BASE ─────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --accent:      <?= $hotel['color'] ?>;
-      --gradient:    <?= $hotel['gradient'] ?>;
-      --badge-bg:    <?= $hotel['badge_color'] ?>;
-      --badge-text:  <?= $hotel['badge_text'] ?>;
-      --deep:        #0f1923;
-      --muted:       #6b7280;
-      --border:      rgba(0,0,0,.08);
-      --surface:     #f7f8f9;
-      --white:       #ffffff;
-      --radius-sm:   10px;
-      --radius-md:   18px;
-      --radius-lg:   28px;
-    }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Outfit', sans-serif;
-      color: var(--deep);
-      background: #fafafa;
-      min-height: 100vh;
-    }
-
-    /* ── BACK NAV ─────────────────────────────────────────────── */
-    .back-nav {
-      position: fixed;
-      top: 1.25rem; left: 1.5rem;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-      background: rgba(255,255,255,.9);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,.6);
-      border-radius: 999px;
-      padding: .55rem 1.1rem;
-      font-size: .85rem;
-      font-weight: 600;
-      color: var(--deep);
-      text-decoration: none;
-      box-shadow: 0 4px 20px rgba(0,0,0,.1);
-      transition: transform .2s ease, box-shadow .2s ease;
-    }
-    .back-nav:hover { transform: translateX(-3px); box-shadow: 0 6px 24px rgba(0,0,0,.14); }
-
-    /* ── HERO ─────────────────────────────────────────────────── */
-    .hero {
-      position: relative;
-      height: 58vh;
-      min-height: 400px;
-      background: var(--gradient);
-      overflow: hidden;
-      display: flex;
-      align-items: flex-end;
-    }
-    .hero-texture {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 70% 30%, rgba(255,255,255,.06) 0%, transparent 60%),
-        linear-gradient(to bottom, transparent 40%, rgba(0,0,0,.55) 100%);
-    }
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      padding: 2.5rem 2.5rem 3rem;
-      max-width: 700px;
-    }
-    .hero-location {
-      display: flex;
-      align-items: center;
-      gap: .4rem;
-      font-size: .82rem;
-      color: rgba(255,255,255,.72);
-      letter-spacing: .5px;
-      margin-bottom: .9rem;
-    }
-    .hero-location svg { width: 13px; height: 13px; flex-shrink: 0; }
-    .hero-stars {
-      font-size: .95rem;
-      color: #fcd34d;
-      letter-spacing: 2px;
-      margin-bottom: .65rem;
-    }
-    .hero-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.2rem, 5vw, 3.6rem);
-      font-weight: 600;
-      color: #fff;
-      line-height: 1.1;
-      margin-bottom: .65rem;
-    }
-    .hero-tagline {
-      font-size: 1rem;
-      color: rgba(255,255,255,.78);
-      font-weight: 300;
-      max-width: 440px;
-      line-height: 1.6;
-    }
-    .hero-rating {
-      position: absolute;
-      bottom: 2.5rem;
-      right: 2.5rem;
-      z-index: 2;
-      text-align: right;
-    }
-    .rating-number {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 3rem;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1;
-    }
-    .rating-label { font-size: .75rem; color: rgba(255,255,255,.65); margin-top: .15rem; }
-    .rating-stars  { font-size: .8rem; color: #fcd34d; margin-top: .3rem; }
-
-    /* ── MAIN LAYOUT ──────────────────────────────────────────── */
-    .main {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 3rem 1.5rem 6rem;
-      display: grid;
-      grid-template-columns: 1fr 360px;
-      gap: 2.5rem;
-      align-items: start;
-    }
-    .left-col { min-width: 0; }
-
-    /* ── SECTION TITLE ────────────────────────────────────────── */
-    .section-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.7rem;
-      font-weight: 600;
-      color: var(--deep);
-      margin-bottom: 1.25rem;
-    }
-
-    /* ── ABOUT ────────────────────────────────────────────────── */
-    .about-block { margin-bottom: 2.5rem; }
-    .about-text {
-      font-size: .97rem;
-      color: #374151;
-      line-height: 1.85;
-    }
-    .highlights {
-      display: flex;
-      flex-direction: column;
-      gap: .5rem;
-      margin-top: 1.25rem;
-    }
-    .highlight-item {
-      display: flex;
-      align-items: center;
-      gap: .65rem;
-      font-size: .88rem;
-      color: #374151;
-    }
-    .highlight-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent);
-      flex-shrink: 0;
-    }
-
-    /* ── AMENITIES ────────────────────────────────────────────── */
-    .amenities-block { margin-bottom: 2.5rem; }
-    .amenities-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: .6rem;
-    }
-    .amenity-tag {
-      display: flex;
-      align-items: center;
-      gap: .55rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: .65rem .95rem;
-      font-size: .85rem;
-      color: var(--deep);
-      font-weight: 500;
-    }
-    .amenity-check {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--badge-bg);
-      color: var(--badge-text);
-      font-size: .65rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-weight: 700;
-    }
-
-    /* ── ROOMS ────────────────────────────────────────────────── */
-    .rooms-block { margin-bottom: 2.5rem; }
-    .room-list { display: grid; gap: .9rem; }
-    .room-card {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 1.25rem 1.4rem;
-      background: var(--white);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-      cursor: pointer;
-      transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease;
-    }
-    .room-card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 6px 24px rgba(0,0,0,.07);
-      transform: translateY(-2px);
-    }
-    .room-card.selected {
-      border-color: var(--accent);
-      background: var(--badge-bg);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
-    }
-    .room-info { flex: 1; }
-    .room-type {
-      font-weight: 600;
-      font-size: .97rem;
-      color: var(--deep);
-      margin-bottom: .3rem;
-    }
-    .room-meta {
-      font-size: .82rem;
-      color: var(--muted);
-      display: flex;
-      gap: 1rem;
-    }
-    .room-price-col { text-align: right; flex-shrink: 0; }
-    .room-price {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--accent);
-      line-height: 1;
-    }
-    .room-per { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
-    .room-select-badge {
-      display: none;
-      font-size: .72rem;
-      font-weight: 700;
-      background: var(--accent);
-      color: #fff;
-      border-radius: 999px;
-      padding: .2rem .7rem;
-      margin-top: .35rem;
-    }
-    .room-card.selected .room-select-badge { display: inline-block; }
-
-    /* ── BOOKING CARD ─────────────────────────────────────────── */
-    .booking-card {
-      position: sticky;
-      top: 5.5rem;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,.1);
-    }
-    .booking-header {
-      background: var(--gradient);
-      padding: 1.6rem 1.75rem;
-    }
-    .bh-price {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.4rem;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1;
-    }
-    .bh-price span { font-size: 1rem; font-weight: 400; opacity: .75; }
-    .bh-label { font-size: .78rem; color: rgba(255,255,255,.65); margin-top: .3rem; }
-    .bh-stars { font-size: .85rem; color: #fcd34d; margin-top: .6rem; }
-
-    .booking-body { padding: 1.5rem 1.75rem 2rem; }
-
-    .bk-field { margin-bottom: 1rem; }
-    .bk-field label {
-      display: block;
-      font-size: .78rem;
-      font-weight: 600;
-      color: var(--muted);
-      letter-spacing: .6px;
-      text-transform: uppercase;
-      margin-bottom: .4rem;
-    }
-    .bk-field input,
-    .bk-field select {
-      width: 100%;
-      padding: .8rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: var(--surface);
-      font-family: 'Outfit', sans-serif;
-      font-size: .92rem;
-      color: var(--deep);
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
-      appearance: none;
-    }
-    .bk-field input:focus,
-    .bk-field select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
-      background: #fff;
-    }
-    .bk-dates {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .75rem;
-      margin-bottom: 1rem;
-    }
-
-    .bk-total {
-      background: var(--surface);
-      border-radius: var(--radius-sm);
-      padding: 1rem;
-      margin-bottom: 1.25rem;
-      display: none;
-    }
-    .bk-total.visible { display: block; }
-    .bk-total-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: .88rem;
-      color: var(--muted);
-      margin-bottom: .45rem;
-    }
-    .bk-total-row.grand {
-      color: var(--deep);
-      font-weight: 700;
-      font-size: 1rem;
-      margin-top: .75rem;
-      padding-top: .75rem;
-      border-top: 1px solid var(--border);
-      margin-bottom: 0;
-    }
-
-    .bk-btn {
-      width: 100%;
-      padding: 1rem;
-      border: none;
-      border-radius: var(--radius-md);
-      background: var(--gradient);
-      color: #fff;
-      font-family: 'Outfit', sans-serif;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity .2s ease, transform .2s ease;
-      letter-spacing: .3px;
-    }
-    .bk-btn:hover { opacity: .88; transform: translateY(-1px); }
-    .bk-note {
-      text-align: center;
-      font-size: .78rem;
-      color: var(--muted);
-      margin-top: .85rem;
-    }
-
-    /* ── SELECTED ROOM DISPLAY ────────────────────────────────── */
-    .selected-room-pill {
-      display: none;
-      align-items: center;
-      gap: .5rem;
-      background: var(--badge-bg);
-      border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
-      border-radius: var(--radius-sm);
-      padding: .6rem .85rem;
-      font-size: .83rem;
-      color: var(--badge-text);
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-    .selected-room-pill.visible { display: flex; }
-    .srp-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--accent);
-      flex-shrink: 0;
-    }
-
-    /* ── REVIEWS SECTION ──────────────────────────────────────── */
-    .reviews-block { margin-bottom: 2.5rem; }
-    .reviews-summary {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-      padding: 1.25rem 1.4rem;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-    }
-    .rs-number {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 3rem;
-      font-weight: 700;
-      color: var(--accent);
-      line-height: 1;
-    }
-    .rs-stars { font-size: .9rem; color: #f59e0b; margin-bottom: .2rem; }
-    .rs-count { font-size: .82rem; color: var(--muted); }
-    .review-card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 1.25rem 1.4rem;
-      margin-bottom: .75rem;
-    }
-    .rc-stars { font-size: .82rem; color: #f59e0b; margin-bottom: .6rem; }
-    .rc-text { font-size: .9rem; line-height: 1.7; color: #374151; margin-bottom: .9rem; }
-    .rc-author { display: flex; align-items: center; gap: .7rem; }
-    .rc-avatar {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      background: var(--badge-bg);
-      color: var(--badge-text);
-      font-size: .8rem;
-      font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .rc-name { font-size: .88rem; font-weight: 600; color: var(--deep); }
-    .rc-date { font-size: .78rem; color: var(--muted); }
-
-    /* ── BOOKING CONFIRMATION MODAL ───────────────────────────── */
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.45);
-      z-index: 999;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-    }
-    .modal-backdrop.open { display: flex; }
-    .modal-box {
-      background: #fff;
-      border-radius: var(--radius-lg);
-      padding: 2.5rem;
-      max-width: 460px;
-      width: 100%;
-      text-align: center;
-      position: relative;
-      animation: slideUp .3s ease;
-    }
-    @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
-    .modal-check {
-      width: 64px; height: 64px;
-      border-radius: 50%;
-      background: var(--badge-bg);
-      margin: 0 auto 1.25rem;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.8rem;
-    }
-    .modal-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.8rem;
-      font-weight: 600;
-      color: var(--deep);
-      margin-bottom: .5rem;
-    }
-    .modal-sub { font-size: .93rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.75rem; }
-    .modal-details {
-      text-align: left;
-      background: var(--surface);
-      border-radius: var(--radius-sm);
-      padding: 1rem 1.2rem;
-      margin-bottom: 1.5rem;
-    }
-    .md-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: .88rem;
-      padding: .35rem 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .md-row:last-child { border-bottom: none; }
-    .md-row span:first-child { color: var(--muted); }
-    .md-row span:last-child { font-weight: 600; color: var(--deep); }
-    .modal-close-btn {
-      width: 100%;
-      padding: .9rem;
-      border: none;
-      border-radius: var(--radius-md);
-      background: var(--gradient);
-      color: #fff;
-      font-family: 'Outfit', sans-serif;
-      font-size: .95rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    /* ── RESPONSIVE ───────────────────────────────────────────── */
-    @media (max-width: 800px) {
-      .main {
-        grid-template-columns: 1fr;
-        padding: 2rem 1rem 4rem;
-      }
-      .booking-card { position: static; }
-      .hero-rating { display: none; }
-      .hero-content { padding: 1.5rem 1.5rem 2rem; }
-    }
-    @media (max-width: 500px) {
-      .bk-dates { grid-template-columns: 1fr; }
-      .amenities-grid { grid-template-columns: 1fr 1fr; }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/hotel.css" />
 </head>
+
 <body>
 
-<!-- Back Button -->
-<a class="back-nav" href="index.php#hotels">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-  Back to Hotels
-</a>
+  <!-- Back Button -->
+  <a class="back-nav" href="index.php#hotels">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M19 12H5M12 5l-7 7 7 7" />
+    </svg>
+    Back to Hotels
+  </a>
 
-<!-- ── HERO ── -->
-<section class="hero">
-  <div class="hero-texture"></div>
-  <div class="hero-content">
-    <div class="hero-location">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-      <?= htmlspecialchars($hotel['location']) ?>
-    </div>
-    <div class="hero-stars"><?= stars($hotel['stars']) ?></div>
-    <h1 class="hero-name"><?= htmlspecialchars($hotel['name']) ?></h1>
-    <p class="hero-tagline"><?= htmlspecialchars($hotel['tagline']) ?></p>
-  </div>
-  <div class="hero-rating">
-    <div class="rating-number"><?= $hotel['rating'] ?></div>
-    <div class="rating-stars"><?= str_repeat('★', round($hotel['rating'])) ?></div>
-    <div class="rating-label"><?= number_format($hotel['reviews']) ?> reviews</div>
-  </div>
-</section>
-
-<!-- ── MAIN ── -->
-<div class="main">
-
-  <!-- LEFT COLUMN -->
-  <div class="left-col">
-
-    <!-- About -->
-    <div class="about-block">
-      <h2 class="section-title">About this hotel</h2>
-      <p class="about-text"><?= htmlspecialchars($hotel['description']) ?></p>
-      <div class="highlights">
-        <?php foreach ($hotel['highlights'] as $h): ?>
-          <div class="highlight-item">
-            <div class="highlight-dot"></div>
-            <?= htmlspecialchars($h) ?>
-          </div>
-        <?php endforeach; ?>
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-texture"></div>
+    <div class="hero-content">
+      <div class="hero-location">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+          <circle cx="12" cy="9" r="2.5" />
+        </svg>
+        <?= htmlspecialchars($hotel['location']) ?>
       </div>
+      <div class="hero-stars"><?= stars($hotel['stars']) ?></div>
+      <h1 class="hero-name"><?= htmlspecialchars($hotel['name']) ?></h1>
+      <p class="hero-tagline"><?= htmlspecialchars($hotel['tagline']) ?></p>
     </div>
+    <div class="hero-rating">
+      <div class="rating-number"><?= $hotel['rating'] ?></div>
+      <div class="rating-stars"><?= str_repeat('★', round($hotel['rating'])) ?></div>
+      <div class="rating-label"><?= number_format($hotel['reviews']) ?> reviews</div>
+    </div>
+  </section>
 
-    <!-- Amenities -->
-    <div class="amenities-block">
-      <h2 class="section-title">What's included</h2>
-      <div class="amenities-grid">
-        <?php foreach ($hotel['amenities'] as $am): ?>
-          <div class="amenity-tag">
-            <div class="amenity-check">✓</div>
-            <?= htmlspecialchars($am) ?>
-          </div>
-        <?php endforeach; ?>
+  <!-- ── MAIN ── -->
+  <div class="main">
+
+    <!-- LEFT COLUMN -->
+    <div class="left-col">
+
+      <!-- About -->
+      <div class="about-block">
+        <h2 class="section-title">About this hotel</h2>
+        <p class="about-text"><?= htmlspecialchars($hotel['description']) ?></p>
+        <div class="highlights">
+          <?php foreach (($hotel['highlights'] ?? []) as $h): ?>
+            <div class="highlight-item">
+              <div class="highlight-dot"></div>
+              <?= htmlspecialchars($h) ?>
+            </div>
+          <?php endforeach; ?>
+        </div>
       </div>
-    </div>
 
-    <!-- Room Selection -->
-    <div class="rooms-block">
-      <h2 class="section-title">Choose your room</h2>
-      <div class="room-list">
-        <?php foreach ($hotel['rooms'] as $i => $room): ?>
-          <div class="room-card" onclick="selectRoom(this, <?= $i ?>, '<?= htmlspecialchars(addslashes($room['type'])) ?>', <?= $room['price'] ?>)">
-            <div class="room-info">
+      <!-- Amenities -->
+      <div class="amenities-block">
+        <h2 class="section-title">What's included</h2>
+        <div class="amenities-grid">
+          <?php foreach (($hotel['amenities'] ?? []) as $am): ?>
+            <div class="amenity-tag">
+              <div class="amenity-check">✓</div>
+              <?= htmlspecialchars($am) ?>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+
+      <!-- Room Selection -->
+      <div class="rooms-block">
+        <h2 class="section-title">Choose your room</h2>
+        <div class="room-list">
+          <?php foreach (($hotel['rooms'] ?? []) as $i => $room): ?>
+            <div class="room-card" onclick='selectRoom(this, <?= $i ?>, <?= json_encode($room["type"], JSON_HEX_APOS | JSON_HEX_QUOT) ?>, <?= (int)$room["price"] ?>)'
+              <div class="room-info">
               <div class="room-type"><?= htmlspecialchars($room['type']) ?></div>
               <div class="room-meta">
                 <span>🛏 <?= htmlspecialchars($room['beds']) ?></span>
@@ -880,8 +377,8 @@ function stars(int $n): string {
               <div class="room-price">₱<?= number_format($room['price']) ?></div>
               <div class="room-per">/ night</div>
             </div>
-          </div>
-        <?php endforeach; ?>
+        </div>
+      <?php endforeach; ?>
       </div>
     </div>
 
@@ -889,13 +386,13 @@ function stars(int $n): string {
     <div class="reviews-block">
       <h2 class="section-title">Guest reviews</h2>
       <div class="reviews-summary">
-        <div class="rs-number"><?= $hotel['rating'] ?></div>
+        <div class="rs-number"><?= $hotel['rating'] ?? 0 ?></div>
         <div>
-          <div class="rs-stars"><?= str_repeat('★', round($hotel['rating'])) ?><?= str_repeat('☆', 5 - round($hotel['rating'])) ?></div>
+          <div class="rs-stars"><?= stars($hotel['rating'] ?? 0) ?></div>
           <div style="font-size:.9rem; font-weight:600; color:var(--deep);">
-            <?= $hotel['rating'] >= 4.8 ? 'Exceptional' : ($hotel['rating'] >= 4.5 ? 'Excellent' : 'Very Good') ?>
+            <?= ($hotel['rating'] ?? 0) >= 4.8 ? 'Exceptional' : (($hotel['rating'] ?? 0) >= 4.5 ? 'Excellent' : 'Very Good') ?>
           </div>
-          <div class="rs-count"><?= number_format($hotel['reviews']) ?> verified reviews</div>
+          <div class="rs-count"><?= number_format($hotel['reviews'] ?? 0) ?> verified reviews</div>
         </div>
       </div>
       <!-- Static sample reviews (in real system: from DB) -->
@@ -904,7 +401,10 @@ function stars(int $n): string {
         <p class="rc-text">"Absolutely loved our stay here. The staff were incredibly welcoming, the room was spotless, and the location couldn't have been more convenient for our trip. Would definitely book again!"</p>
         <div class="rc-author">
           <div class="rc-avatar">MR</div>
-          <div><div class="rc-name">Maria Reyes</div><div class="rc-date">May 2025</div></div>
+          <div>
+            <div class="rc-name">Maria Reyes</div>
+            <div class="rc-date">May 2025</div>
+          </div>
         </div>
       </div>
       <div class="review-card">
@@ -912,7 +412,10 @@ function stars(int $n): string {
         <p class="rc-text">"Great value for the price. Check-in was smooth, beds were super comfortable, and we slept like logs after a long day of exploring. The breakfast was a nice bonus."</p>
         <div class="rc-author">
           <div class="rc-avatar">JL</div>
-          <div><div class="rc-name">James Lim</div><div class="rc-date">April 2025</div></div>
+          <div>
+            <div class="rc-name">James Lim</div>
+            <div class="rc-date">April 2025</div>
+          </div>
         </div>
       </div>
     </div>
@@ -942,11 +445,11 @@ function stars(int $n): string {
         <div class="bk-dates">
           <div class="bk-field">
             <label>Check-in</label>
-            <input type="date" id="checkIn" onchange="calcTotal()"/>
+            <input type="date" id="checkIn" onchange="calcTotal()" />
           </div>
           <div class="bk-field">
             <label>Check-out</label>
-            <input type="date" id="checkOut" onchange="calcTotal()"/>
+            <input type="date" id="checkOut" onchange="calcTotal()" />
           </div>
         </div>
 
@@ -996,110 +499,118 @@ function stars(int $n): string {
     </div>
   </div>
 
-</div><!-- /main -->
+  </div><!-- /main -->
 
-<!-- ── CONFIRMATION MODAL ── -->
-<div class="modal-backdrop" id="confirmModal">
-  <div class="modal-box">
-    <div class="modal-check">✅</div>
-    <div class="modal-title">Booking Confirmed!</div>
-    <p class="modal-sub">Your reservation at <strong><?= htmlspecialchars($hotel['name']) ?></strong> has been received. A confirmation will be sent to your email.</p>
-    <div class="modal-details" id="modalDetails"></div>
-    <button class="modal-close-btn" onclick="document.getElementById('confirmModal').classList.remove('open')">Back to Hotel →</button>
+  <!-- ── CONFIRMATION MODAL ── -->
+  <div class="modal-backdrop" id="confirmModal">
+    <div class="modal-box">
+      <div class="modal-check">✅</div>
+      <div class="modal-title">Booking Confirmed!</div>
+      <p class="modal-sub">Your reservation at <strong><?= htmlspecialchars($hotel['name']) ?></strong> has been received. A confirmation will be sent to your email.</p>
+      <div class="modal-details" id="modalDetails"></div>
+      <button class="modal-close-btn" onclick="document.getElementById('confirmModal').classList.remove('open')">Back to Hotel →</button>
+    </div>
   </div>
-</div>
 
-<script>
-  // ── STATE ──────────────────────────────────────────────────────
-  let selectedRoomPrice = <?= $hotel['price'] ?>;
-  let selectedRoomIndex = -1;
+  <script>
+    // ── STATE ──────────────────────────────────────────────────────
+    let selectedRoomPrice = <?= $hotel['price'] ?>;
+    let selectedRoomIndex = -1;
 
-  const roomData = <?= json_encode(array_values($hotel['rooms'])) ?>;
+    const roomData = <?= json_encode(array_values($hotel['rooms'] ?? [])) ?>;
 
-  // ── SET DEFAULT DATES ──────────────────────────────────────────
-  (function() {
-    const today = new Date();
-    const tom   = new Date(today); tom.setDate(tom.getDate() + 1);
-    const atot  = new Date(today); atot.setDate(atot.getDate() + 3);
-    document.getElementById('checkIn').value  = tom.toISOString().slice(0,10);
-    document.getElementById('checkOut').value = atot.toISOString().slice(0,10);
-    calcTotal();
-  })();
+    // ── SET DEFAULT DATES ──────────────────────────────────────────
+    (function() {
+      const today = new Date();
+      const tom = new Date(today);
+      tom.setDate(tom.getDate() + 1);
+      const atot = new Date(today);
+      atot.setDate(atot.getDate() + 3);
+      document.getElementById('checkIn').value = tom.toISOString().slice(0, 10);
+      document.getElementById('checkOut').value = atot.toISOString().slice(0, 10);
+      calcTotal();
+    })();
 
-  // ── SELECT ROOM (from left column cards) ──────────────────────
-  function selectRoom(card, idx, name, price) {
-    document.querySelectorAll('.room-card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-    selectedRoomIndex = idx;
-    selectedRoomPrice = price;
+    // ── SELECT ROOM (from left column cards) ──────────────────────
+    function selectRoom(card, idx, name, price) {
+      document.querySelectorAll('.room-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedRoomIndex = idx;
+      selectedRoomPrice = price;
 
-    // update pill
-    const pill = document.getElementById('selectedRoomPill');
-    document.getElementById('selectedRoomName').textContent = name;
-    pill.classList.add('visible');
+      // update pill
+      const pill = document.getElementById('selectedRoomPill');
+      document.getElementById('selectedRoomName').textContent = name;
+      pill.classList.add('visible');
 
-    // sync sidebar dropdown
-    document.getElementById('roomSelect').value = idx;
-    calcTotal();
-  }
+      // sync sidebar dropdown
+      document.getElementById('roomSelect').value = idx;
+      calcTotal();
+    }
 
-  // ── SYNC ROOM FROM SIDEBAR DROPDOWN ───────────────────────────
-  function syncRoomFromSelect() {
-    const sel = document.getElementById('roomSelect');
-    const idx = parseInt(sel.value);
-    if (isNaN(idx)) return;
-    const room = roomData[idx];
-    selectedRoomIndex = idx;
-    selectedRoomPrice = room.price;
+    // ── SYNC ROOM FROM SIDEBAR DROPDOWN ───────────────────────────
+    function syncRoomFromSelect() {
+      const sel = document.getElementById('roomSelect');
+      const idx = parseInt(sel.value);
+      if (isNaN(idx)) return;
+      const room = roomData[idx];
+      selectedRoomIndex = idx;
+      selectedRoomPrice = room.price;
 
-    // update pill
-    document.getElementById('selectedRoomName').textContent = room.type;
-    document.getElementById('selectedRoomPill').classList.add('visible');
+      // update pill
+      document.getElementById('selectedRoomName').textContent = room.type;
+      document.getElementById('selectedRoomPill').classList.add('visible');
 
-    // highlight card
-    document.querySelectorAll('.room-card').forEach((c, i) => {
-      c.classList.toggle('selected', i === idx);
-    });
-    calcTotal();
-  }
+      // highlight card
+      document.querySelectorAll('.room-card').forEach((c, i) => {
+        c.classList.toggle('selected', i === idx);
+      });
+      calcTotal();
+    }
 
-  // ── CALCULATE TOTAL ────────────────────────────────────────────
-  function calcTotal() {
-    const ci = document.getElementById('checkIn').value;
-    const co = document.getElementById('checkOut').value;
-    if (!ci || !co) return;
+    // ── CALCULATE TOTAL ────────────────────────────────────────────
+    function calcTotal() {
+      const ci = document.getElementById('checkIn').value;
+      const co = document.getElementById('checkOut').value;
+      if (!ci || !co) return;
 
-    const nights = Math.max(0, (new Date(co) - new Date(ci)) / 864e5);
-    if (nights <= 0) return;
+      const nights = Math.max(0, (new Date(co) - new Date(ci)) / 864e5);
+      if (nights <= 0) return;
 
-    const base  = selectedRoomPrice * nights;
-    const tax   = Math.round(base * 0.12);
-    const total = base + tax;
+      const base = selectedRoomPrice * nights;
+      const tax = Math.round(base * 0.12);
+      const total = base + tax;
 
-    document.getElementById('totalRoomLine').textContent =
-      `₱${selectedRoomPrice.toLocaleString()} × ${nights} night${nights !== 1 ? 's' : ''}`;
-    document.getElementById('totalRoomCost').textContent = `₱${base.toLocaleString()}`;
-    document.getElementById('totalTax').textContent      = `₱${tax.toLocaleString()}`;
-    document.getElementById('totalGrand').textContent    = `₱${total.toLocaleString()}`;
+      document.getElementById('totalRoomLine').textContent =
+        `₱${selectedRoomPrice.toLocaleString()} × ${nights} night${nights !== 1 ? 's' : ''}`;
+      document.getElementById('totalRoomCost').textContent = `₱${base.toLocaleString()}`;
+      document.getElementById('totalTax').textContent = `₱${tax.toLocaleString()}`;
+      document.getElementById('totalGrand').textContent = `₱${total.toLocaleString()}`;
 
-    document.getElementById('bkTotal').classList.add('visible');
-  }
+      document.getElementById('bkTotal').classList.add('visible');
+    }
 
-  // ── BOOK NOW ───────────────────────────────────────────────────
-  function bookNow() {
-    const ci = document.getElementById('checkIn').value;
-    const co = document.getElementById('checkOut').value;
-    if (!ci || !co) { alert('Please select your check-in and check-out dates.'); return; }
-    if (selectedRoomIndex < 0) { alert('Please select a room type first.'); return; }
+    // ── BOOK NOW ───────────────────────────────────────────────────
+    function bookNow() {
+      const ci = document.getElementById('checkIn').value;
+      const co = document.getElementById('checkOut').value;
+      if (!ci || !co) {
+        alert('Please select your check-in and check-out dates.');
+        return;
+      }
+      if (selectedRoomIndex < 0) {
+        alert('Please select a room type first.');
+        return;
+      }
 
-    const nights = Math.max(0, (new Date(co) - new Date(ci)) / 864e5);
-    const base   = selectedRoomPrice * nights;
-    const tax    = Math.round(base * 0.12);
-    const room   = roomData[selectedRoomIndex];
-    const guests = document.getElementById('guestCount').value;
+      const nights = Math.max(0, (new Date(co) - new Date(ci)) / 864e5);
+      const base = selectedRoomPrice * nights;
+      const tax = Math.round(base * 0.12);
+      const room = roomData[selectedRoomIndex];
+      const guests = document.getElementById('guestCount').value;
 
-    document.getElementById('modalDetails').innerHTML = `
-      <div class="md-row"><span>Hotel</span><span><?= htmlspecialchars(addslashes($hotel['name'])) ?></span></div>
+      document.getElementById('modalDetails').innerHTML = `
+      <div class="md-row"><span>Hotel</span><span><?= htmlspecialchars(addslashes($hotel['name'] ?? '')) ?></span></div>
       <div class="md-row"><span>Room</span><span>${room.type}</span></div>
       <div class="md-row"><span>Check-in</span><span>${ci}</span></div>
       <div class="md-row"><span>Check-out</span><span>${co}</span></div>
@@ -1107,8 +618,9 @@ function stars(int $n): string {
       <div class="md-row"><span>Nights</span><span>${nights}</span></div>
       <div class="md-row"><span>Total (incl. tax)</span><span>₱${(base + tax).toLocaleString()}</span></div>
     `;
-    document.getElementById('confirmModal').classList.add('open');
-  }
-</script>
+      document.getElementById('confirmModal').classList.add('open');
+    }
+  </script>
 </body>
+
 </html>
