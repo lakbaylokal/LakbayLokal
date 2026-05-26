@@ -8,20 +8,33 @@ This project is currently in **early development stage**. Core structure and UI 
 
 ## 📌 Project Status
 
-### ✅ Completed / In Progress
-- Basic frontend UI (Landing Page)
-- Modular file structure (separated folders)
-- Destinations section (static UI)
-- Basic hotel listing (temporary data)
-- Navbar, Footer, and Search components separated
-- Admin folder structure created (dashboard UI placeholder)
+### 🔴 HIGH PRIORITY (Fixes / Core Functionality Issues)
+- Hotel click navigation issue (index.php → hotel details page not fully consistent across all hotel cards)
+- Destination system not functional yet (no proper filtering/navigation behavior for all pages)
+- Search functionality not working
 
-### 🚧 Not Yet Implemented
-- Login / Signup system (UI only or sample placeholder)
-- Database integration (still using static/sample data)
-- Hotel CRUD system
-- Destination management system
-- Booking system (not functional yet)
-- Dynamic itinerary saving
-- Admin authentication and authorization
+---
+
+### 🟡 MEDIUM PRIORITY (Main Feature Logic / System Behavior)
+- Destination behavior update:
+  - Clicking a location (e.g., Baguio) should filter and display only related hotels
+  - Other hotels should be hidden based on selected destination
+- Plan Trip system:
+  - Selecting a place should dynamically update available hotels and activities only
+- Hotel system improvement:
+  - Some hotels may include sample itineraries (lightweight version only if needed)
+- Booking system (not yet implemented)
+- Payment system (not yet implemented)
+- Database integration ongoing (partially implemented for auth module only)
+
+---
+
+### 🟢 LOW PRIORITY (UI / Design / Structural Improvements)
+- Hotel page UI issue (hotel.php CSS needs fixing)
+  - Use `hotel2.php` design as reference
+- Navbar / UI consistency improvements across pages
+- Modular file structure already implemented
+- Admin dashboard UI placeholder only
+- Basic frontend UI (Landing Page, Destinations, Hotels listing)
+- Footer and navigation components already separated
 
