@@ -20,7 +20,7 @@
   <h1>Discover the Beauty<br/>of <em>Pilipinas</em></h1>
   <p>Plan your perfect Philippine adventure — from Baguio's cool mountains to Boracay's white sand beaches. Book hotels, choose activities, create your itinerary.</p>
   <div class="hero-ctas">
-    <a href="#destinations" class="btn-primary">Explore Destinations</a>
+    <a href="#hotels" class="btn-primary">Explore Hotels</a>
     <a href="#itinerary" class="btn-outline-white">Plan My Trip</a>
   </div>
   <div class="hero-stats">
