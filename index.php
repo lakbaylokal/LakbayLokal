@@ -169,6 +169,7 @@ include_once 'includes/header.php';
 <!-- ======= ABOUT PAGE ======= -->
 <?php include 'components/about.php'; ?>
 
+<<<<<<< HEAD
 <!-- FOOTER -->
 <?php
 // 2. Isabit ang Footer at Scripts
@@ -178,6 +179,119 @@ include_once 'includes/footer.php';
 <!-- Inject PHP destination data into JS -->
 <script>
   const DESTINATIONS = <?= $destinationsJson ?>;
+=======
+    <!-- BAGUIO HOTELS -->
+    <div class="hotel-card" data-destination="baguio">
+      <div class="hotel-dest">📍 Baguio City</div>
+      <div class="hotel-name">Hotel Veniz</div>
+      <div class="hotel-stars">★★★☆☆</div>
+      <div class="hotel-price">₱1,800 <span>/ night</span></div>
+      <a href="hotel.php?id=hotel-veniz" class="btn-hotel">View Hotel →</a>
+    </div>
+    <div class="hotel-card" data-destination="baguio">
+      <div class="hotel-dest">📍 Baguio City</div>
+      <div class="hotel-name">The Manor at Camp John Hay</div>
+      <div class="hotel-stars">★★★★★</div>
+      <div class="hotel-price">₱8,500 <span>/ night</span></div>
+      <a href="hotel.php?id=the-manor" class="btn-hotel">View Hotel →</a>
+    </div>
+    <div class="hotel-card" data-destination="baguio">
+      <div class="hotel-dest">📍 Baguio City</div>
+      <div class="hotel-name">Microtel by Wyndham Baguio</div>
+      <div class="hotel-stars">★★★☆☆</div>
+      <div class="hotel-price">₱2,500 <span>/ night</span></div>
+      <a href="hotel.php?id=microtel-baguio" class="btn-hotel">View Hotel →</a>
+    </div>
+
+    <!-- BORACAY HOTELS -->
+    <div class="hotel-card" data-destination="boracay">
+      <div class="hotel-dest">📍 Boracay</div>
+      <div class="hotel-name">Henann Resort Boracay</div>
+      <div class="hotel-stars">★★★★★</div>
+      <div class="hotel-price">₱12,000 <span>/ night</span></div>
+      <a href="hotel.php?id=henann-resort" class="btn-hotel">View Hotel →</a>
+    </div>
+    <div class="hotel-card" data-destination="boracay">
+      <div class="hotel-dest">📍 Boracay</div>
+      <div class="hotel-name">Fairways & Bluewater</div>
+      <div class="hotel-stars">★★★★☆</div>
+      <div class="hotel-price">₱6,000 <span>/ night</span></div>
+      <a href="hotel.php?id=fairways-bluewater" class="btn-hotel">View Hotel →</a>
+    </div>
+    <div class="hotel-card" data-destination="boracay">
+      <div class="hotel-dest">📍 Boracay</div>
+      <div class="hotel-name">Boracay Budget Inn</div>
+      <div class="hotel-stars">★★☆☆☆</div>
+      <div class="hotel-price">₱1,200 <span>/ night</span></div>
+      <a href="hotel.php?id=boracay-budget-inn" class="btn-hotel">View Hotel →</a>
+    </div>
+
+    <!-- CEBU HOTELS -->
+    <div class="hotel-card" data-destination="cebu">
+      <div class="hotel-dest">📍 Cebu City</div>
+      <div class="hotel-name">Radisson Blu Cebu</div>
+      <div class="hotel-stars">★★★★★</div>
+      <div class="hotel-price">₱9,000 <span>/ night</span></div>
+      <a href="hotel.php?id=radisson-blu-cebu" class="btn-hotel">View Hotel →</a>
+    </div>
+    <div class="hotel-card" data-destination="cebu">
+      <div class="hotel-dest">📍 Cebu City</div>
+      <div class="hotel-name">Seda Ayala Center Cebu</div>
+      <div class="hotel-stars">★★★★☆</div>
+      <div class="hotel-price">₱5,500 <span>/ night</span></div>
+      <a href="hotel.php?id=seda-cebu" class="btn-hotel">View Hotel →</a>
+    </div>
+    <div class="hotel-card" data-destination="cebu">
+      <div class="hotel-dest">📍 Cebu City</div>
+      <div class="hotel-name">Harolds Evotel Cebu</div>
+      <div class="hotel-stars">★★★☆☆</div>
+      <div class="hotel-price">₱2,200 <span>/ night</span></div>
+      <a href="hotel.php?id=harolds-evotel" class="btn-hotel">View Hotel →</a>
+    </div>
+
+  </div>
+</section>
+
+<?php include 'includes/itinerary.php'; ?>
+
+<!-- ── REVIEWS ── -->
+<section class="reviews-section" id="reviews">
+  <div class="section-header">
+    <div class="section-tag">Traveler Stories</div>
+    <h2 class="section-title">What Travelers <em>Say</em></h2>
+  </div>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Baguio was absolutely magical! The strawberry farm tour was my favorite — fresh picks and amazing views. Lakbaylokal made the whole booking so easy."</p>
+      <div class="review-author">
+        <div class="review-avatar" style="background:var(--teal)">MR</div>
+        <div class="review-info"><strong>Maria Reyes</strong><span>Baguio City Trip · May 2025</span></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Boracay's White Beach is everything they say and more. Parasailing was a highlight! The itinerary builder helped me maximize every single day."</p>
+      <div class="review-author">
+        <div class="review-avatar" style="background:var(--ocean)">JC</div>
+        <div class="review-info"><strong>Juan Carlos</strong><span>Boracay Trip · March 2025</span></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★☆</div>
+      <p class="review-text">"Cebu canyoneering was a life experience. Loved how the platform showed me all activities nearby the hotel I picked. Super convenient!"</p>
+      <div class="review-author">
+        <div class="review-avatar" style="background:var(--coral)">AL</div>
+        <div class="review-info"><strong>Ana Lim</strong><span>Cebu Trip · April 2025</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<?php include 'includes/footer.php'; ?>
+
+<script src="assets/script.js">
+>>>>>>> 4f0fdfbef158114ac38cdd496c925c5d2650c1c2
 </script>
 <script src="assets/script.js"></script>
 </body>
