@@ -25,11 +25,6 @@
       <p>Safe online reservations with instant email confirmations and booking history.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon" style="background:var(--primary-pale);"><span>💰</span></div>
-      <h3>Transparent Pricing</h3>
-      <p>No hidden fees. See the full cost before you confirm — base package plus chosen add-ons.</p>
-    </div>
-    <div class="feature-card">
       <div class="feature-icon" style="background:var(--accent-pale);"><span>🇵🇭</span></div>
       <h3>Promote Local Tourism</h3>
       <p>Every booking supports local hotels, guides, and businesses across the Philippines.</p>
