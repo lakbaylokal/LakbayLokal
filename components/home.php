@@ -1,51 +1,5 @@
-<?php
-// index.php — LakbayLokal main entry point
-require_once 'data.php';
-
-// Encode PHP destination data for use in JavaScript
-$destinationsJson = json_encode($destinations, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-
-include_once 'includes/header.php';
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LakbayLokal — Explore the Philippines</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css">
-</head>
-<body>
-
-<!-- NAV
-<nav>
-  <div class="nav-logo" onclick="showPage('home')">Lakbay<span>Lokal</span></div>
-  <ul class="nav-links">
-    <li><a onclick="showPage('home')" id="nav-home" class="active">Home</a></li>
-    <li><a onclick="showPage('destinations')" id="nav-destinations">Destinations</a></li>
-    <li><a onclick="showPage('about')" id="nav-about">About</a></li>
-    <li><a onclick="showPage('dashboard')" id="nav-dashboard">My Trips</a></li>
-  </ul>
-  <button class="nav-cta" onclick="showPage('destinations')">Book Now</button>
-  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
-<div class="mobile-menu" id="mobileMenu">
-  <a onclick="showPage('home');closeMenu()">Home</a>
-  <a onclick="showPage('destinations');closeMenu()">Destinations</a>
-  <a onclick="showPage('about');closeMenu()">About</a>
-  <a onclick="showPage('dashboard');closeMenu()">My Trips</a>
-</div>
-
-<!-- TOAST -->
-<!-- <div class="toast" id="toast">Booking confirmed! 🎉</div> -->
-
-<!-- ======= HOME PAGE ======= -->
-<!-- <div class="page active" id="page-home"> -->
-  <!-- <section class="hero">
+<div class="page active" id="page-home">
+  <section class="hero">
     <div class="hero-content">
       <span class="hero-tag">🇵🇭 Your Philippine Journey Starts Here</span>
       <h1>Discover the <em>Beauty</em> of the Philippines</h1>
@@ -62,8 +16,8 @@ include_once 'includes/header.php';
         <div class="stat-item"><div class="stat-num">30+</div><div class="stat-label">Activities</div></div>
         <div class="stat-item"><div class="stat-num">100%</div><div class="stat-label">Local Picks</div></div>
       </div>
-    </div> -->
-<!-- 
+    </div>
+
     <div class="hero-visual">
       <div class="hero-card">
         <div style="height:130px;background:linear-gradient(135deg,#8ECAC0,#2E6B4F);display:flex;align-items:center;justify-content:center;font-size:3.5rem;">🏄</div>
@@ -82,10 +36,10 @@ include_once 'includes/header.php';
         </div>
       </div>
     </div>
-  </section> -->
+  </section>
 
   <!-- SEARCH -->
-  <!-- <div class="search-section">
+  <div class="search-section">
     <div class="search-group">
       <label>Destination</label>
       <select id="homeSearchDest">
@@ -109,19 +63,19 @@ include_once 'includes/header.php';
       <input type="date" id="homeCheckin">
     </div>
     <button class="search-btn" onclick="doSearch()">🔍 Search Packages</button>
-  </div> -->
+  </div>
 
   <!-- FEATURED DESTINATIONS -->
-  <!-- <section class="section">
+  <section class="section">
     <div class="section-header">
       <h2 class="section-title">Featured <span>Destinations</span></h2>
       <button class="see-all" onclick="showPage('destinations')">See all →</button>
     </div>
     <div class="dest-grid" id="featuredGrid"></div>
-  </section> -->
+  </section>
 
   <!-- WHY SECTION -->
-  <!-- <section class="section" style="background:white;padding-top:3rem;padding-bottom:3rem;">
+  <section class="section" style="background:white;padding-top:3rem;padding-bottom:3rem;">
     <div class="section-header">
       <h2 class="section-title">Why <span>LakbayLokal?</span></h2>
     </div>
@@ -148,37 +102,4 @@ include_once 'includes/header.php';
       </div>
     </div>
   </section>
-</div> -->
-
-<?php include 'components/home.php'; ?>
-
-<!-- ======= DESTINATIONS PAGE ======= -->
-<?php include 'components/destinations.php'; ?>
-
-
-
-<!-- ======= DESTINATION DETAIL PAGE ======= -->
-<?php include 'components/detail.php'; ?>
-
-<!-- ======= CONFIRMATION PAGE ======= -->
-<?php include 'components/confirm.php'; ?>
-
-<!-- ======= DASHBOARD PAGE ======= -->
-<?php include 'components/dashboard.php'; ?>
-
-<!-- ======= ABOUT PAGE ======= -->
-<?php include 'components/about.php'; ?>
-
-<!-- FOOTER -->
-<?php
-// 2. Isabit ang Footer at Scripts
-include_once 'includes/footer.php';
-?>
-
-<!-- Inject PHP destination data into JS -->
-<script>
-  const DESTINATIONS = <?= $destinationsJson ?>;
-</script>
-<script src="assets/script.js"></script>
-</body>
-</html>
+</div>

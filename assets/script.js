@@ -1,133 +1,243 @@
-  /* ── MODAL ── */
-  function openModal(tab) {
-    document.getElementById('authModal').classList.add('open');
-    switchTab(tab);
+// script.js — LakbayLokal frontend logic
+// Expects DESTINATIONS to be injected as a global variable from index.php
+
+let currentDest = null;
+let selectedHotel = null;
+let checkedActivities = new Set();
+let bookings = [];
+let prevPage = 'destinations';
+
+/* ── PAGE NAVIGATION ── */
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + page);
+  if (navEl) navEl.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (page === 'dashboard') renderDashboard();
+}
+
+/* ── MOBILE MENU ── */
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+function closeMenu() {
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+
+/* ── RENDER DESTINATION CARD ── */
+function renderDestCard(d) {
+  return `
+    <div class="dest-card" onclick="openDest('${d.id}')">
+      <div class="dest-img" style="background:${d.gradient}">
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:4rem">${d.emoji}</div>
+        <div class="dest-badge">${d.region.charAt(0).toUpperCase() + d.region.slice(1)}</div>
+        <div class="dest-price-badge">from ₱${d.price.toLocaleString()}</div>
+      </div>
+      <div class="dest-body">
+        <h3>${d.name}</h3>
+        <div class="dest-meta">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+            <circle cx="12" cy="9" r="2.5"/>
+          </svg>
+          ${d.tagline}
+        </div>
+        <div class="dest-activities">
+          ${d.activities.map(a => `<span class="act-tag">${a}</span>`).join('')}
+        </div>
+        <div class="dest-footer">
+          <div class="dest-footer-price">Base: <strong>₱${d.price.toLocaleString()}</strong></div>
+          <button class="book-btn" onclick="event.stopPropagation();openDest('${d.id}')">Book Now</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ── RENDER GRIDS ── */
+function renderFeatured() {
+  const featured = DESTINATIONS.slice(0, 3);
+  document.getElementById('featuredGrid').innerHTML = featured.map(renderDestCard).join('');
+}
+
+function renderAll(list) {
+  document.getElementById('allDestGrid').innerHTML = (list || DESTINATIONS).map(renderDestCard).join('');
+}
+
+/* ── FILTER DESTINATIONS ── */
+function filterDest(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.style.background = 'white';
+    b.style.color = 'var(--muted)';
+    b.style.borderColor = 'var(--border)';
+  });
+  btn.style.background = 'var(--primary)';
+  btn.style.color = 'white';
+  btn.style.borderColor = 'var(--primary)';
+
+  let filtered;
+  if (type === 'all')          filtered = DESTINATIONS;
+  else if (type === 'low')     filtered = DESTINATIONS.filter(d => d.price < 5000);
+  else if (type === 'mid')     filtered = DESTINATIONS.filter(d => d.price >= 5000 && d.price <= 7500);
+  else if (type === 'high')    filtered = DESTINATIONS.filter(d => d.price > 7500);
+  else                         filtered = DESTINATIONS.filter(d => d.region === type);
+  renderAll(filtered);
+}
+
+/* ── HOME SEARCH ── */
+function doSearch() {
+  const dest   = document.getElementById('homeSearchDest').value.toLowerCase();
+  const budget = document.getElementById('homeSearchBudget').value;
+  let filtered = DESTINATIONS;
+  if (dest)              filtered = filtered.filter(d => d.name.toLowerCase().includes(dest));
+  if (budget === 'low')  filtered = filtered.filter(d => d.price < 5000);
+  else if (budget === 'mid')  filtered = filtered.filter(d => d.price >= 5000 && d.price <= 7000);
+  else if (budget === 'high') filtered = filtered.filter(d => d.price > 7000);
+  showPage('destinations');
+  setTimeout(() => { document.getElementById('allDestGrid').innerHTML = filtered.map(renderDestCard).join(''); }, 100);
+}
+
+/* ── OPEN DESTINATION DETAIL ── */
+function openDest(id) {
+  const d = DESTINATIONS.find(x => x.id === id);
+  currentDest = d;
+  selectedHotel = null;
+  checkedActivities = new Set();
+
+  document.getElementById('detailTitle').textContent = d.name;
+  document.getElementById('detailSub').textContent   = d.tagline;
+  document.getElementById('detailHero').style.background = d.gradient;
+
+  document.getElementById('hotelList').innerHTML = d.hotels.map((h, i) => `
+    <div class="hotel-item" id="hotel-${i}" onclick="selectHotel(${i},'${h.name.replace(/'/g, "\\'")}')">
+      <div>
+        <div class="hotel-name">${h.name}</div>
+        <a class="hotel-link" href="${h.url}" target="_blank" onclick="event.stopPropagation()">View Hotel Website ↗</a>
+      </div>
+      <div class="hotel-radio"></div>
+    </div>`).join('');
+
+  document.getElementById('activityList').innerHTML = d.acts.map((a, i) => `
+    <div class="activity-item" id="act-${i}" onclick="toggleAct(${i},'${a.name.replace(/'/g, "\\'")}',${a.price})">
+      <div>
+        <div class="activity-name">${a.name}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="activity-price">₱${a.price.toLocaleString()}</span>
+        <div class="activity-check"></div>
+      </div>
+    </div>`).join('');
+
+  updateBookingSummary();
+  prevPage = document.querySelector('.page.active')?.id?.replace('page-', '') || 'destinations';
+  showPage('detail');
+}
+
+/* ── HOTEL & ACTIVITY SELECTION ── */
+function selectHotel(i, name) {
+  selectedHotel = name;
+  document.querySelectorAll('.hotel-item').forEach(el => el.classList.remove('selected'));
+  document.getElementById('hotel-' + i).classList.add('selected');
+  updateBookingSummary();
+}
+
+function toggleAct(i, name, price) {
+  const el  = document.getElementById('act-' + i);
+  const key = name + '__' + price;
+  if (checkedActivities.has(key)) {
+    checkedActivities.delete(key);
+    el.classList.remove('checked');
+  } else {
+    checkedActivities.add(key);
+    el.classList.add('checked');
   }
-  function closeModal() { document.getElementById('authModal').classList.remove('open'); }
-  document.getElementById('authModal').addEventListener('click', function(e) { if(e.target===this) closeModal(); });
+  updateBookingSummary();
+}
 
-  function switchTab(tab) {
-    document.querySelectorAll('.modal-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
-    document.getElementById('loginForm').classList.toggle('active', tab==='login');
-    document.getElementById('registerForm').classList.toggle('active', tab==='register');
-  }
+/* ── BOOKING SUMMARY ── */
+function updateBookingSummary() {
+  if (!currentDest) return;
+  document.getElementById('bDest').textContent  = currentDest.name;
+  document.getElementById('bBase').textContent  = '₱' + currentDest.price.toLocaleString();
+  document.getElementById('bHotel').textContent = selectedHotel || 'Not selected';
+  const actList = [...checkedActivities];
+  document.getElementById('bActs').textContent  = actList.length ? actList.length + ' selected' : 'None';
+  const actTotal = actList.reduce((sum, k) => sum + parseInt(k.split('__')[1]), 0);
+  const total    = currentDest.price + actTotal;
+  document.getElementById('bTotal').textContent = '₱' + total.toLocaleString();
+}
 
-  /* ── DESTINATION FILTER ── */
-  function filterDest(region, btn) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.dest-card').forEach(card => {
-      card.style.display = (region === 'all' || card.dataset.region === region) ? '' : 'none';
-    });
-  }
+/* ── CONFIRM BOOKING ── */
+function confirmBooking() {
+  const name  = document.getElementById('guestName').value.trim();
+  const email = document.getElementById('guestEmail').value.trim();
+  const date  = document.getElementById('checkinDate').value;
 
-  /* ── SCROLL TO DEST ── */
-  function scrollToDestinations() { document.getElementById('destinations').scrollIntoView({behavior:'smooth'}); }
+  if (!name || !email)   { showToast('⚠️ Please fill in your name and email.'); return; }
+  if (!selectedHotel)    { showToast('⚠️ Please select a hotel.');               return; }
+  if (!date)             { showToast('⚠️ Please pick a check-in date.');          return; }
 
-  /* ── SELECT DEST ── */
-  function selectDest(name) {
-    const map = { 'Baguio City':'baguio', 'Boracay':'boracay', 'Cebu City':'cebu', 'Bukidnon':'bukidnon' };
-    const val = map[name];
-    if (val) {
-      document.getElementById('planDest').value = val;
-      updateHotels();
-    }
-    document.getElementById('itinerary').scrollIntoView({behavior:'smooth'});
-  }
+  const actTotal = [...checkedActivities].reduce((s, k) => s + parseInt(k.split('__')[1]), 0);
+  const total    = currentDest.price + actTotal;
 
-  /* ── HOTEL & ACTIVITY DATA ── */
-  const destData = {
-    baguio: {
-      hotels: [
-        {name:'Hotel Veniz', price:1800},
-        {name:'The Manor at Camp John Hay', price:8500},
-        {name:'Microtel by Wyndham', price:2500}
-      ],
-      activities: ['Burnham Park (Free)','Strawberry Farm (₱200)','Café Hopping (₱300)','Hiking/Trekking (₱500)','Botanical Garden (₱400)'],
-      actPrices: [0,200,300,500,400]
-    },
-    boracay: {
-      hotels: [
-        {name:'Henann Resort Boracay', price:12000},
-        {name:'Fairways & Bluewater', price:6000},
-        {name:'Boracay Budget Inn', price:1200}
-      ],
-      activities: ['Island Hopping (₱800)','Parasailing (₱1500)','Helmet Diving (₱1200)','ATV Ride (₱600)','Sunset Sailing (₱900)'],
-      actPrices: [800,1500,1200,600,900]
-    },
-    cebu: {
-      hotels: [
-        {name:'Radisson Blu Cebu', price:9000},
-        {name:'Seda Ayala Center Cebu', price:5500},
-        {name:'Harolds Evotel Cebu', price:2200}
-      ],
-      activities: ['Whale Shark Watching (₱1000)','Canyoneering (₱800)','Magellan\'s Cross (Free)','Temple of Leah (₱150)','Sinulog Museum (₱200)'],
-      actPrices: [1000,800,0,150,200]
-    },
-    bukidnon: {
-      hotels: [
-        {name:'Mallberry Suites', price:3500},
-        {name:'Dahilayan Forest Park', price:4200},
-        {name:'Citi Inn Bukidnon', price:1500}
-      ],
-      activities: ['Dahilayan Adventure Park (₱600)','Del Monte Pineapple Plantation (₱300)','Monastery of Transfiguration (Free)','Kampo Juan (₱200)','Impalutao Highland Resort (₱400)'],
-      actPrices: [600,300,0,200,400]
-    }
+  const booking = {
+    dest: currentDest.name,
+    hotel: selectedHotel,
+    date, name, email, total,
+    status: 'upcoming',
+    emoji: currentDest.emoji,
+    gradient: currentDest.gradient,
   };
+  bookings.unshift(booking);
 
-  let selectedActivities = {};
+  document.getElementById('cfDest').textContent  = booking.dest;
+  document.getElementById('cfHotel').textContent = booking.hotel;
+  document.getElementById('cfDate').textContent  = new Date(date).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' });
+  document.getElementById('cfName').textContent  = booking.name;
+  document.getElementById('cfTotal').textContent = '₱' + booking.total.toLocaleString();
 
-  function updateHotels() {
-    const dest = document.getElementById('planDest').value;
-    const hotelSel = document.getElementById('planHotel');
-    const actGrid = document.getElementById('activitiesGrid');
-    hotelSel.innerHTML = '<option value="">Select hotel...</option>';
-    selectedActivities = {};
-    if (!dest) { actGrid.innerHTML = ''; return; }
-    const d = destData[dest];
-    d.hotels.forEach((h,i) => {
-      hotelSel.innerHTML += `<option value="${h.price}">${h.name} — ₱${h.price.toLocaleString()}/night</option>`;
-    });
-    actGrid.innerHTML = d.activities.map((a,i) =>
-      `<div class="activity-check" onclick="toggleActivity(this,${d.actPrices[i]})"><div class="check-icon"></div> ${a}</div>`
-    ).join('');
-    updateSummary();
+  showPage('confirm');
+  showToast('Booking confirmed! 🎉');
+}
+
+/* ── DASHBOARD ── */
+function renderDashboard() {
+  document.getElementById('statTotal').textContent    = bookings.length;
+  document.getElementById('statUpcoming').textContent = bookings.filter(b => b.status === 'upcoming').length;
+  const spent = bookings.reduce((s, b) => s + b.total, 0);
+  document.getElementById('statSpent').textContent    = '₱' + spent.toLocaleString();
+
+  if (bookings.length === 0) {
+    document.getElementById('bookingsList').innerHTML = `
+      <div style="text-align:center;padding:3rem;color:var(--muted);">
+        <div style="font-size:3rem;margin-bottom:1rem;">🗺️</div>
+        <p>No bookings yet. <button onclick="showPage('destinations')" style="background:none;border:none;color:var(--primary);font-weight:600;cursor:pointer;font-size:inherit;">Explore destinations →</button></p>
+      </div>`;
+    return;
   }
+  document.getElementById('bookingsList').innerHTML = bookings.map(b => `
+    <div class="booking-card">
+      <div class="booking-dest-icon" style="background:${b.gradient};display:flex;align-items:center;justify-content:center;font-size:1.8rem">${b.emoji}</div>
+      <div class="booking-card-info">
+        <h4>${b.dest}</h4>
+        <p>${b.hotel} · ${new Date(b.date).toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' })}</p>
+        <p style="font-weight:700;color:var(--primary);margin-top:4px">₱${b.total.toLocaleString()}</p>
+      </div>
+      <span class="booking-status status-${b.status}">${b.status.charAt(0).toUpperCase() + b.status.slice(1)}</span>
+    </div>`).join('');
+}
 
-  function toggleActivity(el, price) {
-    el.classList.toggle('checked');
-    const key = el.textContent.trim();
-    if (el.classList.contains('checked')) selectedActivities[key] = price;
-    else delete selectedActivities[key];
-    updateSummary();
-  }
+/* ── UTILITIES ── */
+function goBack() { showPage(prevPage); }
 
-  function updateSummary() {
-    const dest = document.getElementById('planDest');
-    const hotel = document.getElementById('planHotel');
-    const ci = document.getElementById('planCheckIn').value;
-    const co = document.getElementById('planCheckOut').value;
-    if (!dest.value || !hotel.value || !ci || !co) {
-      document.getElementById('builderSummary').classList.remove('show');
-      return;
-    }
-    const nights = Math.max(0, (new Date(co)-new Date(ci))/(1000*60*60*24));
-    const hotelCost = parseInt(hotel.value) * nights;
-    const actCost = Object.values(selectedActivities).reduce((a,b)=>a+b,0);
-    const total = hotelCost + actCost;
-    const destNames = {baguio:'Baguio City',boracay:'Boracay',cebu:'Cebu City',bukidnon:'Bukidnon'};
-    document.getElementById('sumDest').textContent = destNames[dest.value] || '—';
-    document.getElementById('sumHotel').textContent = hotel.options[hotel.selectedIndex].text.split('—')[0].trim();
-    document.getElementById('sumDates').textContent = `${ci} → ${co}`;
-    document.getElementById('sumNights').textContent = nights + (nights===1?' night':' nights');
-    document.getElementById('sumHotelCost').textContent = '₱' + hotelCost.toLocaleString();
-    document.getElementById('sumActCost').textContent = '₱' + actCost.toLocaleString();
-    document.getElementById('sumTotal').textContent = '₱' + total.toLocaleString();
-    document.getElementById('builderSummary').classList.add('show');
-  }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
 
-  function confirmBooking() {
-    const dest = document.getElementById('planDest').value;
-    if (!dest) { alert('Please select a destination first!'); return; }
-    alert('✅ Booking confirmed! (This would redirect to the checkout/payment page in the full system.)');
-  }
+/* ── INIT ── */
+renderFeatured();
+renderAll();
