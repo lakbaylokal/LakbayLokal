@@ -49,7 +49,7 @@ function renderDestCard(d) {
         <div class="dest-activities">
           ${d.activities.map(a => `<span class="act-tag">${a}</span>`).join('')}
         </div>
-        <div class="dest-footer">
+        <div class="dest-">
           <div class="dest-footer-price">Base: <strong>₱${d.price.toLocaleString()}</strong></div>
           <button class="book-btn" onclick="event.stopPropagation();openDest('${d.id}')">Book Now</button>
         </div>

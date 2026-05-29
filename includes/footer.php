@@ -2,7 +2,7 @@
   <div class="footer-grid">
     <div class="footer-brand">
       <h3>Lakbay<span>Lokal</span></h3>
-      <p>A hotel booking platform with curated travel itineraries across the Philippines. Plan your perfect trip in minutes.</p>
+      <p>Discover the heartbeat of the Philippines. We combine curated, local-first itineraries with seamless hotel bookings to help you plan, customize, and experience your perfect tropical getaway in minutes.</p>
     </div>
     <div class="footer-col">
       <h4>Destinations</h4>
