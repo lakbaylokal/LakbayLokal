@@ -288,6 +288,26 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
   appearance: none;
   background: var(--cream);
 }
+.input-with-prefix {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.input-prefix {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.65rem 0.8rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--cream);
+  color: var(--deep);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.input-with-prefix input {
+  flex: 1;
+  min-width: 0;
+}
 .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
 .book-now-btn {
   background: var(--primary); color: white;
@@ -302,6 +322,74 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .book-now-btn:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(196,96,42,0.3); }
 
 /* CONFIRMATION */
+.payment-page {
+  min-height: 80vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 4rem 5%;
+}
+.payment-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 3rem;
+  max-width: 520px; width: 100%;
+  box-shadow: var(--shadow-hover);
+  border: 1px solid var(--border);
+}
+.payment-card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+.payment-card p {
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+.payment-form {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.payment-form input {
+  width: 100%;
+}
+.payment-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1rem 0 0.5rem;
+}
+.payment-method {
+  flex: 1 1 160px;
+  min-width: 160px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.payment-method strong {
+  font-weight: 700;
+}
+.payment-method span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.payment-method:hover {
+  border-color: var(--primary);
+}
+.payment-method.selected {
+  border-color: var(--primary);
+  background: var(--primary-pale);
+}
+#payNowBtn {
+  width: 100%;
+  margin-top: 0.5rem;
+}
 .confirm-page {
   min-height: 80vh;
   display: flex; align-items: center; justify-content: center;

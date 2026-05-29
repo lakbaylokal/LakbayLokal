@@ -29,6 +29,9 @@ include_once 'includes/header.php';
 <!-- ======= DESTINATION DETAIL PAGE ======= -->
 <?php include 'components/detail.php'; ?>
 
+<!-- ======= PAYMENT PAGE ======= -->
+<?php include 'components/payment.php'; ?>
+
 <!-- ======= CONFIRMATION PAGE ======= -->
 <?php include 'components/confirm.php'; ?>
 

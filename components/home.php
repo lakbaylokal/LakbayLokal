@@ -1,8 +1,16 @@
-<div class="page active" id="page-home">
-  <section class="hero">
-    <div class="hero-content">
-      <span class="hero-tag">🇵🇭 Your Philippine Journey Starts Here</span>
-      <h1>Discover the <em>Beauty</em> of the Philippines</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LakbayLokal</title>
+</head>
+<body>
+  <div class="page active" id="page-home">
+    <section class="hero">
+      <div class="hero-content">
+        <span class="hero-tag">🇵🇭 Your Philippine Journey Starts Here</span>
+        <h1>Discover the <em>Beauty</em> of the Philippines</h1>
       <p>Handpicked hotel stays paired with unforgettable local activities — all in one seamless booking platform.</p>
       <div class="hero-btns">
         <button class="btn-primary" onclick="showPage('destinations')">
@@ -25,7 +33,12 @@
       <label>Destination</label>
       <select id="homeSearchDest">
         <option value="">All Destinations</option>
-        <?php foreach ($destinations as $d): ?>
+        <?php
+          if (!isset($destinations) || !is_array($destinations)) {
+            $destinations = [];
+          }
+          foreach ($destinations as $d):
+        ?>
           <option><?= htmlspecialchars($d['name']) ?></option>
         <?php endforeach; ?>
       </select>

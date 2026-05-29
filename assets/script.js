@@ -5,7 +5,9 @@ let currentDest = null;
 let selectedHotel = null;
 let checkedActivities = new Set();
 let bookings = [];
-let prevPage = 'destinations';
+let pendingBooking = null;
+let selectedPaymentMethod = null;
+let prevPage = (document.querySelector('.page.active')?.id?.replace('page-', '')) || 'destinations';
 
 /* ── PAGE NAVIGATION ── */
 function showPage(page) {
@@ -181,24 +183,143 @@ function confirmBooking() {
   const actTotal = [...checkedActivities].reduce((s, k) => s + parseInt(k.split('__')[1]), 0);
   const total    = currentDest.price + actTotal;
 
-  const booking = {
+  pendingBooking = {
     dest: currentDest.name,
     hotel: selectedHotel,
-    date, name, email, total,
+    date,
+    name,
+    email,
+    total,
     status: 'upcoming',
     emoji: currentDest.emoji,
     gradient: currentDest.gradient,
   };
-  bookings.unshift(booking);
 
-  document.getElementById('cfDest').textContent  = booking.dest;
-  document.getElementById('cfHotel').textContent = booking.hotel;
-  document.getElementById('cfDate').textContent  = new Date(date).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' });
-  document.getElementById('cfName').textContent  = booking.name;
-  document.getElementById('cfTotal').textContent = '₱' + booking.total.toLocaleString();
+  renderPaymentDetails();
+  showPage('payment');
+}
 
+function renderPaymentDetails() {
+  if (!pendingBooking) return;
+  selectedPaymentMethod = null;
+  document.getElementById('payDest').textContent  = pendingBooking.dest;
+  document.getElementById('payHotel').textContent = pendingBooking.hotel;
+  document.getElementById('payDate').textContent  = new Date(pendingBooking.date).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' });
+  document.getElementById('payName').textContent  = pendingBooking.name;
+  document.getElementById('payTotal').textContent = '₱' + pendingBooking.total.toLocaleString();
+  document.getElementById('cardNumber').value = '';
+  document.getElementById('cardExpiry').value = '';
+  document.getElementById('cardCvv').value = '';
+  document.getElementById('gcashMobile').value = '';
+  document.getElementById('gcashRef').value = '';
+  document.getElementById('cardPaymentFields').style.display = 'none';
+  document.getElementById('gcashPaymentFields').style.display = 'none';
+  document.getElementById('method-gcash').classList.remove('selected');
+  document.getElementById('method-card').classList.remove('selected');
+  const payBtn = document.getElementById('payNowBtn');
+  payBtn.disabled = false;
+  payBtn.textContent = 'Pay Now';
+}
+
+function selectPaymentMethod(method) {
+  selectedPaymentMethod = method;
+  document.getElementById('method-gcash').classList.toggle('selected', method === 'gcash');
+  document.getElementById('method-card').classList.toggle('selected', method === 'card');
+  document.getElementById('gcashPaymentFields').style.display = method === 'gcash' ? 'flex' : 'none';
+  document.getElementById('cardPaymentFields').style.display = method === 'card' ? 'flex' : 'none';
+  const payBtn = document.getElementById('payNowBtn');
+  payBtn.textContent = method === 'gcash' ? 'Pay with GCash' : 'Pay with Card';
+}
+
+function formatGcashMobile(input) {
+  const digits = input.value.replace(/\D/g, '').slice(0, 10);
+  const parts = [];
+  if (digits.length > 0) parts.push(digits.substring(0, Math.min(3, digits.length)));
+  if (digits.length > 3) parts.push(digits.substring(3, Math.min(6, digits.length)));
+  if (digits.length > 6) parts.push(digits.substring(6, 10));
+  input.value = parts.join(' ');
+}
+
+function formatCardNumber(input) {
+  const digits = input.value.replace(/\D/g, '').slice(0, 16);
+  const groups = [];
+  for (let i = 0; i < digits.length; i += 4) {
+    groups.push(digits.substring(i, i + 4));
+  }
+  input.value = groups.join(' ');
+}
+
+function processPayment() {
+  if (!selectedPaymentMethod) {
+    showToast('⚠️ Please select a payment method.');
+    return;
+  }
+
+  if (selectedPaymentMethod === 'card') {
+    const cardNumber = document.getElementById('cardNumber').value.trim();
+    const cardExpiry = document.getElementById('cardExpiry').value.trim();
+    const cardCvv    = document.getElementById('cardCvv').value.trim();
+
+    if (!cardNumber || !cardExpiry || !cardCvv) {
+      showToast('⚠️ Please enter your card details.');
+      return;
+    }
+
+    pendingBooking.paymentInfo = {
+      method: 'Card',
+      label: `Card ending ${cardNumber.replace(/\s+/g, '').slice(-4)}`,
+      details: cardExpiry,
+    };
+  }
+
+  if (selectedPaymentMethod === 'gcash') {
+    const gcashMobile = document.getElementById('gcashMobile').value.trim();
+    const gcashRef = document.getElementById('gcashRef').value.trim();
+
+    if (!gcashMobile || !gcashRef) {
+      showToast('⚠️ Please enter your GCash mobile and reference.');
+      return;
+    }
+
+    pendingBooking.paymentInfo = {
+      method: 'GCash',
+      label: `GCash ${gcashMobile}`,
+      details: gcashRef,
+    };
+  }
+
+  const payBtn = document.getElementById('payNowBtn');
+  payBtn.disabled = true;
+  payBtn.textContent = 'Processing…';
+
+  setTimeout(() => {
+    finalizeBooking();
+  }, 1400);
+}
+
+function finalizeBooking() {
+  if (!pendingBooking) return;
+
+  pendingBooking.paymentMethod = selectedPaymentMethod || 'Card';
+  bookings.unshift(pendingBooking);
+
+  document.getElementById('cfDest').textContent  = pendingBooking.dest;
+  document.getElementById('cfHotel').textContent = pendingBooking.hotel;
+  document.getElementById('cfDate').textContent  = new Date(pendingBooking.date).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' });
+  document.getElementById('cfName').textContent  = pendingBooking.name;
+  document.getElementById('cfMethod').textContent = pendingBooking.paymentInfo?.method || pendingBooking.paymentMethod;
+  document.getElementById('cfTotal').textContent = '₱' + pendingBooking.total.toLocaleString();
+
+  if (pendingBooking.paymentInfo?.details) {
+    document.getElementById('cfPaymentRef').textContent = pendingBooking.paymentInfo.details;
+    document.getElementById('cfPaymentRefRow').style.display = 'flex';
+  } else {
+    document.getElementById('cfPaymentRefRow').style.display = 'none';
+  }
+
+  pendingBooking = null;
   showPage('confirm');
-  showToast('Booking confirmed! 🎉');
+  showToast('Payment successful! 🎉');
 }
 
 /* ── DASHBOARD ── */
@@ -241,3 +362,14 @@ function showToast(msg) {
 /* ── INIT ── */
 renderFeatured();
 renderAll();
+// Ensure the navbar reflects the currently visible page on initial load
+function syncNavWithPage() {
+  const activePageEl = document.querySelector('.page.active');
+  if (!activePageEl) return;
+  const pageName = activePageEl.id.replace('page-', '');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + pageName);
+  if (navEl) navEl.classList.add('active');
+}
+
+syncNavWithPage();

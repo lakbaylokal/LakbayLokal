@@ -13,7 +13,7 @@
 <nav>
   <div class="nav-logo" onclick="showPage('home')">Lakbay<span>Lokal</span></div>
   <ul class="nav-links">
-    <li><a onclick="showPage('home')" id="nav-home" class="active">Home</a></li>
+    <li><a onclick="showPage('home')" id="nav-home">Home</a></li>
     <li><a onclick="showPage('destinations')" id="nav-destinations">Destinations</a></li>
     <li><a onclick="showPage('about')" id="nav-about">About</a></li>
     <li><a onclick="showPage('dashboard')" id="nav-dashboard">My Trips</a></li>

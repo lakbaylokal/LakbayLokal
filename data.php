@@ -103,7 +103,9 @@ $destinations = [
     'desc' => "Ride the world-famous Cloud 9 waves, hop between pristine islands, and soak in Siargao's laid-back surf culture.",
     'activities' => ['Surfing', 'Island Hopping', 'Bike Rides'],
     'hotels' => [
-      ['name' => 'View available hotels in Siargao', 'url' => 'https://www.booking.com/searchresults.en-gb.html?ss=Siargao'],
+      ['name' => 'Villa Cali', 'url' => 'https://www.agoda.com/villa-cali-siargao-h14430666/hotel/siargao-islands-ph.html'],
+      ['name' => 'Nay Palad Hideaway', 'url' => 'Nay Palad Hideaway https://share.google/WOJEgaWlxiFShVRrq'],
+      ['name' => 'Kalinaw Resort', 'url' => 'Kalinaw Resort https://share.google/SHtuwjO3x1VlpZjSN'],
     ],
     'acts' => [
       ['name' => 'Island Hopping',            'price' => 2500],
@@ -119,7 +121,9 @@ $destinations = [
     'desc' => "Experience the longest zipline in Asia, ATV rides through highland meadows, and the cool breeze of Mindanao's highlands.",
     'activities' => ['Zipline', 'ATV', 'DropZone'],
     'hotels' => [
-      ['name' => 'View available hotels in Bukidnon', 'url' => 'https://www.booking.com/searchresults.en-gb.html?ss=Bukidnon'],
+      ['name' => 'Dahilayan Forest Park Resort', 'url' => 'http://www.dahilayanforestpark.com/en/'],
+      ['name' => 'Ultrawinds Mountain Resort', 'url' => 'https://www.ultrawindsresort.com/'],
+      ['name' => 'Secret Haven Private Resort',           'url' => 'https://www.agoda.com/secret-haven-vacation-home/hotel/manila-ph.html?cid=1844104&ds=nHvNV7RDAmTN5uHG'],
     ],
     'acts' => [
       ['name' => 'ATV – Dahilayan Adventure Park',       'price' => 850],
@@ -136,12 +140,14 @@ $destinations = [
     'desc' => 'This tiny island has more volcanoes per square kilometer than anywhere on Earth, plus stunning waterfalls and turquoise springs.',
     'activities' => ['Island Hopping', 'Waterfalls', 'Diving'],
     'hotels' => [
-      ['name' => 'View available hotels in Camiguin', 'url' => 'https://www.booking.com/searchresults.en-gb.html?ss=Camiguin'],
+      ['name' => 'Bintana sa Paraiso', 'url' => 'Bintana Sa Paraiso https://share.google/JUJB0dyuiWRzeT2X2'],
+      ['name' => 'Paras Beach Resort',  'url' => 'Paras Beach Resort website - Camiguin hotel https://share.google/iICKZs4Yzxh7zOp7f'],
+      ['name' => 'Balai sa Baibai', 'url' => 'Balai sa Baibai - Camiguin https://share.google/dLHN4xpBKEatxXi2P'],
     ],
     'acts' => [
       ['name' => 'Island Hopping',  'price' => 2500],
       ['name' => 'Waterfalls Tour', 'price' => 3500],
-      ['name' => 'Scuba Diving',    'price' => 2150],
+      ['name' => 'Scuba Diving',    'price' => 2800],
     ],
   ],
 ];
