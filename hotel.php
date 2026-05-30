@@ -223,6 +223,69 @@ $stars = str_repeat('★', $hotel['stars']) . str_repeat('☆', 5 - $hotel['star
             <label>Special Requests (optional)</label>
             <input type="text" name="requests" placeholder="e.g. early check-in, high floor...">
           </div>
+          
+          <div class="form-group">
+            <label>Payment Method</label>
+            <select name="payment_method" id="paymentMethodSelect" required onchange="showPaymentFields()">
+              <option value="">Select Payment Method</option>
+              <option value="gcash">GCash</option>
+              <option value="credit_card">Credit Card</option>
+              <option value="debit_card">Debit Card</option>
+            </select>
+          </div>
+
+          <!-- GCash Fields -->
+          <div id="gcashFields" style="display:none;">
+            <div class="form-group">
+              <label>GCash Mobile Number</label>
+              <input type="tel" name="gcash_number" id="gcashNumber"
+                     placeholder="09XX XXX XXXX"
+                     pattern="^(09|\+639)\d{9}$"
+                     maxlength="13">
+              <small style="color:var(--muted);font-size:0.75rem;">Format: 09XXXXXXXXX</small>
+            </div>
+            <div class="form-group">
+              <label>Account Name</label>
+              <input type="text" name="gcash_name" id="gcashName"
+                     placeholder="Name registered on GCash">
+            </div>
+          </div>
+
+          <!-- Credit / Debit Card Fields -->
+          <div id="cardFields" style="display:none;">
+            <div class="form-group">
+              <label>Cardholder Name</label>
+              <input type="text" name="card_holder" id="cardHolder"
+                     placeholder="As printed on the card"
+                     autocomplete="cc-name">
+            </div>
+            <div class="form-group">
+              <label>Card Number</label>
+              <input type="text" name="card_number" id="cardNumber"
+                     placeholder="XXXX XXXX XXXX XXXX"
+                     maxlength="19"
+                     autocomplete="cc-number"
+                     oninput="formatCardNumber(this)">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Expiry Date</label>
+                <input type="text" name="card_expiry" id="cardExpiry"
+                       placeholder="MM / YY"
+                       maxlength="7"
+                       autocomplete="cc-exp"
+                       oninput="formatExpiry(this)">
+              </div>
+              <div class="form-group">
+                <label>CVV</label>
+                <input type="password" name="card_cvv" id="cardCvv"
+                       placeholder="•••"
+                       maxlength="4"
+                       autocomplete="cc-csc"
+                       oninput="this.value=this.value.replace(/\D/g,'')">
+              </div>
+            </div>
+          </div>
 
           <!-- Price Breakdown -->
           <div class="booking-summary-breakdown">
@@ -314,19 +377,117 @@ function calcTotal() {
   document.getElementById('totalDisplay').textContent  = '—';
 }
 
+// ── Payment method: show / hide fields ──
+function showPaymentFields() {
+  const method = document.getElementById('paymentMethodSelect').value;
+
+  const gcashFields = document.getElementById('gcashFields');
+  const cardFields  = document.getElementById('cardFields');
+
+  // Hide all first, clear required
+  gcashFields.style.display = 'none';
+  cardFields.style.display  = 'none';
+  setRequired(['gcashNumber','gcashName'], false);
+  setRequired(['cardHolder','cardNumber','cardExpiry','cardCvv'], false);
+
+  if (method === 'gcash') {
+    gcashFields.style.display = 'block';
+    setRequired(['gcashNumber','gcashName'], true);
+  } else if (method === 'credit_card' || method === 'debit_card') {
+    cardFields.style.display = 'block';
+    setRequired(['cardHolder','cardNumber','cardExpiry','cardCvv'], true);
+  }
+}
+
+function setRequired(ids, req) {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.required = req;
+  });
+}
+
+// ── Card number formatter: XXXX XXXX XXXX XXXX ──
+function formatCardNumber(el) {
+  let v = el.value.replace(/\D/g, '').substring(0, 16);
+  el.value = v.match(/.{1,4}/g)?.join(' ') ?? v;
+}
+
+// ── Expiry formatter: MM / YY ──
+function formatExpiry(el) {
+  let v = el.value.replace(/\D/g, '').substring(0, 4);
+  if (v.length >= 3) v = v.substring(0,2) + ' / ' + v.substring(2);
+  el.value = v;
+}
+
+// ── Validate payment details before submit ──
+function validatePayment() {
+  const method = document.getElementById('paymentMethodSelect').value;
+  if (!method) {
+    alert('Pakipili ng payment method.');
+    return false;
+  }
+
+  if (method === 'gcash') {
+    const num  = document.getElementById('gcashNumber').value.replace(/\s/g,'');
+    const name = document.getElementById('gcashName').value.trim();
+    if (!num || !/^(09|\+639)\d{9}$/.test(num)) {
+      alert('Pakilagay ng tamang GCash number (e.g. 09XXXXXXXXX).');
+      return false;
+    }
+    if (!name) {
+      alert('Pakilagay ng account name sa GCash.');
+      return false;
+    }
+  }
+
+  if (method === 'credit_card' || method === 'debit_card') {
+    const holder = document.getElementById('cardHolder').value.trim();
+    const num    = document.getElementById('cardNumber').value.replace(/\s/g,'');
+    const expiry = document.getElementById('cardExpiry').value.replace(/\s/g,'');
+    const cvv    = document.getElementById('cardCvv').value.trim();
+
+    if (!holder) {
+      alert('Pakilagay ng pangalan na nasa card.');
+      return false;
+    }
+    if (!/^\d{16}$/.test(num)) {
+      alert('Ang card number ay dapat 16 digits.');
+      return false;
+    }
+    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+      alert('Pakilagay ng tamang expiry date (MM/YY).');
+      return false;
+    }
+    // Check expiry not in the past
+    const [mm, yy] = expiry.split('/').map(Number);
+    const now = new Date();
+    const expDate = new Date(2000 + yy, mm - 1, 1);
+    if (expDate < new Date(now.getFullYear(), now.getMonth(), 1)) {
+      alert('Expired na ang iyong card.');
+      return false;
+    }
+    if (!/^\d{3,4}$/.test(cvv)) {
+      alert('Ang CVV ay dapat 3 o 4 digits.');
+      return false;
+    }
+  }
+  return true;
+}
+
 // ── Pre-submit: validate & pack activities ──
 function prepareSubmit() {
   const checkin  = document.getElementById('checkinInput').value;
   const checkout = document.getElementById('checkoutInput').value;
   if (!checkin || !checkout) {
-    alert('Please select check-in and check-out dates.');
+    alert('Pakipili ng check-in at check-out dates.');
     return false;
   }
   const nights = Math.round((new Date(checkout) - new Date(checkin)) / 86400000);
   if (nights < 1) {
-    alert('Check-out must be after check-in.');
+    alert('Ang check-out date ay dapat pagkatapos ng check-in.');
     return false;
   }
+  if (!validatePayment()) return false;
   // Pack selected activities as JSON string for PHP
   document.getElementById('selectedActsInput').value = JSON.stringify(Object.values(selectedActivities));
   return true;

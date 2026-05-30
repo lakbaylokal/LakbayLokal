@@ -19,6 +19,7 @@ $checkout     = htmlspecialchars($_POST['checkout']        ?? '');
 $guests       = htmlspecialchars($_POST['guests']          ?? '2');
 $rooms        = htmlspecialchars($_POST['rooms']           ?? '1');
 $requests     = htmlspecialchars($_POST['requests']        ?? '');
+$paymentMethod = htmlspecialchars($_POST['payment_method'] ?? '');
 $totalPrice   = (int)($_POST['total_price']                ?? 0);
 $nights       = (int)($_POST['nights']                     ?? 0);
 $pricePerNight= (int)($_POST['price_per_night']            ?? 0);
@@ -28,7 +29,7 @@ $destEmoji    = htmlspecialchars($_POST['dest_emoji']      ?? '🏝️');
 $selectedActsRaw = $_POST['selected_acts'] ?? '[]';
 
 // Validate
-if (!$guestName || !$guestEmail || !$checkin || !$checkout) {
+if (!$guestName || !$guestEmail || !$checkin || !$checkout || !$paymentMethod) {
   header('Location: hotel.php?dest=' . urlencode($destId) . '&id=' . urlencode($hotelId));
   exit;
 }
@@ -46,6 +47,13 @@ $ref = 'LBL-' . strtoupper(substr(md5($guestEmail . $checkin . microtime()), 0, 
 // Format dates
 $checkinFmt  = date('F j, Y', strtotime($checkin));
 $checkoutFmt = date('F j, Y', strtotime($checkout));
+
+// Format payment method for display
+$paymentMethodDisplay = [
+  'gcash' => '💳 GCash',
+  'credit_card' => '💳 Credit Card',
+  'debit_card' => '💳 Debit Card'
+][$paymentMethod] ?? $paymentMethod;
 
 // Compute breakdown (server-side for display)
 $hotelSubtotal = $pricePerNight * $nights * (int)$rooms;
@@ -78,6 +86,7 @@ include 'includes/header.php';
         <div class="confirm-detail-row"><span>Check-out</span><strong><?= $checkoutFmt ?></strong></div>
         <div class="confirm-detail-row"><span>Duration</span><strong><?= $nights ?> night<?= $nights != 1 ? 's' : '' ?></strong></div>
         <div class="confirm-detail-row"><span>Rooms / Guests</span><strong><?= $rooms ?> room · <?= $guests ?></strong></div>
+        <div class="confirm-detail-row"><span>Payment Method</span><strong><?= $paymentMethodDisplay ?></strong></div>
 
         <form action="components/payment.php" method="POST">
           <input type="hidden" name="dest_id" value="<?= $destId ?>">
@@ -86,6 +95,7 @@ include 'includes/header.php';
           <input type="hidden" name="guest_name" value="<?= $guestName ?>">
           <input type="hidden" name="guest_email" value="<?= $guestEmail ?>">
           <input type="hidden" name="checkin" value="<?= $checkin ?>">
+          <input type="hidden" name="payment_method" value="<?= $paymentMethod ?>">
           <input type="hidden" name="checkout" value="<?= $checkout ?>">
         </form>
 
