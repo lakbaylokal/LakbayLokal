@@ -28,6 +28,7 @@
   </div>
 </footer>
 
+
 <script>
   const DESTINATIONS = <?= $destinationsJson ?>;
 </script>
