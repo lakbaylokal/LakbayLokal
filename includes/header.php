@@ -33,13 +33,11 @@ $userName = $_SESSION['user']['name'] ?? '';
     </ul>
     <div class="nav-actions">
 
-      <?php if ($isLoggedIn): ?>
-        <span class="nav-user"><?= htmlspecialchars($userName) ?></span>
-        <button class="nav-ghost" onclick="logoutUser()">Logout</button>
-      <?php else: ?>
-        <button class="nav-ghost" onclick="openAuthModal('login')">Login</button>
-        <button class="nav-cta" onclick="openAuthModal('signup')">Sign Up</button>
-      <?php endif; ?>
+      <!-- These elements are always in the DOM; JavaScript controls visibility -->
+      <span id="navUserName" class="nav-user" style="display: <?= $isLoggedIn ? 'block' : 'none'; ?>">👤 <?= htmlspecialchars($userName) ?></span>
+      <button id="navLogoutBtn" class="nav-ghost" onclick="logoutUser()" style="display: <?= $isLoggedIn ? 'block' : 'none'; ?>">Logout</button>
+      <button id="navLoginBtn" class="nav-ghost" onclick="openAuthModal('login')" style="display: <?= $isLoggedIn ? 'none' : 'block'; ?>">Login</button>
+      <button id="navSignupBtn" class="nav-cta" onclick="openAuthModal('signup')" style="display: <?= $isLoggedIn ? 'none' : 'block'; ?>">Sign Up</button>
 
     </div>
     <button class="hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('open')" aria-label="Menu">
@@ -54,12 +52,10 @@ $userName = $_SESSION['user']['name'] ?? '';
     <a href="index.php#about">About</a>
     <a href="index.php#mytrips">My Trips</a>
 
-    <?php if ($isLoggedIn): ?>
-      <a onclick="logoutUser()">Logout</a>
-    <?php else: ?>
-      <a onclick="openAuthModal('login')">Login</a>
-      <a onclick="openAuthModal('signup')">Sign Up</a>
-    <?php endif; ?>
+    <!-- Mobile menu buttons; JavaScript controls visibility -->
+    <a id="mobileLogoutLink" onclick="logoutUser()" style="display: <?= $isLoggedIn ? 'block' : 'none'; ?>">Logout</a>
+    <a id="mobileLoginLink" onclick="openAuthModal('login')" style="display: <?= $isLoggedIn ? 'none' : 'block'; ?>">Login</a>
+    <a id="mobileSignupLink" onclick="openAuthModal('signup')" style="display: <?= $isLoggedIn ? 'none' : 'block'; ?>">Sign Up</a>
 
   </div>
 

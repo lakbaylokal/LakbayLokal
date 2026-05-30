@@ -35,11 +35,26 @@ function handleLogin(event) {
     return;
   }
 
-  const user = { FName: email.split('@')[0], LName: '', Email: email };
-  setLoggedInUser(user);
-  document.getElementById('loginPassword').value = '';
-  closeAuthModal();
-  showToast('Welcome back, ' + user.FName + '! 👋');
+  // Send to backend to set PHP session
+  const formData = new FormData();
+  formData.append('action', 'login');
+  formData.append('email', email);
+  formData.append('password', password);
+
+  fetch('api_auth.php', { method: 'POST', body: formData })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const user = data.user;
+        setLoggedInUser(user);
+        document.getElementById('loginPassword').value = '';
+        closeAuthModal();
+        showToast('Welcome back, ' + user.FName + '! 👋');
+      } else {
+        showToast('Login failed: ' + data.message);
+      }
+    })
+    .catch(err => showToast('Error: ' + err.message));
 }
 
 /* ─────────────────────── SIGNUP ──────────────────────────────── */
@@ -60,23 +75,71 @@ function handleSignup(event) {
     return;
   }
 
-  const user = { FName, LName, Email: email };
-  setLoggedInUser(user);
-  document.getElementById('signupPassword').value = '';
-  closeAuthModal();
-  showToast('Account created! Welcome, ' + FName + ' 🎉');
+  // Send to backend to set PHP session
+  const formData = new FormData();
+  formData.append('action', 'signup');
+  formData.append('FName', FName);
+  formData.append('LName', LName);
+  formData.append('email', email);
+  formData.append('password', password);
+
+  fetch('api_auth.php', { method: 'POST', body: formData })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const user = data.user;
+        setLoggedInUser(user);
+        document.getElementById('signupPassword').value = '';
+        closeAuthModal();
+        showToast('Account created! Welcome, ' + user.FName + ' 🎉');
+      } else {
+        showToast('Signup failed: ' + data.message);
+      }
+    })
+    .catch(err => showToast('Error: ' + err.message));
 }
 
 /* ─────────────────────── LOGOUT ──────────────────────────────── */
 
 function logoutUser() {
-  sessionStorage.removeItem('lbl_user');
-  currentUser = null;
-  updateAuthNav();
-  showToast('You have been logged out.');
+  const formData = new FormData();
+  formData.append('action', 'logout');
+
+  fetch('api_auth.php', { method: 'POST', body: formData })
+    .then(() => {
+      sessionStorage.removeItem('lbl_user');
+      currentUser = null;
+      updateAuthNav();
+      showToast('You have been logged out.');
+      // Reload page to refresh header on all pages
+      setTimeout(() => location.reload(), 500);
+    })
+    .catch(err => {
+      showToast('Error: ' + err.message);
+    });
 }
 
 /* ─────────────────────── NAV STATE ──────────────────────────── */
+
+function fetchCurrentUser() {
+  // Check if user is stored in sessionStorage
+  if (currentUser) {
+    updateAuthNav();
+    return;
+  }
+
+  // Fetch from server if session exists (on page reload)
+  fetch('api_auth.php?action=getCurrentUser')
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.user) {
+        setLoggedInUser(data.user);
+      } else {
+        updateAuthNav();
+      }
+    })
+    .catch(() => updateAuthNav());
+}
 
 function setLoggedInUser(user) {
   currentUser = user;
@@ -124,8 +187,8 @@ function showToast(msg) {
 /* ─────────────────────── INIT ────────────────────────────────── */
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Restore auth state
-  updateAuthNav();
+  // Restore auth state and fetch current user if logged in
+  fetchCurrentUser();
 
   // Render My Trips if section exists
   if (document.getElementById('myTripsContent') && typeof renderMyTrips === 'function') {
