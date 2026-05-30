@@ -18,7 +18,12 @@
     <li><a onclick="showPage('about')" id="nav-about">About</a></li>
     <li><a onclick="showPage('dashboard')" id="nav-dashboard">My Trips</a></li>
   </ul>
-  <button class="nav-cta" onclick="showPage('destinations')">Book Now</button>
+  <div class="nav-actions">
+    <span class="nav-user" id="navUserName" style="display:none;"></span>
+    <button class="nav-ghost" id="navLoginBtn" onclick="showPage('login')">Login</button>
+    <button class="nav-cta" id="navSignupBtn" onclick="showPage('signup')">Sign Up</button>
+    <button class="nav-ghost" id="navLogoutBtn" onclick="logoutUser()" style="display:none;">Logout</button>
+  </div>
   <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
@@ -29,6 +34,9 @@
   <a onclick="showPage('destinations');closeMenu()">Destinations</a>
   <a onclick="showPage('about');closeMenu()">About</a>
   <a onclick="showPage('dashboard');closeMenu()">My Trips</a>
+  <a id="mobileLoginLink" onclick="showPage('login');closeMenu()">Login</a>
+  <a id="mobileSignupLink" onclick="showPage('signup');closeMenu()">Sign Up</a>
+  <a id="mobileLogoutLink" onclick="logoutUser();closeMenu()" style="display:none;">Logout</a>
 </div>
 
 <div class="toast" id="toast">Booking confirmed! 🎉</div>

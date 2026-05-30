@@ -16,6 +16,7 @@ include_once 'includes/header.php';
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/auth.css">
 </head>
 <body>
 
@@ -35,6 +36,12 @@ include_once 'includes/header.php';
 <!-- ======= CONFIRMATION PAGE ======= -->
 <?php include 'components/confirm.php'; ?>
 
+<!-- ======= LOGIN PAGE ======= -->
+<?php include 'components/login.php'; ?>
+
+<!-- ======= SIGNUP PAGE ======= -->
+<?php include 'components/signup.php'; ?>
+
 <!-- ======= DASHBOARD PAGE ======= -->
 <?php include 'components/dashboard.php'; ?>
 
@@ -52,5 +59,6 @@ include_once 'includes/footer.php';
   const DESTINATIONS = <?= $destinationsJson ?>;
 </script>
 <script src="assets/script.js"></script>
+<script src="assets/auth.js"></script>
 </body>
 </html>

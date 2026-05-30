@@ -11,6 +11,10 @@ let prevPage = (document.querySelector('.page.active')?.id?.replace('page-', '')
 
 /* ── PAGE NAVIGATION ── */
 function showPage(page) {
+  if (page === 'dashboard' && !currentUser) {
+    showToast('Please login first.');
+    page = 'login';
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
