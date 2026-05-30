@@ -1,0 +1,145 @@
+/* admin/admin-style.css — LakbayLokal Admin Dashboard */
+
+:root {
+  --cream: #FBF7F0;
+  --deep: #1A1208;
+  --primary: #C4602A;
+  --primary-light: #E8905D;
+  --accent: #2E6B4F;
+  --muted: #7A6E62;
+  --border: #E8E0D5;
+  --white: #FFFFFF;
+  --shadow: 0 4px 20px rgba(26,18,8,0.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--deep);
+  display: flex; /* Para magkatabi ang sidebar at main content */
+  min-height: 100vh;
+}
+
+/* SIDEBAR STYLING */
+.admin-sidebar {
+  width: 260px;
+  background: var(--deep);
+  color: white;
+  padding: 2rem 1.5rem;
+  position: fixed;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.sidebar-brand h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+}
+.sidebar-brand span { color: var(--primary-light); }
+
+.sidebar-menu {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-menu a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
+  display: block;
+  font-size: 0.9rem;
+  transition: 0.3s;
+}
+
+.sidebar-menu a:hover, .sidebar-menu a.active {
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.sidebar-menu a.active {
+  border-left: 4px solid var(--primary);
+  background: rgba(255,255,255,0.05);
+}
+
+/* MAIN CONTENT AREA */
+.main-content {
+  flex: 1;
+  margin-left: 260px; /* Space para sa sidebar */
+  padding: 2.5rem;
+}
+
+/* DASHBOARD COMPONENTS */
+.dash-header {
+  background: linear-gradient(135deg, var(--deep) 0%, #2C1F0A 100%);
+  color: white;
+  padding: 2.5rem;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+}
+
+.dash-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.dash-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.dash-stat {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.dash-stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.dash-stat-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.dash-content {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.dash-bookings-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-sidebar { width: 70px; padding: 1rem 0.5rem; }
+  .sidebar-brand h3, .sidebar-menu span { display: none; }
+  .main-content { margin-left: 70px; padding: 1.5rem; }
+}
