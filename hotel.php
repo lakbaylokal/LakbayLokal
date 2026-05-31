@@ -38,6 +38,9 @@ $amenityIcons = [
   'Hammocks' => '🌴',
 ];
 $stars = str_repeat('★', $hotel['stars']) . str_repeat('☆', 5 - $hotel['stars']);
+$hotelBackground = isset($hotel['image'])
+  ? "linear-gradient(to top, rgba(26,18,8,0.75) 0%, transparent 55%), url('{$hotel['image']}') center/cover no-repeat"
+  : $dest['gradient'];
 ?>
 
 <div class="page-wrapper">
@@ -54,7 +57,7 @@ $stars = str_repeat('★', $hotel['stars']) . str_repeat('☆', 5 - $hotel['star
   </div>
 
   <!-- Hotel Hero -->
-  <div class="hotel-detail-hero" style="background: <?= $dest['gradient'] ?>;">
+  <div class="hotel-detail-hero" style="background: <?= $hotelBackground ?>;">
     <div class="hotel-detail-hero-overlay"></div>
     <div class="hotel-detail-hero-content">
       <div class="hotel-stars-big"><?= $stars ?></div>

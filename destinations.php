@@ -147,9 +147,12 @@ include 'includes/header.php';
 
             foreach ($hotels as $h):
               $stars = str_repeat('★', $h['stars']) . str_repeat('☆', 5 - $h['stars']);
+              $hotelBackground = isset($h['image'])
+                ? "linear-gradient(135deg, rgba(0,0,0,0.25), rgba(0,0,0,0.05)), url('{$h['image']}') center/cover no-repeat"
+                : $dest['gradient'];
           ?>
             <a href="hotel.php?dest=<?= $destId ?>&id=<?= $h['id'] ?>" class="hotel-card" data-price="<?= $h['price'] ?>" data-stars="<?= $h['stars'] ?>">
-              <div class="hotel-card-img" style="background: <?= $dest['gradient'] ?>;">
+              <div class="hotel-card-img" style="background: <?= $hotelBackground ?>;">
                 <div class="hotel-card-stars"><?= $stars ?></div>
               </div>
               <div class="hotel-card-body">

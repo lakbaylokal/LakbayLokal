@@ -15,6 +15,7 @@ $destinations = [
       [
         'id' => 'sotogrande-baguio',
         'name' => 'Sotogrande Hotel Baguio',
+        'image' => 'assets/pics/sotogrande.jpg',
         'stars' => 4, 'price' => 5200, 'rating' => 4.6, 'reviews' => 312,
         'location' => 'Session Road, Baguio City',
         'desc' => 'A modern boutique hotel nestled in the heart of Baguio, offering luxurious rooms with stunning mountain views and world-class amenities.',
@@ -25,6 +26,7 @@ $destinations = [
       [
         'id' => 'microtel-baguio',
         'name' => 'Microtel by Wyndham Baguio',
+        'image' => 'assets/pics/microtel3.jpg',
         'stars' => 3, 'price' => 3600, 'rating' => 4.3, 'reviews' => 205,
         'location' => 'Legarda Road, Baguio City',
         'desc' => 'Comfortable and affordable rooms with reliable service, conveniently located near SM City Baguio and key tourist spots.',
@@ -35,6 +37,7 @@ $destinations = [
       [
         'id' => 'travelite-baguio',
         'name' => 'Travelite Express Hotel',
+        'image' => 'assets/pics/travellite2.jpg',
         'stars' => 2, 'price' => 2800, 'rating' => 4.1, 'reviews' => 148,
         'location' => 'Magsaysay Avenue, Baguio City',
         'desc' => 'A budget-friendly option with clean, cozy rooms ideal for solo travelers and backpackers exploring the City of Pines.',
@@ -62,6 +65,7 @@ $destinations = [
       [
         'id' => 'hotel-luna-vigan',
         'name' => 'Hotel Luna',
+        'image' => 'assets/pics/hotelluna.jpg',
         'stars' => 4, 'price' => 5800, 'rating' => 4.8, 'reviews' => 421,
         'location' => 'Crisologo St., Vigan City',
         'desc' => 'An award-winning boutique hotel housed in a century-old ancestral mansion, blending heritage architecture with modern luxury on the famous Calle Crisologo.',
@@ -72,6 +76,7 @@ $destinations = [
       [
         'id' => 'hotel-felicidad',
         'name' => 'Hotel Felicidad Vigan',
+        'image' => 'assets/pics/hotelfelicidad.jpg',
         'stars' => 3, 'price' => 4200, 'rating' => 4.4, 'reviews' => 186,
         'location' => 'Quirino Blvd, Vigan City',
         'desc' => 'A charming heritage hotel offering comfortable rooms with period-inspired décor, located steps away from Vigan\'s famous plazas and churches.',
@@ -82,6 +87,7 @@ $destinations = [
       [
         'id' => 'paradores-vigan',
         'name' => 'Paradores de Vigan',
+        'image' => 'assets/pics/paradores de vigan.jpg',
         'stars' => 3, 'price' => 3500, 'rating' => 4.2, 'reviews' => 97,
         'location' => 'Mena Crisologo St., Vigan City',
         'desc' => 'Experience the warmth of Ilocano hospitality in this cozy, family-run hotel set in a restored colonial building within the heritage zone.',
@@ -108,6 +114,7 @@ $destinations = [
       [
         'id' => 'seda-lio',
         'name' => 'Seda Lio – El Nido',
+        'image' => 'assets/pics/sedalio.jpg',
         'stars' => 5, 'price' => 12500, 'rating' => 4.9, 'reviews' => 534,
         'location' => 'Lio Tourism Estate, El Nido, Palawan',
         'desc' => 'A stunning eco-luxury resort set on the shores of El Nido\'s Lio Beach, offering sustainable luxury with panoramic views of the Bacuit Archipelago.',
@@ -118,6 +125,7 @@ $destinations = [
       [
         'id' => 'hue-hotels-pp',
         'name' => 'Hue Hotels – Puerto Princesa',
+        'image' => 'assets/pics/huehotel.jpg',
         'stars' => 4, 'price' => 7200, 'rating' => 4.6, 'reviews' => 298,
         'location' => 'Rizal Avenue, Puerto Princesa City',
         'desc' => 'A vibrant, design-forward hotel in the heart of Puerto Princesa, offering colorful rooms, an excellent restaurant, and easy access to the city\'s attractions.',
@@ -128,6 +136,7 @@ $destinations = [
       [
         'id' => 'two-seasons-coron',
         'name' => 'Two Seasons Coron Island Resort',
+        'image' => 'assets/pics/two seasons.jpg',
         'stars' => 4, 'price' => 9800, 'rating' => 4.7, 'reviews' => 187,
         'location' => 'Malaroyroy Peninsula, Coron, Palawan',
         'desc' => 'Perched on a private peninsula overlooking the famous Coron Bay, this overwater resort offers an intimate island experience with world-class diving access.',
@@ -155,6 +164,7 @@ $destinations = [
       [
         'id' => 'radisson-blu-cebu',
         'name' => 'Radisson Blu Cebu',
+        'image' => 'assets/pics/radisson.jpg',
         'stars' => 5, 'price' => 9500, 'rating' => 4.7, 'reviews' => 689,
         'location' => 'Sergio Osmeña Blvd, Cebu City',
         'desc' => 'A five-star landmark in the heart of Cebu City, offering elegant rooms, multiple dining venues, a rooftop pool, and a world-class spa.',
@@ -165,6 +175,7 @@ $destinations = [
       [
         'id' => 'quest-hotel-cebu',
         'name' => 'Quest Hotel Cebu',
+        'image' => 'assets/pics/questhotel.jpg',
         'stars' => 4, 'price' => 5500, 'rating' => 4.4, 'reviews' => 412,
         'location' => 'Archbishop Reyes Ave, Cebu City',
         'desc' => 'A contemporary hotel known for its vibrant social spaces, spectacular pool area, and easy access to Cebu\'s business and leisure districts.',
@@ -175,6 +186,7 @@ $destinations = [
       [
         'id' => 'bayfront-cebu',
         'name' => 'Bayfront Hotel Cebu',
+        'image' => 'assets/pics/bayfront.jpg',
         'stars' => 3, 'price' => 3200, 'rating' => 4.2, 'reviews' => 253,
         'location' => 'Manalili St, Cebu City',
         'desc' => 'A reliable mid-range option in Cebu City offering clean, comfortable rooms with great city views and close proximity to Carbon Market and Colon Street.',
@@ -201,6 +213,7 @@ $destinations = [
       [
         'id' => 'henann-crystal',
         'name' => 'Henann Crystal Sands Resort',
+        'image' => 'assets/pics/boracay.jpg',
         'stars' => 5, 'price' => 11800, 'rating' => 4.8, 'reviews' => 876,
         'location' => 'Station 1, White Beach, Boracay',
         'desc' => 'An iconic beachfront resort on the finest stretch of White Beach, offering breathtaking sunsets, multiple pools, and world-class island dining.',
@@ -211,6 +224,7 @@ $destinations = [
       [
         'id' => 'fairways-boracay',
         'name' => 'Fairways and Bluewater Boracay',
+        'image' => 'assets/pics/boracay.jpg',
         'stars' => 5, 'price' => 14500, 'rating' => 4.9, 'reviews' => 432,
         'location' => 'Newcoast, Boracay Island',
         'desc' => "Boracay's only golf resort, offering sprawling tropical villas, championship fairways, and direct access to a pristine private beach.",
@@ -221,6 +235,7 @@ $destinations = [
       [
         'id' => 'la-carmela-boracay',
         'name' => 'La Carmela de Boracay',
+        'image' => 'assets/pics/boracay.jpg',
         'stars' => 3, 'price' => 5500, 'rating' => 4.2, 'reviews' => 321,
         'location' => 'Station 2, White Beach, Boracay',
         'desc' => 'A charming resort right on White Beach, offering great value with comfortable rooms and the convenience of beachfront access at Station 2.',
@@ -247,6 +262,7 @@ $destinations = [
       [
         'id' => 'nay-palad-siargao',
         'name' => 'Nay Palad Hideaway',
+        'image' => 'assets/pics/siargao.jpg',
         'stars' => 5, 'price' => 18000, 'rating' => 4.9, 'reviews' => 156,
         'location' => 'Pacifico, Siargao Island',
         'desc' => "An ultra-exclusive eco-luxury hideaway on Siargao's wild northern shore, offering just 10 private beachfront cottages with personalized butler service.",
@@ -257,6 +273,7 @@ $destinations = [
       [
         'id' => 'kalinaw-siargao',
         'name' => 'Kalinaw Resort',
+        'image' => 'assets/pics/siargao.jpg',
         'stars' => 4, 'price' => 7500, 'rating' => 4.7, 'reviews' => 289,
         'location' => 'General Luna, Siargao Island',
         'desc' => 'A tranquil boutique resort tucked among coconut palms near Cloud 9, offering stunning lagoon views and a genuine island atmosphere.',
@@ -267,6 +284,7 @@ $destinations = [
       [
         'id' => 'villa-cali-siargao',
         'name' => 'Villa Cali',
+        'image' => 'assets/pics/siargao.jpg',
         'stars' => 3, 'price' => 3700, 'rating' => 4.3, 'reviews' => 198,
         'location' => 'General Luna, Siargao Island',
         'desc' => 'A laid-back villa perfect for surf enthusiasts and budget travelers, with cozy rooms, a social common area, and walking distance to Cloud 9 breaks.',
@@ -293,6 +311,7 @@ $destinations = [
       [
         'id' => 'dahilayan-resort',
         'name' => 'Dahilayan Forest Park Resort',
+        'image' => 'assets/pics/bukidno.jpg',
         'stars' => 4, 'price' => 4500, 'rating' => 4.5, 'reviews' => 312,
         'location' => 'Dahilayan, Manolo Fortich, Bukidnon',
         'desc' => 'Stay right at the adventure park and wake up to misty mountain views. Direct access to all zipline and extreme adventure facilities.',
@@ -303,6 +322,7 @@ $destinations = [
       [
         'id' => 'ultrawinds-resort',
         'name' => 'Ultrawinds Mountain Resort',
+        'image' => 'assets/pics/bukidno.jpg',
         'stars' => 3, 'price' => 3200, 'rating' => 4.3, 'reviews' => 198,
         'location' => 'Manolo Fortich, Bukidnon',
         'desc' => 'A scenic highland resort with comfortable accommodations and stunning views of Bukidnon\'s pine-covered mountains.',
@@ -313,6 +333,7 @@ $destinations = [
       [
         'id' => 'secret-haven-bukidnon',
         'name' => 'Secret Haven Private Resort',
+        'image' => 'assets/pics/bukidno.jpg',
         'stars' => 3, 'price' => 2100, 'rating' => 4.1, 'reviews' => 145,
         'location' => 'Bukidnon Province',
         'desc' => 'An intimate private resort surrounded by nature, perfect for group getaways with exclusive use of the property.',
@@ -340,6 +361,7 @@ $destinations = [
       [
         'id' => 'bintana-paraiso',
         'name' => 'Bintana sa Paraiso',
+        'image' => 'assets/pics/camiguin.jpg',
         'stars' => 4, 'price' => 5800, 'rating' => 4.7, 'reviews' => 203,
         'location' => 'Mambajao, Camiguin Island',
         'desc' => 'A picturesque resort with sea-facing cottages and direct beach access, offering a genuine island paradise experience in Camiguin.',
@@ -350,6 +372,7 @@ $destinations = [
       [
         'id' => 'paras-beach',
         'name' => 'Paras Beach Resort',
+        'image' => 'assets/pics/camiguin.jpg',
         'stars' => 3, 'price' => 4200, 'rating' => 4.4, 'reviews' => 178,
         'location' => 'Guinsiliban, Camiguin Island',
         'desc' => 'A beloved beachside resort known for its warm hospitality, well-kept grounds, and stunning views of the island\'s volcanic peaks.',
@@ -360,6 +383,7 @@ $destinations = [
       [
         'id' => 'balai-baibai',
         'name' => 'Balai sa Baibai',
+        'image' => 'assets/pics/camiguin.jpg',
         'stars' => 3, 'price' => 3500, 'rating' => 4.2, 'reviews' => 134,
         'location' => 'Mambajao, Camiguin Island',
         'desc' => 'A cozy family-run beachside inn offering affordable comfort and genuine Camiguinon hospitality just steps from the beach.',
