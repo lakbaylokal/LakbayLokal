@@ -65,7 +65,7 @@ $destinations = [
       [
         'id' => 'hotel-luna-vigan',
         'name' => 'Hotel Luna',
-        'image' => 'assets/pics/hotelluna.jpg',
+        'image' => 'assets/pics/hotelluna2.jpg',
         'stars' => 4, 'price' => 5800, 'rating' => 4.8, 'reviews' => 421,
         'location' => 'Crisologo St., Vigan City',
         'desc' => 'An award-winning boutique hotel housed in a century-old ancestral mansion, blending heritage architecture with modern luxury on the famous Calle Crisologo.',
@@ -76,7 +76,7 @@ $destinations = [
       [
         'id' => 'hotel-felicidad',
         'name' => 'Hotel Felicidad Vigan',
-        'image' => 'assets/pics/hotelfelicidad.jpg',
+        'image' => 'assets/pics/hotelfelicidad2.jpg',
         'stars' => 3, 'price' => 4200, 'rating' => 4.4, 'reviews' => 186,
         'location' => 'Quirino Blvd, Vigan City',
         'desc' => 'A charming heritage hotel offering comfortable rooms with period-inspired décor, located steps away from Vigan\'s famous plazas and churches.',
@@ -87,7 +87,7 @@ $destinations = [
       [
         'id' => 'paradores-vigan',
         'name' => 'Paradores de Vigan',
-        'image' => 'assets/pics/paradores de vigan.jpg',
+        'image' => 'assets/pics/paradores de.jpg',
         'stars' => 3, 'price' => 3500, 'rating' => 4.2, 'reviews' => 97,
         'location' => 'Mena Crisologo St., Vigan City',
         'desc' => 'Experience the warmth of Ilocano hospitality in this cozy, family-run hotel set in a restored colonial building within the heritage zone.',
@@ -114,7 +114,7 @@ $destinations = [
       [
         'id' => 'seda-lio',
         'name' => 'Seda Lio – El Nido',
-        'image' => 'assets/pics/sedalio.jpg',
+        'image' => 'assets/pics/sedalio2.jpg',
         'stars' => 5, 'price' => 12500, 'rating' => 4.9, 'reviews' => 534,
         'location' => 'Lio Tourism Estate, El Nido, Palawan',
         'desc' => 'A stunning eco-luxury resort set on the shores of El Nido\'s Lio Beach, offering sustainable luxury with panoramic views of the Bacuit Archipelago.',
@@ -125,7 +125,7 @@ $destinations = [
       [
         'id' => 'hue-hotels-pp',
         'name' => 'Hue Hotels – Puerto Princesa',
-        'image' => 'assets/pics/huehotel.jpg',
+        'image' => 'assets/pics/huehotel2.jpg',
         'stars' => 4, 'price' => 7200, 'rating' => 4.6, 'reviews' => 298,
         'location' => 'Rizal Avenue, Puerto Princesa City',
         'desc' => 'A vibrant, design-forward hotel in the heart of Puerto Princesa, offering colorful rooms, an excellent restaurant, and easy access to the city\'s attractions.',
