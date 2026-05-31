@@ -1,5 +1,6 @@
 <?php
 require_once 'data.php';
+include 'config/db.php';
 
 $pageTitle  = 'LakbayLokal — Explore the Philippines';
 $activePage = 'home';
@@ -7,7 +8,6 @@ $rootPath   = '';
 
 include 'includes/header.php';
 ?>
-
 <!-- ======= HOME HERO ======= -->
 <section class="hero">
   <div class="hero-content">
