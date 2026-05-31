@@ -5,8 +5,8 @@
 $destinations = [
   [
     'id' => 'baguio', 'name' => 'Baguio City', 'region' => 'Luzon', 'price' => 4500,
-    'emoji' => '🏔️',
-    'gradient' => 'linear-gradient(135deg, #6DB1C5, #2E6B4F)',
+    'emoji' => '',
+    'gradient' => "linear-gradient(135deg, rgba(109,177,197,0.75), rgba(0,0,0,0.22)), url('assets/pics/Baguio.jpg') center/cover no-repeat",
     'tagline' => 'The Summer Capital of the Philippines',
     'desc' => 'Escape to the cool mountain air of Baguio City and discover pine forests, strawberry farms, and rich Igorot culture.',
     'activities' => ['Strawberry Farms', 'Adventure Park', 'Museums'],
@@ -52,8 +52,8 @@ $destinations = [
   ],
   [
     'id' => 'vigan', 'name' => 'Vigan City', 'region' => 'Luzon', 'price' => 6500,
-    'emoji' => '🏛️',
-    'gradient' => 'linear-gradient(135deg, #C4A882, #6B4226)',
+    'emoji' => '',
+    'gradient' => "linear-gradient(135deg, rgba(0,0,0,0.34), rgba(0,0,0,0.05)), url('assets/pics/vigan.jpg') center/cover no-repeat",
     'tagline' => 'UNESCO World Heritage City',
     'desc' => 'Walk the cobblestone streets of a colonial-era city frozen in time, with kalesas, ancestral houses, and Ilocano cuisine.',
     'activities' => ['Heritage Walk', 'Pottery', 'Calesa Ride'],
@@ -98,8 +98,8 @@ $destinations = [
   ],
   [
     'id' => 'palawan', 'name' => 'Palawan', 'region' => 'Luzon', 'price' => 8500,
-    'emoji' => '🏝️',
-    'gradient' => 'linear-gradient(135deg, #43BEAC, #0B5E6E)',
+    'emoji' => '',
+    'gradient' => "linear-gradient(135deg, rgba(0,0,0,0.28), rgba(0,0,0,0.1)), url('assets/pics/palawan.jpg') center/cover no-repeat",
     'tagline' => 'Last Frontier of the Philippines',
     'desc' => 'Crystal lagoons, secret beaches, WWII shipwrecks, and the world-famous Underground River await in paradise Palawan.',
     'activities' => ['Lagoon Tours', 'Underground River', 'Diving'],
@@ -145,8 +145,8 @@ $destinations = [
   ],
   [
     'id' => 'cebu', 'name' => 'Cebu City', 'region' => 'Visayas', 'price' => 5500,
-    'emoji' => '🌊',
-    'gradient' => 'linear-gradient(135deg, #5DC8E0, #1A6E8A)',
+    'emoji' => '',
+    'gradient' => "linear-gradient(135deg, rgba(0,0,0,0.32), rgba(0,0,0,0.08)), url('assets/pics/Cebu2.jpg') center/cover no-repeat",
     'tagline' => 'The Queen City of the South',
     'desc' => 'From canyoneering in Kawasan Falls to swimming with whale sharks in Oslob — Cebu offers it all.',
     'activities' => ['Canyoneering', 'Whale Sharks', 'Temple'],
@@ -191,8 +191,8 @@ $destinations = [
   ],
   [
     'id' => 'boracay', 'name' => 'Boracay Island', 'region' => 'Visayas', 'price' => 7500,
-    'emoji' => '🏖️',
-    'gradient' => 'linear-gradient(135deg, #F0CE79, #E06B30)',
+    'emoji' => '',
+    'gradient' => "linear-gradient(135deg, rgba(0,0,0,0.22), rgba(0,0,0,0.08)), url('assets/pics/boracay.jpg') center/cover no-repeat",
     'tagline' => 'World-Famous White Sand Beach',
     'desc' => "Powdery white sand, turquoise waters, and endless island adventures — Boracay is the Philippines' crown jewel.",
     'activities' => ['Island Hopping', 'Parasailing', 'Diving'],
@@ -237,8 +237,8 @@ $destinations = [
   ],
   [
     'id' => 'siargao', 'name' => 'Siargao Island', 'region' => 'Mindanao', 'price' => 3700,
-    'emoji' => '🏄',
-    'gradient' => 'linear-gradient(135deg, #56C8A0, #1A5E4A)',
+    'emoji' => '',
+    'gradient' => "linear-gradient(135deg, rgba(0,0,0,0.32), rgba(0,0,0,0.08)), url('assets/pics/siargao.jpg') center/cover no-repeat",
     'tagline' => 'Surfing Capital of the Philippines',
     'desc' => "Ride the world-famous Cloud 9 waves, hop between pristine islands, and soak in Siargao's laid-back surf culture.",
     'activities' => ['Surfing', 'Island Hopping', 'Bike Rides'],
@@ -283,8 +283,8 @@ $destinations = [
   ],
   [
     'id' => 'bukidnon', 'name' => 'Bukidnon', 'region' => 'Mindanao', 'price' => 2100,
-    'emoji' => '🏕️',
-    'gradient' => 'linear-gradient(135deg, #94C96A, #3A6B1A)',
+    'emoji' => '',
+    'gradient' => "linear-gradient(135deg, rgba(0,0,0,0.28), rgba(0,0,0,0.06)), url('assets/pics/bukidno.jpg') center/cover no-repeat",
     'tagline' => 'Thrills at Dahilayan Adventure Park',
     'desc' => "Experience the longest zipline in Asia, ATV rides through highland meadows, and the cool breeze of Mindanao's highlands.",
     'activities' => ['Zipline', 'ATV', 'DropZone'],
@@ -330,8 +330,8 @@ $destinations = [
   ],
   [
     'id' => 'camiguin', 'name' => 'Camiguin Island', 'region' => 'Mindanao', 'price' => 7500,
-    'emoji' => '🌋',
-    'gradient' => 'linear-gradient(135deg, #6EC9B5, #1D5E50)',
+    'emoji' => '',
+    'gradient' => "linear-gradient(135deg, rgba(0,0,0,0.32), rgba(0,0,0,0.08)), url('assets/pics/camiguin.jpg') center/cover no-repeat",
     'tagline' => 'Island Born of Fire',
     'desc' => 'This tiny island has more volcanoes per square kilometer than anywhere on Earth, plus stunning waterfalls and turquoise springs.',
     'activities' => ['Island Hopping', 'Waterfalls', 'Diving'],
