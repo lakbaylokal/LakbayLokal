@@ -60,12 +60,6 @@ $userName = $_SESSION['user']['name'] ?? '';
     </ul>
     <div class="nav-actions">
 
-      <?php if ($isLoggedIn && ($_SESSION['user']['role'] ?? '') === 'admin'): ?>
-        <a href="<?= $rootPath ?? '' ?>admin/index.php" class="nav-ghost">
-          Admin Panel
-        </a>
-      <?php endif; ?>
-
       <span id="navUserName" class="nav-user" style="display: <?= $isLoggedIn ? 'block' : 'none'; ?>">
         👤 <?= htmlspecialchars($userName) ?>
       </span>
