@@ -1,0 +1,22 @@
+<?php
+$amenityIcons = [
+  'Free WiFi' => '📶', 'Pool' => '🏊', 'Restaurant' => '🍽️', 'Gym' => '💪',
+  'Spa' => '💆', 'Parking' => '🅿️', 'Breakfast' => '🍳', 'Breakfast Included' => '🍳',
+  'Beach Access' => '🏖️', 'Beachfront' => '🌊', 'Airport Shuttle' => '🚌',
+  'Room Service' => '🛎️', 'Laundry' => '👕', 'Laundry Service' => '👕',
+  'Concierge' => '🤵', 'Bike Rental' => '🚲', 'Bicycle Rental' => '🚲',
+  'Water Sports' => '🤿', 'Golf Course' => '⛳', 'Tennis' => '🎾',
+  'Infinity Pool' => '🏊', 'Rooftop Pool' => '🏊', '3 Pools' => '🏊',
+  'Art Gallery' => '🎨', 'Dive Center' => '🤿', 'Kayaking' => '🚣',
+  'Snorkeling Gear' => '🤿', 'Butler Service' => '🤵', 'Organic Restaurant' => '🍽️',
+  'Surfing Access' => '🏄', 'Kids Club' => '🧸', 'Business Center' => '💼',
+  'Multiple Restaurants' => '🍽️', 'Multiple Pools' => '🏊', 'Tour Desk' => '🗺️',
+  'Hammock Garden' => '🌿', 'Common Area' => '🛋️', 'Courtyard Garden' => '🌿',
+  'Surf Board Rental' => '🏄', 'Surfboard Storage' => '🏄', 'Breakfast Available' => '🍳',
+  'Overwater Villas' => '🏝️', 'Private Beach' => '🏖️', 'Beachfront Location' => '🌊',
+  'Event Halls' => '🎪', '24/7 Front Desk' => '🔑', 'Air Conditioning' => '❄️',
+  'Adventure Park Access' => '🎢', 'Bonfire Area' => '🔥', 'Mountain View' => '⛰️',
+  'BBQ Area' => '🍖', 'Exclusive Use' => '🔒', 'Kitchen Facilities' => '🍴',
+  'Communal Kitchen' => '🍴', 'Outdoor Bar' => '🍹', 'Lagoon Views' => '💧',
+  'Hammocks' => '🌴',
+];

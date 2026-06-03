@@ -27,12 +27,19 @@ include 'includes/header.php';
   <?php if ($dest): ?>
     <!-- ========== SINGLE DESTINATION: HOTEL LIST ========== -->
 
-    <div class="breadcrumb">
-      <a href="index.php">Home</a>
-      <span class="breadcrumb-sep">›</span>
-      <a href="destinations.php">Destinations</a>
-      <span class="breadcrumb-sep">›</span>
-      <span><?= htmlspecialchars($dest['name']) ?></span>
+    <div class="breadcrumb-wrapper">
+      <button class="breadcrumb-back" onclick="window.history.back()" title="Go back to previous page" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <div class="breadcrumb">
+        <a href="index.php">Home</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="destinations.php">Destinations</a>
+        <span class="breadcrumb-sep">›</span>
+        <span><?= htmlspecialchars($dest['name']) ?></span>
+      </div>
     </div>
 
     <!-- Destination Hero -->
@@ -71,7 +78,7 @@ include 'includes/header.php';
         <div class="sidebar-group">
           <label>Star Rating</label>
           <div class="star-filter">
-            <?php foreach ([2,3,4,5] as $s): ?>
+            <?php foreach ([2, 3, 4, 5] as $s): ?>
               <button class="star-btn" onclick="filterStars(<?= $s ?>)"><?= $s ?>★</button>
             <?php endforeach; ?>
             <button class="star-btn" onclick="filterStars(0)" style="font-size:0.75rem;">All</button>
@@ -119,37 +126,18 @@ include 'includes/header.php';
         </p>
         <div class="hotel-cards" id="hotelCards">
           <?php
-            $amenityIcons = [
-              'Free WiFi' => '📶', 'Pool' => '🏊', 'Restaurant' => '🍽️', 'Gym' => '💪',
-              'Spa' => '💆', 'Parking' => '🅿️', 'Breakfast' => '🍳', 'Breakfast Included' => '🍳',
-              'Beach Access' => '🏖️', 'Beachfront' => '🌊', 'Airport Shuttle' => '🚌',
-              'Room Service' => '🛎️', 'Laundry Service' => '👕', 'Laundry' => '👕',
-              'Rooftop Pool' => '🏊', 'Infinity Pool' => '🏊', 'Multiple Pools' => '🏊',
-              '3 Pools' => '🏊', 'Dive Center' => '🤿', 'Art Gallery' => '🎨',
-              'Concierge' => '🤵', 'Butler Service' => '🤵', 'Golf Course' => '⛳',
-              'Private Beach' => '🏖️', 'Beachfront Location' => '🌊',
-              'Free WiFi' => '📶', 'Air Conditioning' => '❄️', '24/7 Front Desk' => '🔑',
-              'Bike Rental' => '🚲', 'Bicycle Rental' => '🚲', 'Tour Desk' => '🗺️',
-              'Water Sports' => '🤿', 'Snorkeling Gear' => '🤿', 'Kayaking' => '🚣',
-              'Surf Board Rental' => '🏄', 'Surfboard Storage' => '🏄', 'Kids Club' => '🧸',
-              'Business Center' => '💼', 'Organic Restaurant' => '🍽️', 'Multiple Restaurants' => '🍽️',
-              'Overwater Villas' => '🏝️', 'Hammock Garden' => '🌿', 'Adventure Park Access' => '🎢',
-              'Bonfire Area' => '🔥', 'Mountain View' => '⛰️', 'BBQ Area' => '🍖',
-              'Exclusive Use' => '🔒', 'Kitchen Facilities' => '🍴', 'Common Area' => '🛋️',
-              'Courtyard Garden' => '🌿', 'Breakfast Available' => '🍳', 'Communal Kitchen' => '🍴',
-              'Hammocks' => '🌴', 'Outdoor Bar' => '🍹', 'Lagoon Views' => '💧',
-            ];
+          include 'includes/amenity-icons.php';
 
-            $hotels = $dest['hotels'];
-            if ($sortBy === 'price-asc')  usort($hotels, fn($a,$b) => $a['price'] - $b['price']);
-            if ($sortBy === 'price-desc') usort($hotels, fn($a,$b) => $b['price'] - $a['price']);
-            if ($sortBy === 'rating')     usort($hotels, fn($a,$b) => $b['rating'] <=> $a['rating']);
+          $hotels = $dest['hotels'];
+          if ($sortBy === 'price-asc')  usort($hotels, fn($a, $b) => $a['price'] - $b['price']);
+          if ($sortBy === 'price-desc') usort($hotels, fn($a, $b) => $b['price'] - $a['price']);
+          if ($sortBy === 'rating')     usort($hotels, fn($a, $b) => $b['rating'] <=> $a['rating']);
 
-            foreach ($hotels as $h):
-              $stars = str_repeat('★', $h['stars']) . str_repeat('☆', 5 - $h['stars']);
-              $hotelBackground = isset($h['image'])
-                ? "linear-gradient(135deg, rgba(0,0,0,0.25), rgba(0,0,0,0.05)), url('{$h['image']}') center/cover no-repeat"
-                : $dest['gradient'];
+          foreach ($hotels as $h):
+            $stars = str_repeat('★', $h['stars']) . str_repeat('☆', 5 - $h['stars']);
+            $hotelBackground = isset($h['image'])
+              ? "linear-gradient(135deg, rgba(0,0,0,0.25), rgba(0,0,0,0.05)), url('{$h['image']}') center/cover no-repeat"
+              : $dest['gradient'];
           ?>
             <a href="hotel.php?dest=<?= $destId ?>&id=<?= $h['id'] ?>" class="hotel-card" data-price="<?= $h['price'] ?>" data-stars="<?= $h['stars'] ?>">
               <div class="hotel-card-img" style="background: <?= $hotelBackground ?>;">
@@ -188,26 +176,13 @@ include 'includes/header.php';
     </div>
 
   <?php else: ?>
-    <!-- ========== ALL DESTINATIONS LISTING ========== -->
+    <!-- ========== ALL DESTINATIONS: GRID VIEW ========== -->
+    
+    <?php
+    include 'includes/destination_functions.php';
 
-    <div class="dest-page-hero">
-      <h1>All Destinations</h1>
-      <p>Explore hotels across <?= count($destinations) ?> stunning Philippine destinations</p>
-    </div>
-
-    <!-- Filters -->
-    <div class="dest-filters">
-      <span class="filter-label">Filter:</span>
-      <a href="destinations.php" class="filter-btn <?= !$region && !$budget ? 'active' : '' ?>">All</a>
-      <?php $regions = array_unique(array_column($destinations, 'region')); ?>
-      <?php foreach ($regions as $r): ?>
-        <a href="?region=<?= urlencode($r) ?>" class="filter-btn <?= strtolower($region) === strtolower($r) ? 'active' : '' ?>"><?= htmlspecialchars($r) ?></a>
-      <?php endforeach; ?>
-      <span class="filter-label" style="margin-left:0.5rem;">Budget:</span>
-      <a href="?budget=low"  class="filter-btn <?= $budget === 'low'  ? 'active' : '' ?>">Under ₱5,000</a>
-      <a href="?budget=mid"  class="filter-btn <?= $budget === 'mid'  ? 'active' : '' ?>">₱5,000–₱7,500</a>
-      <a href="?budget=high" class="filter-btn <?= $budget === 'high' ? 'active' : '' ?>">Above ₱7,500</a>
-    </div>
+    $filteredDests = filterDestinations($destinations, $region, $budget);
+    ?>
 
     <div class="dest-list-section">
       <div class="dest-grid">
@@ -218,9 +193,11 @@ include 'includes/header.php';
               <div class="dest-badge"><?= htmlspecialchars($d['region']) ?></div>
               <div class="dest-price-badge">From ₱<?= number_format($d['price_from']) ?></div>
             </div>
+
             <div class="dest-body">
               <h3><?= htmlspecialchars($d['name']) ?></h3>
               <p><?= htmlspecialchars($d['tagline']) ?></p>
+
               <div class="dest-meta">
                 <span class="dest-meta-hotels">🏨 <?= count($d['hotels']) ?> Hotels</span>
                 <span>Browse →</span>
@@ -237,19 +214,4 @@ include 'includes/header.php';
 
 <?php include 'includes/footer.php'; ?>
 
-<script>
-function filterStars(n) {
-  document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
-  if (event && event.target) event.target.classList.add('active');
-  document.querySelectorAll('.hotel-card').forEach(card => {
-    card.style.display = (n === 0 || parseInt(card.dataset.stars) >= n) ? 'flex' : 'none';
-  });
-}
-
-function filterPrice(val) {
-  document.getElementById('priceDisplay').textContent = 'Up to ₱' + parseInt(val).toLocaleString();
-  document.querySelectorAll('.hotel-card').forEach(card => {
-    card.style.display = parseInt(card.dataset.price) <= parseInt(val) ? 'flex' : 'none';
-  });
-}
-</script>
+<script src="assets/js/destinations.js"></script>

@@ -8,10 +8,10 @@ $rootPath   = '';
 
 include 'includes/header.php';
 ?>
+
 <!-- ======= HOME HERO ======= -->
 <section class="hero">
   <div class="hero-content">
-    <span class="hero-tag">🇵🇭 Your Philippine Journey Starts Here</span>
     <h1>Discover the <em>Beauty</em> of the Philippines</h1>
     <p>Handpicked hotel stays paired with unforgettable local activities — all in one seamless booking platform.</p>
     <div class="hero-btns">
@@ -30,30 +30,44 @@ include 'includes/header.php';
 </section>
 
 <!-- ======= HOME SEARCH ======= -->
-<div class="search-section">
-  <div class="search-group">
-    <label>Destination</label>
-    <select id="homeSearchDest">
-      <option value="">All Destinations</option>
-      <?php foreach ($destinations as $d): ?>
-        <option value="<?= $d['id'] ?>"><?= htmlspecialchars($d['name']) ?></option>
-      <?php endforeach; ?>
-    </select>
+<div class="search-section-wrapper">
+  <div class="row g-3 align-items-end"> 
+    
+    <div class="col-12 col-md-4 col-lg-3">
+      <div class="search-group">
+        <label for="homeSearchDest">Destination</label>
+        <select id="homeSearchDest" class="form-select">
+          <option value="">All Destinations</option>
+          <?php foreach ($destinations as $d): ?>
+            <option value="<?= $d['id'] ?>"><?= htmlspecialchars($d['name']) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+      <div class="search-group">
+        <label for="homeSearchBudget">Budget</label>
+        <select id="homeSearchBudget" class="form-select">
+          <option value="">Any Budget</option>
+          <option value="low">Under ₱5,000</option>
+          <option value="mid">₱5,000 – ₱7,500</option>
+          <option value="high">Above ₱7,500</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+      <div class="search-group">
+        <label for="homeCheckin">Check-in Date</label>
+        <input type="date" id="homeCheckin" class="form-control" min="<?= date('Y-m-d') ?>">
+      </div>
+    </div>
+    <div class="col-12 col-lg-3">
+      <button class="search-btn w-100" onclick="doHomeSearch()">
+        <i class="bi bi-search"></i>
+        <span>Search</span>
+      </button>
+    </div>
   </div>
-  <div class="search-group">
-    <label>Budget</label>
-    <select id="homeSearchBudget">
-      <option value="">Any Budget</option>
-      <option value="low">Under ₱5,000</option>
-      <option value="mid">₱5,000 – ₱7,500</option>
-      <option value="high">Above ₱7,500</option>
-    </select>
-  </div>
-  <div class="search-group">
-    <label>Check-in Date</label>
-    <input type="date" id="homeCheckin" min="<?= date('Y-m-d') ?>">
-  </div>
-  <button class="search-btn" onclick="doHomeSearch()">🔍 Search</button>
 </div>
 
 <!-- ======= FEATURED DESTINATIONS ======= -->
@@ -131,42 +145,3 @@ include 'includes/header.php';
 </section>
 
 <?php include 'includes/footer.php'; ?>
-
-<script>
-// Inject PHP data for JS use
-window.DESTINATIONS = <?= json_encode($destinations, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-
-function doHomeSearch() {
-  const dest   = document.getElementById('homeSearchDest').value;
-  const budget = document.getElementById('homeSearchBudget').value;
-  let url = 'destinations.php?';
-  if (dest)   url += 'dest=' + encodeURIComponent(dest) + '&';
-  if (budget) url += 'budget=' + encodeURIComponent(budget);
-  window.location.href = url;
-}
-
-// Render My Trips from sessionStorage
-function renderMyTrips() {
-  const bookings = JSON.parse(sessionStorage.getItem('lbl_bookings') || '[]');
-  const el = document.getElementById('myTripsContent');
-  if (!bookings.length) return;
-  el.innerHTML = '<div class="dash-stats" style="margin-bottom:1.5rem;">' +
-    '<div class="dash-stat"><div class="dash-stat-num">' + bookings.length + '</div><div class="dash-stat-label">Total Bookings</div></div>' +
-    '<div class="dash-stat"><div class="dash-stat-num">₱' + bookings.reduce((s,b)=>s+(b.total_price||0),0).toLocaleString() + '</div><div class="dash-stat-label">Total Spent</div></div>' +
-    '</div>' +
-    '<div style="display:flex;flex-direction:column;gap:1rem;">' +
-    bookings.map(b => `
-      <div class="booking-card">
-        <div class="booking-dest-icon" style="background:${b.gradient||'var(--primary)'};display:flex;align-items:center;justify-content:center;font-size:1.8rem;width:60px;height:60px;border-radius:12px;flex-shrink:0;">${b.emoji||'🏝️'}</div>
-        <div class="booking-card-info" style="flex:1;">
-          <h4 style="font-weight:700;margin-bottom:4px;">${b.dest_name}</h4>
-          <p style="font-size:0.85rem;color:var(--muted);">${b.hotel_name} · Check-in: ${b.checkin}</p>
-          <p style="font-weight:700;color:var(--primary);margin-top:4px;">₱${(b.total_price||0).toLocaleString()}</p>
-        </div>
-        <span class="booking-status status-upcoming">Upcoming</span>
-      </div>`).join('') +
-    '</div>';
-}
-
-renderMyTrips();
-</script>

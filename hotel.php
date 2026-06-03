@@ -15,28 +15,8 @@ $pageTitle  = $hotel['name'] . ' — LakbayLokal';
 $activePage = 'destinations';
 $rootPath   = '';
 include 'includes/header.php';
+include 'includes/amenity-icons.php';
 
-$amenityIcons = [
-  'Free WiFi' => '📶', 'Pool' => '🏊', 'Restaurant' => '🍽️', 'Gym' => '💪',
-  'Spa' => '💆', 'Parking' => '🅿️', 'Breakfast' => '🍳', 'Breakfast Included' => '🍳',
-  'Beach Access' => '🏖️', 'Beachfront' => '🌊', 'Airport Shuttle' => '🚌',
-  'Room Service' => '🛎️', 'Laundry' => '👕', 'Laundry Service' => '👕',
-  'Concierge' => '🤵', 'Bike Rental' => '🚲', 'Bicycle Rental' => '🚲',
-  'Water Sports' => '🤿', 'Golf Course' => '⛳', 'Tennis' => '🎾',
-  'Infinity Pool' => '🏊', 'Rooftop Pool' => '🏊', '3 Pools' => '🏊',
-  'Art Gallery' => '🎨', 'Dive Center' => '🤿', 'Kayaking' => '🚣',
-  'Snorkeling Gear' => '🤿', 'Butler Service' => '🤵', 'Organic Restaurant' => '🍽️',
-  'Surfing Access' => '🏄', 'Kids Club' => '🧸', 'Business Center' => '💼',
-  'Multiple Restaurants' => '🍽️', 'Multiple Pools' => '🏊', 'Tour Desk' => '🗺️',
-  'Hammock Garden' => '🌿', 'Common Area' => '🛋️', 'Courtyard Garden' => '🌿',
-  'Surf Board Rental' => '🏄', 'Surfboard Storage' => '🏄', 'Breakfast Available' => '🍳',
-  'Overwater Villas' => '🏝️', 'Private Beach' => '🏖️', 'Beachfront Location' => '🌊',
-  'Event Halls' => '🎪', '24/7 Front Desk' => '🔑', 'Air Conditioning' => '❄️',
-  'Adventure Park Access' => '🎢', 'Bonfire Area' => '🔥', 'Mountain View' => '⛰️',
-  'BBQ Area' => '🍖', 'Exclusive Use' => '🔒', 'Kitchen Facilities' => '🍴',
-  'Communal Kitchen' => '🍴', 'Outdoor Bar' => '🍹', 'Lagoon Views' => '💧',
-  'Hammocks' => '🌴',
-];
 $stars = str_repeat('★', $hotel['stars']) . str_repeat('☆', 5 - $hotel['stars']);
 $hotelBackground = isset($hotel['image'])
   ? "linear-gradient(to top, rgba(26,18,8,0.75) 0%, transparent 55%), url('{$hotel['image']}') center/cover no-repeat"
@@ -46,14 +26,21 @@ $hotelBackground = isset($hotel['image'])
 <div class="page-wrapper">
 
   <!-- Breadcrumb -->
-  <div class="breadcrumb">
-    <a href="index.php">Home</a>
-    <span class="breadcrumb-sep">›</span>
-    <a href="destinations.php">Destinations</a>
-    <span class="breadcrumb-sep">›</span>
-    <a href="destinations.php?dest=<?= $destId ?>"><?= htmlspecialchars($dest['name']) ?></a>
-    <span class="breadcrumb-sep">›</span>
-    <span><?= htmlspecialchars($hotel['name']) ?></span>
+  <div class="breadcrumb-wrapper">
+    <button class="breadcrumb-back" onclick="window.history.back()" title="Go back to previous page" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <div class="breadcrumb">
+      <a href="index.php">Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="destinations.php">Destinations</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="destinations.php?dest=<?= $destId ?>"><?= htmlspecialchars($dest['name']) ?></a>
+      <span class="breadcrumb-sep">›</span>
+      <span><?= htmlspecialchars($hotel['name']) ?></span>
+    </div>
   </div>
 
   <!-- Hotel Hero -->

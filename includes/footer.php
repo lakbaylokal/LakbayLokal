@@ -24,11 +24,11 @@
   </div>
   <div class="footer-bottom">
     <span>© <?= date('Y') ?> LakbayLokal. All rights reserved.</span>
-    <span>Made with ❤️ for Filipino travelers</span>
   </div>
 </footer>
 
 
-<script src="<?= $rootPath ?? '' ?>assets/script.js"></script>
+<script src="<?= $rootPath ?? '' ?>assets/js/script.js"></script>
+<script src="assets/js/home.js"></script>
 </body>
 </html>

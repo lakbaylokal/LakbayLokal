@@ -45,7 +45,16 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .page.active { display: block; }
 
 /* HERO */
-.hero { min-height: calc(100vh - 68px); background: linear-gradient(160deg, #FBF7F0 0%, #F5EDE0 60%, #EAF5EE 100%); display: flex; align-items: center; padding: 6rem 5% 4rem; position: relative; overflow: hidden; }
+.hero { min-height: calc(100vh - 68px); 
+  background: linear-gradient(160deg, #FBF7F0 0%, #F5EDE0 60%, #EAF5EE 100%); display: flex; align-items: 
+  center; padding: 6rem 5% 4rem; position: relative; overflow: hidden; }
+
+/* .hero {  */
+  /* min-height: calc(100vh - 68px); 
+  background: linear-gradient(160deg, rgba(251, 247, 240, 0.5) 0%, rgba(245, 237, 224, 0.5) 60%, rgba(234, 245, 238, 0.5) 100%), 
+      url('images/philippines-bg.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; display: flex; align-items: center; padding: 6rem 5% 4rem; position: relative; overflow: hidden; } */
+
 .hero::before { content: ''; position: absolute; top: -100px; right: -200px; width: 700px; height: 700px; background: radial-gradient(circle, rgba(196,96,42,0.08) 0%, transparent 70%); border-radius: 50%;}
 .hero::after { content: ''; position: absolute; bottom: -150px; left: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(46,107,79,0.08) 0%, transparent 70%); border-radius: 50%;}
 .hero-content { max-width: 560px; position: relative; z-index: 1; }
@@ -74,13 +83,75 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .hero-card-price { font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-top: 4px;}
 
 /* SEARCH BAR */
-.search-section { background: white; padding: 2rem 5%; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+/* .search-section { background: white; padding: 2rem 5%; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .search-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 4px;}
 .search-group label { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;}
 .search-group select, .search-group input { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 0.65rem 0.9rem; font-size: 0.9rem; font-family: 'DM Sans', sans-serif; color: var(--deep); background: var(--cream); outline: none; transition: border-color 0.2s; appearance: none; }
 .search-group select:focus, .search-group input:focus { border-color: var(--primary); }
 .search-btn { background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); padding: 0.8rem 1.8rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; align-self: flex-end; white-space: nowrap;}
-.search-btn:hover { background: var(--primary-light); }
+.search-btn:hover { background: var(--primary-light); } */
+
+/* Custom Container Wrapper (Optional, para sa padding ng buong search area) */
+.search-section-wrapper {
+  background: white;
+  padding: 2rem 5%;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Label Styling */
+.search-group label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px; /* Kaunting awang sa ilalim ng label */
+}
+
+/* Custom styling para mag-blend ang Bootstrap inputs sa theme mo */
+.search-group .form-select, 
+.search-group .form-control {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.9rem;
+  font-size: 0.9rem;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--deep);
+  background-color: var(--cream);
+  box-shadow: none; /* Tinatanggal ang default glow ng bootstrap */
+  transition: border-color 0.2s;
+}
+
+/* Kapag clinick ang input or select box */
+.search-group .form-select:focus, 
+.search-group .form-control:focus {
+  border-color: var(--primary);
+  background-color: var(--cream);
+}
+
+/* Custom Search Button gamit ang kulay mo */
+.search-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 1.8rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+  height: 43px; /* Sakto sa height ng Bootstrap controls para pantay */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.search-btn:hover {
+  background: var(--primary-light);
+}
 
 /* DESTINATIONS GRID */
 .section { padding: 4rem 5%; }
