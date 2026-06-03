@@ -16,9 +16,10 @@ $userName = $_SESSION['user']['name'] ?? '';
   <title><?= htmlspecialchars($pageTitle ?? 'LakbayLokal — Explore the Philippines') ?></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="<?= $rootPath ?? '' ?>assets/style.css">
-  <link rel="stylesheet" href="<?= $rootPath ?? '' ?>assets/hotel.css">
-  <link rel="stylesheet" href="<?= $rootPath ?? '' ?>assets/auth.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="<?= $rootPath ?? '' ?>assets/css/style.css">
+  <link rel="stylesheet" href="<?= $rootPath ?? '' ?>assets/css/hotel.css">
+  <link rel="stylesheet" href="<?= $rootPath ?? '' ?>assets/css/auth.css">
 </head>
 
 <body>

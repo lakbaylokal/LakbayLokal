@@ -7,10 +7,33 @@
 }
 
 /* ── BREADCRUMB ──────────────────────────────────── */
-.breadcrumb {
+.breadcrumb-wrapper {
   background: white;
   border-bottom: 1px solid var(--border);
   padding: 0.75rem 5%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.breadcrumb-back {
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.breadcrumb-back:hover {
+  background: var(--primary-pale);
+  color: var(--primary-light);
+}
+.breadcrumb {
   display: flex;
   align-items: center;
   gap: 0.5rem;
