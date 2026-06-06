@@ -415,20 +415,33 @@
 /* ── BOOKING FORM (sidebar) ───────────────────── */
 .booking-form-card {
   background: white;
-  border: 1.5px solid var(--border);
+  border: 1.5px solid rgba(204,180,157,0.35);
   border-radius: var(--radius);
   padding: 1.8rem;
   position: sticky; top: 88px;
-  box-shadow: var(--shadow);
+  box-shadow: 0 24px 60px rgba(18,21,26,0.07);
 }
 .booking-form-card h3 {
   font-family: 'Playfair Display', serif;
   font-size: 1.3rem; margin-bottom: 0.3rem;
 }
+.booking-form-card .form-control,
+.booking-form-card .form-select {
+  background: #fbf7f2;
+  border-color: rgba(204,180,157,0.45);
+}
+.booking-form-card .form-control:focus,
+.booking-form-card .form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.15rem rgba(46,107,79,0.12);
+}
+.booking-form-card .form-label {
+  color: #5d4c41;
+}
 .booking-price-preview {
   display: flex; align-items: baseline; gap: 4px;
   margin-bottom: 1.2rem; padding-bottom: 1.2rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(204,180,157,0.35);
 }
 .booking-price-preview .price-big {
   font-family: 'Playfair Display', serif;
@@ -457,14 +470,14 @@
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 
 .booking-summary-breakdown {
-  background: var(--cream); border-radius: var(--radius-sm);
+  background: rgba(248,246,242,0.95); border-radius: var(--radius-sm);
   padding: 1rem; margin: 1.2rem 0;
   font-size: 0.85rem;
 }
 .breakdown-row {
   display: flex; justify-content: space-between;
   padding: 0.4rem 0;
-  border-bottom: 1px dashed var(--border);
+  border-bottom: 1px dashed rgba(204,180,157,0.45);
 }
 .breakdown-row:last-child { border-bottom: none; font-weight: 700; font-size: 0.95rem; }
 .breakdown-row span { color: var(--muted); }
@@ -477,8 +490,38 @@
   padding: 0.95rem; font-size: 1rem; font-weight: 700;
   cursor: pointer; transition: all 0.2s;
   font-family: 'DM Sans', sans-serif;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 .book-now-btn:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(196,96,42,0.3); }
+
+.btn-primary,
+.btn-outline {
+  justify-content: center;
+}
+
+.hotel-detail-hero-overlay {
+  background: linear-gradient(to top, rgba(26,18,8,0.82) 0%, rgba(26,18,8,0.12) 55%);
+}
+.hotel-detail-hero-content h1 {
+  text-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+.activity-item {
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.activity-item:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  background: rgba(46,107,79,0.08);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+.list-group-item {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.list-group-item:hover {
+  background: rgba(196,96,42,0.08);
+}
 
 /* ── CONFIRMATION PAGE ─────────────────────────── */
 .confirm-page {
