@@ -2,6 +2,23 @@
 // Handles: auth modal, login/signup/logout, nav, My Trips rendering
 
 var currentUser = JSON.parse(sessionStorage.getItem('lbl_user') || 'null');
+const namePattern = /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[ '\-][A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
+
+function setFieldError(inputId, message) {
+  const error = document.getElementById(inputId + 'Error');
+  if (!error) return;
+  error.textContent = message || '';
+  error.classList.toggle('show', Boolean(message));
+}
+
+function clearAuthErrors(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.querySelectorAll('.validation-error').forEach(el => {
+    el.textContent = '';
+    el.classList.remove('show');
+  });
+}
 
 /* ─────────────────────── AUTH MODAL ────────────────────────── */
 
@@ -17,6 +34,7 @@ function closeAuthModal() {
 function switchAuthTab(tab) {
   document.getElementById('authLogin').style.display  = tab === 'login'  ? 'block' : 'none';
   document.getElementById('authSignup').style.display = tab === 'signup' ? 'block' : 'none';
+  clearAuthErrors(tab === 'login' ? 'authLogin' : 'authSignup');
 }
 
 /* ─────────────────────── LOGIN ───────────────────────────────── */
@@ -27,10 +45,15 @@ function handleLogin(event) {
   const password = document.getElementById('loginPassword').value.trim();
 
   if (!email || !password) {
+    if (!email) setFieldError('loginEmail', 'Please enter your email and password.');
+    if (!password) setFieldError('loginPassword', 'Please enter your email and password.');
     showToast('Please enter your email and password.');
     return;
   }
+  setFieldError('loginEmail', '');
+  setFieldError('loginPassword', '');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setFieldError('loginEmail', 'Please enter a valid email address.');
     showToast('Please enter a valid email address.');
     return;
   }
@@ -51,7 +74,8 @@ function handleLogin(event) {
         closeAuthModal();
         showToast('Welcome back, ' + user.FName + '! 👋');
       } else {
-        showToast('Login failed: ' + data.message);
+        setFieldError('loginPassword', 'Incorrect email or password.');
+        showToast(data.message || 'Incorrect email or password.');
       }
     })
     .catch(err => showToast('Error: ' + err.message));
@@ -67,11 +91,32 @@ function handleSignup(event) {
   const password = document.getElementById('signupPassword').value.trim();
 
   if (!FName || !LName || !email || !password) {
+    if (!FName) setFieldError('signupFName', 'Please complete all required fields.');
+    if (!LName) setFieldError('signupLName', 'Please complete all required fields.');
+    if (!email) setFieldError('signupEmail', 'Please complete all required fields.');
+    if (!password) setFieldError('signupPassword', 'Please complete all required fields.');
     showToast('Please complete all required fields.');
     return;
   }
+  clearAuthErrors('authSignup');
+  if (!namePattern.test(FName)) {
+    setFieldError('signupFName', 'Name must contain letters only.');
+    showToast('Name must contain letters only.');
+    return;
+  }
+  if (!namePattern.test(LName)) {
+    setFieldError('signupLName', 'Name must contain letters only.');
+    showToast('Name must contain letters only.');
+    return;
+  }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setFieldError('signupEmail', 'Please enter a valid email address.');
     showToast('Please enter a valid email address.');
+    return;
+  }
+  if (password.length < 6) {
+    setFieldError('signupPassword', 'Password must be at least 6 characters long.');
+    showToast('Password must be at least 6 characters long.');
     return;
   }
 
@@ -93,7 +138,7 @@ function handleSignup(event) {
         closeAuthModal();
         showToast('Account created! Welcome, ' + user.FName + ' 🎉');
       } else {
-        showToast('Signup failed: ' + data.message);
+        showToast(data.message || 'Signup failed.');
       }
     })
     .catch(err => showToast('Error: ' + err.message));
@@ -189,6 +234,28 @@ function showToast(msg) {
 document.addEventListener('DOMContentLoaded', function() {
   // Restore auth state and fetch current user if logged in
   fetchCurrentUser();
+
+  const authValidators = {
+    signupFName: value => namePattern.test(value.trim()) ? '' : 'Name must contain letters only.',
+    signupLName: value => namePattern.test(value.trim()) ? '' : 'Name must contain letters only.',
+    signupPassword: value => value.length >= 6 ? '' : 'Password must be at least 6 characters long.'
+  };
+
+  Object.keys(authValidators).forEach(id => {
+    const input = document.getElementById(id);
+    if (!input) return;
+    input.addEventListener('input', function() {
+      setFieldError(id, authValidators[id](input.value));
+    });
+  });
+
+  ['loginEmail', 'loginPassword', 'signupEmail'].forEach(id => {
+    const input = document.getElementById(id);
+    if (!input) return;
+    input.addEventListener('input', function() {
+      setFieldError(id, '');
+    });
+  });
 
   // Render My Trips if section exists
   if (document.getElementById('myTripsContent') && typeof renderMyTrips === 'function') {

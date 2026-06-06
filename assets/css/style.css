@@ -621,8 +621,10 @@ footer {
   margin-bottom: 2rem;
 }
 .footer-brand h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.4rem; color: white; margin-bottom: 0.8rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: #E8905D;
+    margin-bottom: 0.75rem;
 }
 .footer-brand h3 span { color: var(--primary-light); }
 .footer-brand p { font-size: 0.85rem; line-height: 1.7; }
@@ -749,7 +751,7 @@ footer {
   transition: color 0.2s;
 }
 .footer-col ul li a:hover,
-.footer-col ul li:hover { color: white; }
+.footer-col ul li:hover { color: #E8905D; }
 .footer-bottom {
   border-top: 1px solid rgba(255,255,255,0.1);
   padding-top: 1.5rem;
@@ -764,4 +766,32 @@ footer {
 @media (max-width: 768px) {
   .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
   .footer-bottom { flex-direction: column; text-align: center; }
+}
+
+/* Custom Styles for Dashboard and Trips */
+.trip-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.trip-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+.empty-icon {
+    font-size: 3.5rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+.bg-primary-subtle {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+}
+.text-primary {
+    color: var(--primary) !important;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
 }

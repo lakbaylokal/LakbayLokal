@@ -106,10 +106,12 @@ $userName = $_SESSION['user']['name'] ?? '';
           <div class="form-group">
             <label>Email</label>
             <input type="email" id="loginEmail" placeholder="juan@email.com" required>
+            <small class="validation-error" id="loginEmailError"></small>
           </div>
           <div class="form-group">
             <label>Password</label>
             <input type="password" id="loginPassword" placeholder="••••••••" required>
+            <small class="validation-error" id="loginPasswordError"></small>
           </div>
           <button class="btn-primary auth-submit" type="submit">Login</button>
         </form>
@@ -125,19 +127,23 @@ $userName = $_SESSION['user']['name'] ?? '';
             <div class="form-group">
               <label>First Name</label>
               <input type="text" id="signupFName" required>
+              <small class="validation-error" id="signupFNameError"></small>
             </div>
             <div class="form-group">
               <label>Last Name</label>
               <input type="text" id="signupLName" required>
+              <small class="validation-error" id="signupLNameError"></small>
             </div>
           </div>
           <div class="form-group">
             <label>Email</label>
             <input type="email" id="signupEmail" required>
+            <small class="validation-error" id="signupEmailError"></small>
           </div>
           <div class="form-group">
             <label>Password</label>
             <input type="password" id="signupPassword" required>
+            <small class="validation-error" id="signupPasswordError"></small>
           </div>
           <button class="btn-primary auth-submit" type="submit">Create Account</button>
         </form>

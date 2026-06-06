@@ -174,7 +174,8 @@
               <!-- Full Name -->
               <div class="mb-3">
                 <label class="form-label">Full Name</label>
-                <input type="text" name="guest_name" class="form-control" placeholder="Juan dela Cruz" required>
+                <input type="text" name="guest_name" class="form-control" id="guestNameInput" placeholder="Juan dela Cruz" required>
+                <small class="validation-error" id="guestNameInputError"></small>
               </div>
 
               <!-- Email -->
@@ -189,11 +190,13 @@
                   <label class="form-label">Check-in</label>
                   <input type="date" name="checkin" class="form-control" id="checkinInput" 
                          min="<?= date('Y-m-d') ?>" required onchange="calcTotal()">
+                  <small class="validation-error" id="checkinInputError"></small>
                 </div>
                 <div class="col-6">
                   <label class="form-label">Check-out</label>
                   <input type="date" name="checkout" class="form-control" id="checkoutInput" 
                          min="<?= date('Y-m-d', strtotime('+1 day')) ?>" required onchange="calcTotal()">
+                  <small class="validation-error" id="checkoutInputError"></small>
                 </div>
               </div>
 
@@ -234,6 +237,7 @@
                   <option value="credit_card">Credit Card</option>
                   <option value="debit_card">Debit Card</option>
                 </select>
+                <small class="validation-error" id="paymentMethodSelectError"></small>
               </div>
 
               <!-- GCash Fields -->
@@ -245,11 +249,13 @@
                          pattern="^(09|\+639)\d{9}$"
                          maxlength="13">
                   <small class="form-text">Format: 09XXXXXXXXX</small>
+                  <small class="validation-error" id="gcashNumberError"></small>
                 </div>
                 <div class="mb-3">
                   <label class="form-label">Account Name</label>
                   <input type="text" name="gcash_name" class="form-control" id="gcashName"
                          placeholder="Name registered on GCash">
+                  <small class="validation-error" id="gcashNameError"></small>
                 </div>
               </div>
 
@@ -260,6 +266,7 @@
                   <input type="text" name="card_holder" class="form-control" id="cardHolder"
                          placeholder="As printed on the card"
                          autocomplete="cc-name">
+                  <small class="validation-error" id="cardHolderError"></small>
                 </div>
                 <div class="mb-3">
                   <label class="form-label">Card Number</label>
@@ -268,6 +275,7 @@
                          maxlength="19"
                          autocomplete="cc-number"
                          oninput="formatCardNumber(this)">
+                  <small class="validation-error" id="cardNumberError"></small>
                 </div>
                 <div class="row g-2 mb-3">
                   <div class="col-6">
@@ -277,6 +285,7 @@
                            maxlength="7"
                            autocomplete="cc-exp"
                            oninput="formatExpiry(this)">
+                    <small class="validation-error" id="cardExpiryError"></small>
                   </div>
                   <div class="col-6">
                     <label class="form-label">CVV</label>
@@ -285,6 +294,7 @@
                            maxlength="4"
                            autocomplete="cc-csc"
                            oninput="this.value=this.value.replace(/\D/g,'')">
+                    <small class="validation-error" id="cardCvvError"></small>
                   </div>
                 </div>
               </div>

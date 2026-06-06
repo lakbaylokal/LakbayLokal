@@ -87,21 +87,50 @@ function handleLogin() {
         return;
     }
 
+    $user = findUserByEmail($email);
+    if ($user && password_verify($password, $user['Password'])) {
+        $_SESSION['user'] = [
+            'id' => $user['id'],
+            'FName' => $user['FName'],
+            'LName' => $user['LName'],
+            'Email' => $user['Email'],
+            'role' => 'user',
+            'name' => $user['FName']
+        ];
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'User login successful',
+            'user' => $_SESSION['user']
+        ]);
+
+        return;
+    }
+
     echo json_encode([
         'success' => false,
-        'message' => 'Invalid credentials'
+        'message' => 'Incorrect email or password.'
     ]);
 }
 
 function handleSignup() {
     $FName = $_POST['FName'] ?? '';
     $LName = $_POST['LName'] ?? '';
-    $Mname = $_POST['Mname'] ?? '';
     $Email = $_POST['email'] ?? '';
     $Password = $_POST['password'] ?? '';
 
     if (empty($FName) || empty($LName) || empty($Email) || empty($Password)) {
         echo json_encode(['success' => false, 'message' => 'All fields are required']);
+        return;
+    }
+
+    if (!isValidName($FName) || !isValidName($LName)) {
+        echo json_encode(['success' => false, 'message' => 'Name must contain letters only.']);
+        return;
+    }
+
+    if (strlen($Password) < 6) {
+        echo json_encode(['success' => false, 'message' => 'Password must be at least 6 characters long.']);
         return;
     }
 
@@ -114,7 +143,6 @@ function handleSignup() {
         'id' => count($_SESSION['users']) + 1,
         'FName' => $FName,
         'LName' => $LName,
-        'Mname' => $Mname,
         'Email' => $Email,
         'Password' => password_hash($Password, PASSWORD_BCRYPT)
     ];
@@ -125,7 +153,6 @@ function handleSignup() {
         'id' => $newUser['id'],
         'FName' => $newUser['FName'],
         'LName' => $newUser['LName'],
-        'Mname' => $newUser['Mname'],
         'Email' => $newUser['Email'],
         'name' => $newUser['FName']
     ];
@@ -168,4 +195,8 @@ function findUserByEmail($email) {
         }
     }
     return null;
+}
+
+function isValidName($name) {
+    return preg_match("/^[\\p{L}]+(?:[ '\\-][\\p{L}]+)*$/u", trim($name));
 }
