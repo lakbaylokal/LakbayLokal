@@ -1,4 +1,4 @@
-# 🇵🇭 LakbayLokal
+# LakbayLokal
 
 A premium, minimalist Philippine travel web application designed as a Single Page Application (SPA). It allows users to explore curated local destinations, customize hotel stays, and build trip itineraries in one seamless, unified flow.
 
