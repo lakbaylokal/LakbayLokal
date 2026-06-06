@@ -16,13 +16,15 @@ include 'views/home.view.php';
 
 <!-- ======= MY TRIPS (session-based) ======= -->
 <section class="section" id="mytrips">
-  <div class="section-header">
-    <h2 class="section-title">My <span>Trips</span></h2>
-  </div>
-  <div id="myTripsContent">
-    <div style="text-align:center;padding:3rem;color:var(--muted);">
-      <div style="font-size:3rem;margin-bottom:1rem;">🗺️</div>
-      <p>No bookings yet. <a href="destinations.php" style="color:var(--primary);font-weight:600;">Explore destinations →</a></p>
+  <div class="container-fluid px-5">
+    <div class="section-header">
+      <h2 class="section-title">My <span>Trips</span></h2>
+    </div>
+    <div id="myTripsContent">
+      <div class="text-center py-5" style="color:var(--muted);">
+        <div style="font-size:3rem;margin-bottom:1rem;">🗺️</div>
+        <p>No bookings yet. <a href="destinations.php" style="color:var(--primary);font-weight:600;">Explore destinations →</a></p>
+      </div>
     </div>
   </div>
 </section>
