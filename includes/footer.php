@@ -27,6 +27,7 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmB43xZLNmH8LWbZLjk4bEVPLWEo" crossorigin="anonymous"></script>
 <script src="<?= $rootPath ?? '' ?>assets/js/script.js"></script>
 </body>
 </html>

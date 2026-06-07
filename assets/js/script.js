@@ -198,20 +198,20 @@ function updateAuthNav() {
   const signupBtn   = document.getElementById('navSignupBtn');
   const logoutBtn   = document.getElementById('navLogoutBtn');
   const userLabel   = document.getElementById('navUserName');
-  const mobileLogin  = document.getElementById('mobileLoginLink');
-  const mobileSignup = document.getElementById('mobileSignupLink');
-  const mobileLogout = document.getElementById('mobileLogoutLink');
+  const mobileLogin  = document.getElementById('mobileLoginItem');
+  const mobileSignup = document.getElementById('mobileSignupItem');
+  const mobileLogout = document.getElementById('mobileLogoutItem');
 
-  if (loginBtn)  loginBtn.style.display  = isLoggedIn ? 'none' : '';
-  if (signupBtn) signupBtn.style.display = isLoggedIn ? 'none' : '';
-  if (logoutBtn) logoutBtn.style.display = isLoggedIn ? '' : 'none';
+  if (loginBtn)  loginBtn.style.display  = isLoggedIn ? 'none' : 'inline-flex';
+  if (signupBtn) signupBtn.style.display = isLoggedIn ? 'none' : 'inline-flex';
+  if (logoutBtn) logoutBtn.style.display = isLoggedIn ? 'inline-flex' : 'none';
   if (userLabel) {
-    userLabel.style.display = isLoggedIn ? '' : 'none';
+    userLabel.style.display = isLoggedIn ? 'inline-block' : 'none';
     userLabel.textContent   = isLoggedIn ? ('👤 ' + currentUser.FName) : '';
   }
-  if (mobileLogin)  mobileLogin.style.display  = isLoggedIn ? 'none' : '';
-  if (mobileSignup) mobileSignup.style.display = isLoggedIn ? 'none' : '';
-  if (mobileLogout) mobileLogout.style.display = isLoggedIn ? '' : 'none';
+  if (mobileLogin)  mobileLogin.style.display  = isLoggedIn ? 'none' : 'list-item';
+  if (mobileSignup) mobileSignup.style.display = isLoggedIn ? 'none' : 'list-item';
+  if (mobileLogout) mobileLogout.style.display = isLoggedIn ? 'list-item' : 'none';
 }
 
 /* ─────────────────────── TOAST ───────────────────────────────── */
@@ -262,12 +262,6 @@ document.addEventListener('DOMContentLoaded', function() {
     renderMyTrips();
   }
 
-  // Close mobile menu on outside click
-  document.addEventListener('click', function(e) {
-    const menu = document.getElementById('mobileMenu');
-    const hamburger = document.querySelector('.hamburger');
-    if (menu && menu.classList.contains('open') && !menu.contains(e.target) && e.target !== hamburger && !hamburger.contains(e.target)) {
-      menu.classList.remove('open');
-    }
-  });
+  // Bootstrap collapse handles mobile menu close on outside click
+
 });
