@@ -1,4 +1,6 @@
 <?php
+require_once 'config/db.php';
+require_once 'database/helpers.php';
 require_once 'data.php';
 include 'includes/amenity-icons.php';
 

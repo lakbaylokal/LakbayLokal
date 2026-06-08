@@ -18,10 +18,7 @@ CREATE TABLE users (
   email VARCHAR(180) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
   role ENUM('user', 'admin') DEFAULT 'user',
-  is_active TINYINT(1) DEFAULT 1,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  
   KEY idx_email (email),
   KEY idx_role (role)
 );
@@ -37,12 +34,8 @@ CREATE TABLE destinations (
   description LONGTEXT,
   price INT DEFAULT 0,
   image_url VARCHAR(255),
-  is_active TINYINT(1) DEFAULT 1,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  
-  KEY idx_region (region),
-  KEY idx_active (is_active)
+  KEY idx_region (region)
 );
 
 -- ============================================================================
@@ -61,14 +54,11 @@ CREATE TABLE hotels (
   description LONGTEXT,
   checkin_time TIME DEFAULT '14:00:00',
   checkout_time TIME DEFAULT '11:00:00',
-  is_active TINYINT(1) DEFAULT 1,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   
   FOREIGN KEY (destination_id) REFERENCES destinations(id) ON DELETE CASCADE,
   KEY idx_destination (destination_id),
-  KEY idx_price (price_per_night),
-  KEY idx_active (is_active)
+  KEY idx_price (price_per_night)
 );
 
 -- ============================================================================
@@ -110,14 +100,11 @@ CREATE TABLE activities (
   name VARCHAR(200) NOT NULL,
   price INT NOT NULL,
   description TEXT,
-  is_active TINYINT(1) DEFAULT 1,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   
   FOREIGN KEY (destination_id) REFERENCES destinations(id) ON DELETE CASCADE,
   KEY idx_destination (destination_id),
-  KEY idx_price (price),
-  KEY idx_active (is_active)
+  KEY idx_price (price)
 );
 
 -- ============================================================================

@@ -1,5 +1,7 @@
 <?php
 require_once 'data.php';
+require_once 'config/db.php';
+require_once 'database/helpers.php';
 
 $destId  = $_GET['dest'] ?? '';
 $hotelId = $_GET['id'] ?? '';

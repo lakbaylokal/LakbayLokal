@@ -1,5 +1,6 @@
 <?php
-include 'config/db.php';
+require_once 'config/db.php';
+require_once 'database/helpers.php';
 // api_auth.php — LakbayLokal Authentication API
 // Handles login, signup, and logout operations
 
