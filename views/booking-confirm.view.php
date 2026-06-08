@@ -16,7 +16,8 @@
         <div class="confirm-detail-row"><span>Check-in</span><strong><?= $checkinFmt ?></strong></div>
         <div class="confirm-detail-row"><span>Check-out</span><strong><?= $checkoutFmt ?></strong></div>
         <div class="confirm-detail-row"><span>Duration</span><strong><?= $nights ?> night<?= $nights != 1 ? 's' : '' ?></strong></div>
-        <div class="confirm-detail-row"><span>Rooms / Guests</span><strong><?= $rooms ?> room · <?= $guests ?></strong></div>
+        <div class="confirm-detail-row"><span>Rooms</span><strong><?= $rooms ?> room<?= $rooms != 1 ? 's' : '' ?></strong></div>
+        <div class="confirm-detail-row"><span>Guests</span><strong><?= $guests ?></strong></div>
         <div class="confirm-detail-row"><span>Payment Method</span><strong><?= $paymentMethodDisplay ?></strong></div>
 
         <form action="components/payment.php" method="POST">
