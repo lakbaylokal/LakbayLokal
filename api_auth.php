@@ -17,9 +17,8 @@ if (!isset($_SESSION['users'])) {
     $_SESSION['users'] = [
         [
             'id' => 1,
-            'FName' => 'Juan',
-            'LName' => 'Dela Cruz',
-            'Mname' => 'Sample',
+            'first_Name' => 'Juan',
+            'last_Name' => 'Dela Cruz',
             'Email' => 'juan@example.com',
             'Password' => password_hash('password123', PASSWORD_BCRYPT)
         ]
@@ -91,11 +90,11 @@ function handleLogin() {
     if ($user && password_verify($password, $user['Password'])) {
         $_SESSION['user'] = [
             'id' => $user['id'],
-            'FName' => $user['FName'],
-            'LName' => $user['LName'],
+            'first_Name' => $user['first_Name'],
+            'last_Name' => $user['last_Name'],
             'Email' => $user['Email'],
             'role' => 'user',
-            'name' => $user['FName']
+            'name' => $user['first_Name']
         ];
 
         echo json_encode([
@@ -114,17 +113,17 @@ function handleLogin() {
 }
 
 function handleSignup() {
-    $FName = $_POST['FName'] ?? '';
-    $LName = $_POST['LName'] ?? '';
+    $first_Name = $_POST['first_Name'] ?? '';
+    $last_Name = $_POST['last_Name'] ?? '';
     $Email = $_POST['email'] ?? '';
     $Password = $_POST['password'] ?? '';
 
-    if (empty($FName) || empty($LName) || empty($Email) || empty($Password)) {
+    if (empty($first_Name) || empty($last_Name) || empty($Email) || empty($Password)) {
         echo json_encode(['success' => false, 'message' => 'All fields are required']);
         return;
     }
 
-    if (!isValidName($FName) || !isValidName($LName)) {
+    if (!isValidName($first_Name) || !isValidName($last_Name)) {
         echo json_encode(['success' => false, 'message' => 'Name must contain letters only.']);
         return;
     }
@@ -141,8 +140,8 @@ function handleSignup() {
 
     $newUser = [
         'id' => count($_SESSION['users']) + 1,
-        'FName' => $FName,
-        'LName' => $LName,
+        'first_Name' => $first_Name,
+        'last_Name' => $last_Name,
         'Email' => $Email,
         'Password' => password_hash($Password, PASSWORD_BCRYPT)
     ];
@@ -151,18 +150,18 @@ function handleSignup() {
     
     $_SESSION['user'] = [
         'id' => $newUser['id'],
-        'FName' => $newUser['FName'],
-        'LName' => $newUser['LName'],
+        'first_Name' => $newUser['first_Name'],
+        'last_Name' => $newUser['last_Name'],
         'Email' => $newUser['Email'],
-        'name' => $newUser['FName']
+        'name' => $newUser['first_Name']
     ];
 
     echo json_encode([
         'success' => true,
         'message' => 'Signup successful',
         'user' => [
-            'FName' => $newUser['FName'],
-            'LName' => $newUser['LName'],
+            'first_Name' => $newUser['first_Name'],
+            'last_Name' => $newUser['last_Name'],
             'Email' => $newUser['Email']
         ]
     ]);
@@ -178,8 +177,8 @@ function handleGetCurrentUser() {
         echo json_encode([
             'success' => true,
             'user' => [
-                'FName' => $_SESSION['user']['FName'],
-                'LName' => $_SESSION['user']['LName'],
+                'first_Name' => $_SESSION['user']['first_Name'],
+                'last_Name' => $_SESSION['user']['last_Name'],
                 'Email' => $_SESSION['user']['Email']
             ]
         ]);
