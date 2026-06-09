@@ -22,7 +22,7 @@
         <form action="components/payment.php" method="POST">
           <input type="hidden" name="dest_id" value="<?= $destId ?>">
           <input type="hidden" name="hotel_id" value="<?= $hotelId ?>">
-          <input type="hidden" name="total_price" value="<?= $displayTotal ?>">
+          <input type="hidden" name="total_price" value="<?= $finalTotal ?>">
           <input type="hidden" name="guest_name" value="<?= $guestName ?>">
           <input type="hidden" name="guest_email" value="<?= $guestEmail ?>">
           <input type="hidden" name="checkin" value="<?= $checkin ?>">
@@ -51,10 +51,16 @@
           <span>Hotel (<?= $nights ?> nights × <?= $rooms ?> room<?= $rooms > 1 ? 's' : '' ?>)</span>
           <strong>₱<?= number_format($hotelSubtotal) ?></strong>
         </div>
-        <?php if ($actsTotal > 0): ?>
+        <?php if ($activityTotal > 0): ?>
         <div class="confirm-detail-row">
           <span>Activities Total</span>
-          <strong>₱<?= number_format($actsTotal) ?></strong>
+          <strong>₱<?= number_format($activityTotal) ?></strong>
+        </div>
+        <?php endif; ?>
+        <?php if ($finalDiscountAmount > 0): ?>
+        <div class="confirm-detail-row" style="color: #27ae60;">
+          <span>Discount Applied</span>
+          <strong style="color: #27ae60;">-₱<?= number_format($finalDiscountAmount) ?> (<?= round($appliedDiscount * 100) ?>%)</strong>
         </div>
         <?php endif; ?>
         <div class="confirm-detail-row">
@@ -63,7 +69,7 @@
         </div>
         <div class="confirm-detail-row" style="font-size:1rem;font-weight:700;border-bottom:none;">
           <span><strong>Total Paid</strong></span>
-          <strong style="color:var(--primary);font-size:1.15rem;">₱<?= number_format($displayTotal) ?></strong>
+          <strong style="color:var(--primary);font-size:1.15rem;">₱<?= number_format($finalTotal) ?></strong>
         </div>
       </div>
 

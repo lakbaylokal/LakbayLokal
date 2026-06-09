@@ -24,9 +24,12 @@ $totalPrice   = (int)($_POST['total_price']                ?? 0);
 $nights       = (int)($_POST['nights']                     ?? 0);
 $pricePerNight= (int)($_POST['price_per_night']            ?? 0);
 $actsTotal    = (int)($_POST['acts_total']                 ?? 0);
+$discountAmount = (int)($_POST['discount_amount']          ?? 0);
+$discountPercent = (float)($_POST['discount_percent']      ?? 0);
 $destGradient = htmlspecialchars($_POST['dest_gradient']   ?? '');
 $destEmoji    = htmlspecialchars($_POST['dest_emoji']      ?? '🏝️');
 $selectedActsRaw = $_POST['selected_acts'] ?? '[]';
+$discountCode = htmlspecialchars($_POST['discount_code'] ?? '');
 $gcashNumber  = $_POST['gcash_number'] ?? '';
 $gcashName    = $_POST['gcash_name'] ?? '';
 $cardHolder   = $_POST['card_holder'] ?? '';
@@ -106,6 +109,36 @@ if ($paymentMethod === 'credit_card' || $paymentMethod === 'debit_card') {
   }
 }
 
+// Validate discount code
+$validDiscountCodes = ['LAKBAYLOCAL10' => 0.10];
+$appliedDiscount = 0;
+if (!empty($discountCode)) {
+  $codeUpper = strtoupper(trim($discountCode));
+  if (isset($validDiscountCodes[$codeUpper])) {
+    $appliedDiscount = $validDiscountCodes[$codeUpper];
+  }
+}
+
+// Server-side recalculation for security
+$hotelSubtotal = $pricePerNight * $nights * (int)$rooms;
+$activityTotal = $actsTotal;
+$subtotal = $hotelSubtotal + $activityTotal;
+
+// Apply validated discount
+$serverDiscountAmount = round($subtotal * $appliedDiscount);
+$subtotalAfterDiscount = $subtotal - $serverDiscountAmount;
+$tax = round($subtotalAfterDiscount * 0.12);
+$serverTotal = $subtotalAfterDiscount + $tax;
+
+// Validate that client-calculated total matches server calculation (within rounding)
+if (abs($serverTotal - $totalPrice) > 5) {
+  validationRedirect($destId, $hotelId, 'Price calculation mismatch. Please try again.');
+}
+
+// Use server-calculated values for security
+$finalDiscountAmount = $serverDiscountAmount;
+$finalTotal = $serverTotal;
+
 // Parse activities
 $selectedActs = [];
 $decoded = json_decode($selectedActsRaw, true);
@@ -127,11 +160,8 @@ $paymentMethodDisplay = [
   'debit_card' => '💳 Debit Card'
 ][$paymentMethod] ?? $paymentMethod;
 
-// Compute breakdown (server-side for display)
-$hotelSubtotal = $pricePerNight * $nights * (int)$rooms;
-$subtotal      = $hotelSubtotal + $actsTotal;
-$tax           = round($subtotal * 0.12);
-$displayTotal  = $totalPrice > 0 ? $totalPrice : ($subtotal + $tax);
+// Prepare breakdown variables for view
+$activityTotal = $actsTotal;
 
 $pageTitle  = 'Booking Confirmed! — LakbayLokal';
 $activePage = '';
@@ -153,7 +183,7 @@ include 'includes/footer.php';
     checkout:   '<?= $checkoutFmt ?>',
     nights:     <?= $nights ?>,
     guests:     '<?= addslashes($guests) ?>',
-    total_price: <?= $displayTotal ?>,
+    total_price: <?= $finalTotal ?>,
     gradient:   '<?= addslashes($destGradient) ?>',
     emoji:      '<?= $destEmoji ?>',
   };
