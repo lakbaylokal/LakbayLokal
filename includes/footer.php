@@ -7,9 +7,11 @@
     <div class="footer-col">
       <h4>Destinations</h4>
       <ul>
-        <?php foreach (array_slice($destinations, 0, 5) as $d): ?>
-          <li><a href="<?= $rootPath ?? '' ?>destinations.php?dest=<?= $d['id'] ?>"><?= htmlspecialchars($d['name']) ?></a></li>
-        <?php endforeach; ?>
+        <?php if (!empty($destinations) && is_array($destinations)): ?>
+          <?php foreach (array_slice($destinations, 0, 5) as $d): ?>
+            <li><a href="<?= $rootPath ?? '' ?>destinations.php?dest=<?= $d['id'] ?>"><?= htmlspecialchars($d['name']) ?></a></li>
+          <?php endforeach; ?>
+        <?php endif; ?>
       </ul>
     </div>
     <div class="footer-col">

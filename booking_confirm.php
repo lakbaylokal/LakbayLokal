@@ -1,5 +1,10 @@
 <?php
 require_once 'data.php';
+require_once 'config/db.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   header('Location: index.php');
@@ -69,6 +74,23 @@ function validateExpiry($expiry) {
 function validationRedirect($destId, $hotelId, $message) {
   header('Location: hotel.php?dest=' . urlencode($destId) . '&id=' . urlencode($hotelId) . '&error=' . urlencode($message));
   exit;
+}
+
+function detectCardBrand($number) {
+  $digits = preg_replace('/\D/', '', $number);
+  if (preg_match('/^4[0-9]{12}(?:[0-9]{3})?$/', $digits)) {
+    return 'Visa';
+  }
+  if (preg_match('/^5[1-5][0-9]{14}$/', $digits)) {
+    return 'Mastercard';
+  }
+  if (preg_match('/^3[47][0-9]{13}$/', $digits)) {
+    return 'American Express';
+  }
+  if (preg_match('/^6(?:011|5[0-9]{2})[0-9]{12}$/', $digits)) {
+    return 'Discover';
+  }
+  return 'Card';
 }
 
 // Validate
@@ -149,19 +171,148 @@ if (is_array($decoded)) {
 // Generate reference
 $ref = 'LBL-' . strtoupper(substr(md5($guestEmail . $checkin . microtime()), 0, 8));
 
+// Save booking and payment details to database
+$bookingId = null;
+$bookingStmt = $conn->prepare(
+  "INSERT INTO bookings (
+      reference_code, user_id, guest_name, guest_email,
+      destination_id, hotel_id, check_in_date, check_out_date,
+      number_of_guests, number_of_rooms, subtotal_amount,
+      activities_total, tax_amount, total_price,
+      payment_method, special_requests, status
+    ) VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmed')"
+);
+if ($bookingStmt) {
+  $destIdInt = (int)$destId;
+  $hotelIdInt = (int)$hotelId;
+  $guestNameClean = trim($guestName);
+  $guestEmailClean = trim($guestEmail);
+  $requestsClean = trim($requests);
+  $paymentMethodClean = trim($paymentMethod);
+
+  $bookingStmt->bind_param(
+    str_repeat('s', 3) . str_repeat('i', 2) . str_repeat('s', 2) . str_repeat('i', 6) . str_repeat('s', 2),
+    $ref,
+    $guestNameClean,
+    $guestEmailClean,
+    $destIdInt,
+    $hotelIdInt,
+    $checkin,
+    $checkout,
+    $nights,
+    $rooms,
+    $hotelSubtotal,
+    $activityTotal,
+    $tax,
+    $finalTotal,
+    $paymentMethodClean,
+    $requestsClean
+  );
+
+  if ($bookingStmt->execute()) {
+    $bookingId = $conn->insert_id;
+  }
+  $bookingStmt->close();
+}
+
+if ($bookingId) {
+  $paymentReference = 'PAY-' . strtoupper(substr(md5($ref . microtime()), 0, 10));
+  $paymentStatus = 'completed';
+
+  if ($paymentMethod === 'gcash') {
+    $gcashNumberClean = preg_replace('/\D/', '', $gcashNumber);
+    $gcashNameClean = trim($gcashName);
+    $paymentStmt = $conn->prepare(
+      "INSERT INTO payment_details (
+          booking_id, gcash_number, gcash_account_name,
+          payment_status, payment_reference
+        ) VALUES (?, ?, ?, ?, ?)"
+    );
+    if ($paymentStmt) {
+      $paymentStmt->bind_param(
+        'issss',
+        $bookingId,
+        $gcashNumberClean,
+        $gcashNameClean,
+        $paymentStatus,
+        $paymentReference
+      );
+      $paymentStmt->execute();
+      $paymentStmt->close();
+    }
+  } else {
+    $cardHolderClean = trim($cardHolder);
+    $cardLastFour = substr(preg_replace('/\D/', '', $cardNumber), -4);
+    $cardBrand = detectCardBrand($cardNumber);
+    $paymentStmt = $conn->prepare(
+      "INSERT INTO payment_details (
+          booking_id, card_holder_name, card_last_four, card_brand,
+          payment_status, payment_reference
+        ) VALUES (?, ?, ?, ?, ?, ?)"
+    );
+    if ($paymentStmt) {
+      $paymentStmt->bind_param(
+        'isssss',
+        $bookingId,
+        $cardHolderClean,
+        $cardLastFour,
+        $cardBrand,
+        $paymentStatus,
+        $paymentReference
+      );
+      $paymentStmt->execute();
+      $paymentStmt->close();
+    }
+  }
+}
+
+
 // Format dates
 $checkinFmt  = date('F j, Y', strtotime($checkin));
 $checkoutFmt = date('F j, Y', strtotime($checkout));
 
 // Format payment method for display
 $paymentMethodDisplay = [
-  'gcash' => '💳 GCash',
-  'credit_card' => '💳 Credit Card',
-  'debit_card' => '💳 Debit Card'
+  'gcash' => 'GCash',
+  'credit_card' => 'Credit Card',
+  'debit_card' => 'Debit Card'
 ][$paymentMethod] ?? $paymentMethod;
+$paymentMethodDisplay = preg_replace('/[^\x20-\x7E]/', '', $paymentMethodDisplay);
 
 // Prepare breakdown variables for view
 $activityTotal = $actsTotal;
+
+// Store receipt data in session so separate receipt page can render it
+$receiptData = [
+  'ref' => $ref,
+  'dest_id' => $destId,
+  'hotel_id' => $hotelId,
+  'dest_name' => $destName,
+  'hotel_name' => $hotelName,
+  'guest_name' => $guestName,
+  'guest_email' => $guestEmail,
+  'checkin' => $checkin,
+  'checkout' => $checkout,
+  'checkin_fmt' => $checkinFmt,
+  'checkout_fmt' => $checkoutFmt,
+  'payment_method' => $paymentMethod,
+  'payment_method_display' => $paymentMethodDisplay,
+  'nights' => $nights,
+  'rooms' => $rooms,
+  'guests' => $guests,
+  'special_requests' => $requests,
+  'hotel_subtotal' => $hotelSubtotal,
+  'activity_total' => $activityTotal,
+  'discount_amount' => $finalDiscountAmount,
+  'discount_percent' => $appliedDiscount,
+  'tax' => $tax,
+  'total' => $finalTotal,
+  'selected_activities' => $selectedActs,
+  'created_at' => date('F j, Y \a\t g:i A'),
+];
+
+$_SESSION['receipt_history'][$ref] = $receiptData;
+$_SESSION['latest_receipt'] = $ref;
 
 $pageTitle  = 'Booking Confirmed! — LakbayLokal';
 $activePage = '';
