@@ -3,6 +3,8 @@
 
 var currentUser = JSON.parse(sessionStorage.getItem('lbl_user') || 'null');
 const namePattern = /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[ '\-][A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
+// API endpoint (prefixed by PHP-provided root path when present)
+const API_URL = (window.ROOT_PATH || '') + 'api_auth.php';
 
 function setFieldError(inputId, message) {
   const error = document.getElementById(inputId + 'Error');
@@ -64,7 +66,7 @@ function handleLogin(event) {
   formData.append('email', email);
   formData.append('password', password);
 
-  fetch('api_auth.php', { method: 'POST', body: formData })
+  fetch(API_URL, { method: 'POST', body: formData })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
@@ -128,7 +130,7 @@ function handleSignup(event) {
   formData.append('email', email);
   formData.append('password', password);
 
-  fetch('api_auth.php', { method: 'POST', body: formData })
+  fetch(API_URL, { method: 'POST', body: formData })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
@@ -150,7 +152,7 @@ function logoutUser() {
   const formData = new FormData();
   formData.append('action', 'logout');
 
-  fetch('api_auth.php', { method: 'POST', body: formData })
+  fetch(API_URL, { method: 'POST', body: formData })
     .then(() => {
       sessionStorage.removeItem('lbl_user');
       currentUser = null;
@@ -174,7 +176,7 @@ function fetchCurrentUser() {
   }
 
   // Fetch from server if session exists (on page reload)
-  fetch('api_auth.php?action=getCurrentUser')
+  fetch(API_URL + '?action=getCurrentUser')
     .then(res => res.json())
     .then(data => {
       if (data.success && data.user) {
