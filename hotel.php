@@ -75,7 +75,7 @@ include 'includes/footer.php';
   function applyDiscount() {
     const code = document.getElementById('discountCode').value.trim().toUpperCase();
 
-    if (code === "LAKBAYLOCAL10") {
+    if (code === "LAKBAYLOKAL10") {
       currentDiscount = 0.10; // 10%
       currentDiscountCode = code;
     } else {

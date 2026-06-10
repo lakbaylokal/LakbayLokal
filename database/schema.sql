@@ -10,12 +10,13 @@ USE lakbaylokal;
 -- ============================================================================
 -- 1. USERS TABLE
 -- ============================================================================
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  first_name VARCHAR(100) NOT NULL,
-  last_name VARCHAR(100) NOT NULL,
+  fname VARCHAR(100) NOT NULL,
+  lname VARCHAR(100) NOT NULL,
   email VARCHAR(180) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
   role ENUM('user', 'admin') DEFAULT 'user',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   KEY idx_email (email),
@@ -384,7 +385,7 @@ INSERT INTO activities (destination_id, name, price, description) VALUES
 -- ============================================================================
 -- SAMPLE USERS
 -- ============================================================================
-INSERT INTO users (first_name, last_name, email, password_hash, role) VALUES
+INSERT INTO users (fname, lname, email, password, role) VALUES
 ('Admin', 'User', 'admin@lakbaylokal.com', '$2y$10$Z3Tm5wTFjXBJG8qN4bL2NO9pqkZmWsXxZ3dRlQ0L9VhYzZ4kG1lzS', 'admin'),
 ('John', 'Doe', 'john@example.com', '$2y$10$1gPWzcwZpMQYEF3Q8xK2Q.8wJ3K8xZ2Q9mN4fG7pR3R3sT5uE2qJ2', 'user'),
 ('Maria', 'Santos', 'maria@example.com', '$2y$10$x3M8nK9oP2L1Q4R5S6T7U8V9W0X1Y2Z3A4B5C6D7E8F9G0H1I2J3', 'user');

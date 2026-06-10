@@ -183,7 +183,7 @@ CREATE TABLE `booking_activities` (
 -- ============================================================================
 
 INSERT INTO `users` (`FName`, `LName`, `Mname`, `Email`, `Password`, `role`) VALUES
-('Admin', 'User', 'Test', 'admin@lakbaylokal.com', '$2y$10$YQv8XqPjKsKYlM.F4zZ6K.AW8l7G.5Xz0P5KpS8r9Q0Q0Q0Q0Q0Qq', 'admin'),
+('Admin', 'User', 'Test', 'admin@lakbaylokal.com', '$2y$10$6xXQLki/XEq43lanGNMsfee9QF4LmsOKg4GL00FTAnciMe.DzbTv6', 'admin'),
 ('Test', 'User', 'Sample', 'user@test.com', '$2y$10$YQv8XqPjKsKYlM.F4zZ6K.AW8l7G.5Xz0P5KpS8r9Q0Q0Q0Q0Q0Qq', 'user'),
 ('Juan', 'Dela Cruz', 'Sample', 'juan@example.com', '$2y$10$YQv8XqPjKsKYlM.F4zZ6K.AW8l7G.5Xz0P5KpS8r9Q0Q0Q0Q0Q0Qq', 'user');
 

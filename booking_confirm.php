@@ -110,7 +110,7 @@ if ($paymentMethod === 'credit_card' || $paymentMethod === 'debit_card') {
 }
 
 // Validate discount code
-$validDiscountCodes = ['LAKBAYLOCAL10' => 0.10];
+$validDiscountCodes = ['LAKBAYLOKAL10' => 0.10];
 $appliedDiscount = 0;
 if (!empty($discountCode)) {
   $codeUpper = strtoupper(trim($discountCode));

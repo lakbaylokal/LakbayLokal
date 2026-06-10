@@ -7,7 +7,7 @@
         <h3 class="mt-3">Mabuhay! Narito ang iyong Welcome Gift!</h3>
         <p class="text-muted">Gamitin ang code na ito para sa bawas-presyo sa iyong unang booking.</p>
         <div class="p-3 my-3 bg-light border rounded">
-          <strong style="font-size: 1.5rem; color: var(--primary);" id="promoCodeText">LAKBAYLOCAL10</strong>
+          <strong style="font-size: 1.5rem; color: var(--primary);" id="promoCodeText">LAKBAYLOKAL10</strong>
         </div>
         <p class="small text-danger">*Minsan lang ito lalabas. I-copy o i-screenshot mo na!</p>
         <button type="button" class="btn btn-hero-primary w-100" data-bs-dismiss="modal">Salamat! I-explore ang Pinas</button>
