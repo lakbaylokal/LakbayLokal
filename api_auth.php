@@ -1,7 +1,7 @@
 <?php
 include 'config/db.php';
 // api_auth.php — LakbayLokal Authentication API
-// Handles login, signup, and logout operations
+// Handles login, signup, and logout operations with database persistence
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -11,27 +11,12 @@ header('Content-Type: application/json');
 
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
-// Simple in-memory user database (in production, use a real database)
-// This is stored in session for demo purposes
-if (!isset($_SESSION['users'])) {
-    $_SESSION['users'] = [
-        [
-            'id' => 1,
-            'FName' => 'Juan',
-            'LName' => 'Dela Cruz',
-            'Mname' => 'Sample',
-            'Email' => 'juan@example.com',
-            'Password' => password_hash('password123', PASSWORD_BCRYPT)
-        ]
-    ];
-}
-
 switch ($action) {
     case 'login':
-        handleLogin();
+        handleLogin($conn);
         break;
     case 'signup':
-        handleSignup();
+        handleSignup($conn);
         break;
     case 'logout':
         handleLogout();
@@ -44,127 +29,147 @@ switch ($action) {
         echo json_encode(['success' => false, 'message' => 'Invalid action']);
 }
 
-function handleLogin() {
 
+function handleLogin($conn) {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    if ($email === 'admin@lakbaylokal.com' && $password === 'admin123') {
-
-        $_SESSION['user'] = [
-            'id' => 1,
-            'FName' => 'Admin',
-            'LName' => 'User',
-            'Email' => $email,
-            'role' => 'admin'
-        ];
-
-        echo json_encode([
-            'success' => true,
-            'message' => 'Admin login successful',
-            'user' => $_SESSION['user']
-        ]);
-
+    if (empty($email) || empty($password)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Email and password required']);
         return;
     }
 
-    if ($email === 'user@test.com' && $password === 'user123') {
-
-        $_SESSION['user'] = [
-            'id' => 2,
-            'FName' => 'Test',
-            'LName' => 'User',
-            'Email' => $email,
-            'role' => 'user'
-        ];
-
-        echo json_encode([
-            'success' => true,
-            'message' => 'User login successful',
-            'user' => $_SESSION['user']
-        ]);
-
+    $query = "SELECT id, FName, LName, Email, Password, role FROM users WHERE Email = ?";
+    $stmt = $conn->prepare($query);
+    
+    if (!$stmt) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
         return;
     }
 
-    $user = findUserByEmail($email);
-    if ($user && password_verify($password, $user['Password'])) {
-        $_SESSION['user'] = [
-            'id' => $user['id'],
-            'FName' => $user['FName'],
-            'LName' => $user['LName'],
-            'Email' => $user['Email'],
-            'role' => 'user',
-            'name' => $user['FName']
-        ];
-
-        echo json_encode([
-            'success' => true,
-            'message' => 'User login successful',
-            'user' => $_SESSION['user']
-        ]);
-
+    $stmt->bind_param('s', $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows === 0) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Incorrect email or password.']);
         return;
     }
+
+    $user = $result->fetch_assoc();
+    $stmt->close();
+
+    if (!password_verify($password, $user['Password'])) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Incorrect email or password.']);
+        return;
+    }
+
+    $_SESSION['user'] = [
+        'id' => $user['id'],
+        'FName' => $user['FName'],
+        'LName' => $user['LName'],
+        'Email' => $user['Email'],
+        'role' => $user['role'],
+        'name' => $user['FName']
+    ];
 
     echo json_encode([
-        'success' => false,
-        'message' => 'Incorrect email or password.'
+        'success' => true,
+        'message' => 'Login successful',
+        'user' => $_SESSION['user']
     ]);
 }
 
-function handleSignup() {
+
+
+function handleSignup($conn) {
     $FName = $_POST['FName'] ?? '';
     $LName = $_POST['LName'] ?? '';
+    $Mname = $_POST['Mname'] ?? '';
     $Email = $_POST['email'] ?? '';
     $Password = $_POST['password'] ?? '';
 
     if (empty($FName) || empty($LName) || empty($Email) || empty($Password)) {
+        http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'All fields are required']);
         return;
     }
 
     if (!isValidName($FName) || !isValidName($LName)) {
+        http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Name must contain letters only.']);
         return;
     }
 
     if (strlen($Password) < 6) {
+        http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Password must be at least 6 characters long.']);
         return;
     }
 
-    if (findUserByEmail($Email)) {
+    // Check if email already exists
+    $checkQuery = "SELECT id FROM users WHERE Email = ?";
+    $checkStmt = $conn->prepare($checkQuery);
+    
+    if (!$checkStmt) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
+        return;
+    }
+
+    $checkStmt->bind_param('s', $Email);
+    $checkStmt->execute();
+    $checkResult = $checkStmt->get_result();
+    $checkStmt->close();
+
+    if ($checkResult->num_rows > 0) {
+        http_response_code(409);
         echo json_encode(['success' => false, 'message' => 'Email already exists']);
         return;
     }
 
-    $newUser = [
-        'id' => count($_SESSION['users']) + 1,
+    // Hash the password
+    $hashedPassword = password_hash($Password, PASSWORD_BCRYPT);
+
+    // Insert new user into database
+    $insertQuery = "INSERT INTO users (FName, LName, Mname, Email, Password, role) VALUES (?, ?, ?, ?, ?, 'user')";
+    $insertStmt = $conn->prepare($insertQuery);
+    
+    if (!$insertStmt) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
+        return;
+    }
+
+    $insertStmt->bind_param('sssss', $FName, $LName, $Mname, $Email, $hashedPassword);
+    
+    if (!$insertStmt->execute()) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Failed to create account']);
+        $insertStmt->close();
+        return;
+    }
+
+    $newUserId = $insertStmt->insert_id;
+    $insertStmt->close();
+
+    $_SESSION['user'] = [
+        'id' => $newUserId,
         'FName' => $FName,
         'LName' => $LName,
         'Email' => $Email,
-        'Password' => password_hash($Password, PASSWORD_BCRYPT)
-    ];
-
-    $_SESSION['users'][] = $newUser;
-    
-    $_SESSION['user'] = [
-        'id' => $newUser['id'],
-        'FName' => $newUser['FName'],
-        'LName' => $newUser['LName'],
-        'Email' => $newUser['Email'],
-        'name' => $newUser['FName']
+        'role' => 'user',
+        'name' => $FName
     ];
 
     echo json_encode([
         'success' => true,
         'message' => 'Signup successful',
-        'user' => [
-            'FName' => $newUser['FName'],
-            'LName' => $newUser['LName'],
-            'Email' => $newUser['Email']
-        ]
+        'user' => $_SESSION['user']
     ]);
 }
 
@@ -180,21 +185,13 @@ function handleGetCurrentUser() {
             'user' => [
                 'FName' => $_SESSION['user']['FName'],
                 'LName' => $_SESSION['user']['LName'],
-                'Email' => $_SESSION['user']['Email']
+                'Email' => $_SESSION['user']['Email'],
+                'role' => $_SESSION['user']['role'] ?? 'user'
             ]
         ]);
     } else {
         echo json_encode(['success' => false, 'message' => 'No user logged in']);
     }
-}
-
-function findUserByEmail($email) {
-    foreach ($_SESSION['users'] as $user) {
-        if ($user['Email'] === $email) {
-            return $user;
-        }
-    }
-    return null;
 }
 
 function isValidName($name) {

@@ -108,6 +108,33 @@ CREATE TABLE `activities` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
+-- TABLE: users
+-- ============================================================================
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `FName` VARCHAR(100) NOT NULL,
+  `LName` VARCHAR(100) NOT NULL,
+  `Mname` VARCHAR(100),
+  `Email` VARCHAR(150) NOT NULL UNIQUE,
+  `Password` VARCHAR(255) NOT NULL,
+  `role` VARCHAR(20) DEFAULT 'user',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY `idx_email` (`Email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- DATA: Users (Sample data - passwords are hashed with bcrypt)
+-- ============================================================================
+
+INSERT INTO `users` (`FName`, `LName`, `Mname`, `Email`, `Password`, `role`) VALUES
+('Admin', 'User', 'Test', 'admin@lakbaylokal.com', '$2y$10$YQv8XqPjKsKYlM.F4zZ6K.AW8l7G.5Xz0P5KpS8r9Q0Q0Q0Q0Q0Qq', 'admin'),
+('Test', 'User', 'Sample', 'user@test.com', '$2y$10$YQv8XqPjKsKYlM.F4zZ6K.AW8l7G.5Xz0P5KpS8r9Q0Q0Q0Q0Q0Qq', 'user'),
+('Juan', 'Dela Cruz', 'Sample', 'juan@example.com', '$2y$10$YQv8XqPjKsKYlM.F4zZ6K.AW8l7G.5Xz0P5KpS8r9Q0Q0Q0Q0Q0Qq', 'user');
+
+-- ============================================================================
 -- DATA: Destinations
 -- ============================================================================
 
