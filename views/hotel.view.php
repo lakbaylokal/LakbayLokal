@@ -162,7 +162,7 @@
               <span class="price-unit" style="color: var(--muted); font-size: 0.9rem;">/ night</span>
             </div>
 
-            <form action="booking_confirm.php" method="POST" id="bookingForm">
+            <form action="booking_confirm.php" method="POST" id="bookingForm" onsubmit="return prepareSubmit()">
               <input type="hidden" name="dest_id" value="<?= htmlspecialchars($destId) ?>">
               <input type="hidden" name="hotel_id" value="<?= htmlspecialchars($hotelId) ?>">
               <input type="hidden" name="dest_name" value="<?= htmlspecialchars($dest['name']) ?>">
@@ -348,7 +348,7 @@
               <input type="hidden" name="acts_total" id="actsTotalInput" value="0">
 
               <!-- Submit Button -->
-              <button type="submit" class="btn btn-primary w-100 btn-lg mb-3" onclick="return prepareSubmit()">
+              <button type="submit" class="btn btn-primary w-100 btn-lg mb-3">
                 Confirm Booking →
               </button>
             </form>

@@ -126,6 +126,59 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
+-- TABLE: bookings
+-- ============================================================================
+
+DROP TABLE IF EXISTS `bookings`;
+CREATE TABLE `bookings` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `reference_code` VARCHAR(30) NOT NULL UNIQUE,
+  `user_id` INT NULL,
+  `guest_name` VARCHAR(150) NOT NULL,
+  `guest_email` VARCHAR(180) NOT NULL,
+  `destination_id` VARCHAR(50) NOT NULL,
+  `hotel_id` VARCHAR(100) NOT NULL,
+  `checkin_date` DATE NOT NULL,
+  `checkout_date` DATE NOT NULL,
+  `number_of_guests` INT NOT NULL DEFAULT 1,
+  `number_of_rooms` INT NOT NULL DEFAULT 1,
+  `subtotal` INT DEFAULT 0,
+  `activities_total` INT DEFAULT 0,
+  `tax_amount` INT DEFAULT 0,
+  `total_price` INT NOT NULL,
+  `payment_method` VARCHAR(50) DEFAULT NULL,
+  `special_requests` TEXT,
+  `status` VARCHAR(50) DEFAULT 'pending',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL,
+  FOREIGN KEY (`destination_id`) REFERENCES `destinations`(`id`) ON DELETE RESTRICT,
+  FOREIGN KEY (`hotel_id`) REFERENCES `hotels`(`id`) ON DELETE RESTRICT,
+  KEY `idx_user` (`user_id`),
+  KEY `idx_destination` (`destination_id`),
+  KEY `idx_hotel` (`hotel_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- TABLE: booking_activities
+-- ============================================================================
+
+DROP TABLE IF EXISTS `booking_activities`;
+CREATE TABLE `booking_activities` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `booking_id` INT NOT NULL,
+  `activity_id` INT NOT NULL,
+  `activity_name` VARCHAR(150) NOT NULL,
+  `activity_price` INT NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`booking_id`) REFERENCES `bookings`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`activity_id`) REFERENCES `activities`(`id`) ON DELETE RESTRICT,
+  KEY `idx_booking` (`booking_id`),
+  KEY `idx_activity` (`activity_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
 -- DATA: Users (Sample data - passwords are hashed with bcrypt)
 -- ============================================================================
 
