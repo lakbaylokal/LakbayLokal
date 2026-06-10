@@ -179,6 +179,26 @@ CREATE TABLE `booking_activities` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
+-- TABLE: payment_details
+-- ============================================================================
+
+DROP TABLE IF EXISTS `payment_details`;
+CREATE TABLE `payment_details` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `booking_id` INT NOT NULL UNIQUE,
+  `gcash_number` VARCHAR(20),
+  `gcash_account_name` VARCHAR(120),
+  `card_holder_name` VARCHAR(120),
+  `card_last_four` VARCHAR(4),
+  `card_brand` VARCHAR(20),
+  `payment_status` VARCHAR(50) DEFAULT 'pending',
+  `payment_reference` VARCHAR(100),
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`booking_id`) REFERENCES `bookings`(`id`) ON DELETE CASCADE,
+  KEY `idx_status` (`payment_status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
 -- DATA: Users (Sample data - passwords are hashed with bcrypt)
 -- ============================================================================
 

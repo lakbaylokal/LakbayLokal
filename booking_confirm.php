@@ -176,31 +176,31 @@ $bookingId = null;
 $bookingStmt = $conn->prepare(
   "INSERT INTO bookings (
       reference_code, user_id, guest_name, guest_email,
-      destination_id, hotel_id, check_in_date, check_out_date,
-      number_of_guests, number_of_rooms, subtotal_amount,
+      destination_id, hotel_id, checkin_date, checkout_date,
+      number_of_guests, number_of_rooms, subtotal,
       activities_total, tax_amount, total_price,
       payment_method, special_requests, status
     ) VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmed')"
 );
 if ($bookingStmt) {
-  $destIdInt = (int)$destId;
-  $hotelIdInt = (int)$hotelId;
   $guestNameClean = trim($guestName);
   $guestEmailClean = trim($guestEmail);
   $requestsClean = trim($requests);
   $paymentMethodClean = trim($paymentMethod);
+  $guestCount = (int)$guests;
+  $roomCount = (int)$rooms;
 
   $bookingStmt->bind_param(
-    str_repeat('s', 3) . str_repeat('i', 2) . str_repeat('s', 2) . str_repeat('i', 6) . str_repeat('s', 2),
+    str_repeat('s', 7) . str_repeat('i', 6) . str_repeat('s', 2),
     $ref,
     $guestNameClean,
     $guestEmailClean,
-    $destIdInt,
-    $hotelIdInt,
+    $destId,
+    $hotelId,
     $checkin,
     $checkout,
-    $nights,
-    $rooms,
+    $guestCount,
+    $roomCount,
     $hotelSubtotal,
     $activityTotal,
     $tax,
