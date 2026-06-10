@@ -4,7 +4,7 @@
   <div class="breadcrumb-wrapper px-5 py-3">
     <button class="breadcrumb-back" onclick="window.history.back()" title="Go back to previous page" aria-label="Back">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
+        <path d="M19 12H5M12 19l-7-7 7-7" />
       </svg>
     </button>
     <div class="breadcrumb">
@@ -28,6 +28,7 @@
         📍 <?= htmlspecialchars($hotel['location']) ?>
         <span class="hotel-rating-pill">⭐ <?= $hotel['rating'] ?> (<?= $hotel['reviews'] ?> reviews)</span>
       </div>
+
     </div>
   </div>
 
@@ -94,11 +95,11 @@
             <div id="activityList" class="d-flex flex-column gap-2">
               <?php foreach ($dest['acts'] as $i => $act): ?>
                 <div class="activity-item p-3 rounded d-flex justify-content-between align-items-center cursor-pointer"
-                     id="act-<?= $i ?>"
-                     data-name="<?= htmlspecialchars($act['name']) ?>"
-                     data-price="<?= $act['price'] ?>"
-                     onclick="toggleActivity(<?= $i ?>)"
-                     style="background: white; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s;">
+                  id="act-<?= $i ?>"
+                  data-name="<?= htmlspecialchars($act['name']) ?>"
+                  data-price="<?= $act['price'] ?>"
+                  onclick="toggleActivity(<?= $i ?>)"
+                  style="background: white; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s;">
                   <div>
                     <div class="activity-name fw-500"><?= htmlspecialchars($act['name']) ?></div>
                   </div>
@@ -128,10 +129,10 @@
               <?php foreach ($dest['hotels'] as $h):
                 if ($h['id'] === $hotelId) continue; ?>
                 <a href="hotel.php?dest=<?= $destId ?>&id=<?= $h['id'] ?>"
-                   class="d-flex justify-content-between align-items-center p-3 rounded text-decoration-none"
-                   style="background: var(--cream); border: 1px solid var(--border); color: inherit; transition: all 0.2s;"
-                   onmouseover="this.style.borderColor='var(--primary)'" 
-                   onmouseout="this.style.borderColor='var(--border)'">
+                  class="d-flex justify-content-between align-items-center p-3 rounded text-decoration-none"
+                  style="background: var(--cream); border: 1px solid var(--border); color: inherit; transition: all 0.2s;"
+                  onmouseover="this.style.borderColor='var(--primary)'"
+                  onmouseout="this.style.borderColor='var(--border)'">
                   <div>
                     <div class="fw-600" style="font-size: 0.9rem;"><?= htmlspecialchars($h['name']) ?></div>
                     <small style="color: var(--muted);">⭐ <?= $h['rating'] ?> · <?= str_repeat('★', $h['stars']) ?></small>
@@ -149,11 +150,11 @@
 
         <!-- RIGHT COLUMN: Booking Form (col-lg-4) -->
         <div class="col-12 col-lg-4">
-          <div class="booking-form-card position-sticky p-4 rounded" 
-               style="background: white; border: 1px solid var(--border); box-shadow: var(--shadow); top: 90px;">
-            
+          <div class="booking-form-card position-sticky p-4 rounded"
+            style="background: white; border: 1px solid var(--border); box-shadow: var(--shadow); top: 90px;">
+
             <h3 class="mb-3">Book This Hotel</h3>
-            
+
             <div class="booking-price-preview mb-4">
               <span class="price-big" style="font-size: 2rem; color: var(--primary); font-weight: 700;">
                 ₱<?= number_format($hotel['price']) ?>
@@ -162,14 +163,16 @@
             </div>
 
             <form action="booking_confirm.php" method="POST" id="bookingForm">
-              <input type="hidden" name="dest_id"        value="<?= htmlspecialchars($destId) ?>">
-              <input type="hidden" name="hotel_id"       value="<?= htmlspecialchars($hotelId) ?>">
-              <input type="hidden" name="dest_name"      value="<?= htmlspecialchars($dest['name']) ?>">
-              <input type="hidden" name="hotel_name"     value="<?= htmlspecialchars($hotel['name']) ?>">
+              <input type="hidden" name="dest_id" value="<?= htmlspecialchars($destId) ?>">
+              <input type="hidden" name="hotel_id" value="<?= htmlspecialchars($hotelId) ?>">
+              <input type="hidden" name="dest_name" value="<?= htmlspecialchars($dest['name']) ?>">
+              <input type="hidden" name="hotel_name" value="<?= htmlspecialchars($hotel['name']) ?>">
               <input type="hidden" name="price_per_night" value="<?= $hotel['price'] ?>">
-              <input type="hidden" name="dest_gradient"  value="<?= htmlspecialchars($dest['gradient']) ?>">
-              <input type="hidden" name="dest_emoji"     value="<?= $dest['emoji'] ?>">
-              <input type="hidden" name="selected_acts"  id="selectedActsInput" value="">
+              <input type="hidden" name="dest_gradient" value="<?= htmlspecialchars($dest['gradient']) ?>">
+              <input type="hidden" name="dest_emoji" value="<?= $dest['emoji'] ?>">
+              <input type="hidden" name="selected_acts" id="selectedActsInput" value="">
+              <input type="hidden" name="discount_amount" id="discountAmountInput" value="0">
+              <input type="hidden" name="discount_percent" id="discountPercentInput" value="0">
 
               <!-- Full Name -->
               <div class="mb-3">
@@ -188,14 +191,14 @@
               <div class="row g-2 mb-3">
                 <div class="col-6">
                   <label class="form-label">Check-in</label>
-                  <input type="date" name="checkin" class="form-control" id="checkinInput" 
-                         min="<?= date('Y-m-d') ?>" required onchange="calcTotal()">
+                  <input type="date" name="checkin" class="form-control" id="checkinInput"
+                    min="<?= date('Y-m-d') ?>" required onchange="calcTotal()">
                   <small class="validation-error" id="checkinInputError"></small>
                 </div>
                 <div class="col-6">
                   <label class="form-label">Check-out</label>
-                  <input type="date" name="checkout" class="form-control" id="checkoutInput" 
-                         min="<?= date('Y-m-d', strtotime('+1 day')) ?>" required onchange="calcTotal()">
+                  <input type="date" name="checkout" class="form-control" id="checkoutInput"
+                    min="<?= date('Y-m-d', strtotime('+1 day')) ?>" required onchange="calcTotal()">
                   <small class="validation-error" id="checkoutInputError"></small>
                 </div>
               </div>
@@ -240,21 +243,30 @@
                 <small class="validation-error" id="paymentMethodSelectError"></small>
               </div>
 
+              <!-- Discount Code -->
+              <div class="mb-3">
+                <label class="form-label">Discount Code (optional)</label>
+                <input type="text" name="discount_code" id="discountCode"
+                  class="form-control"
+                  placeholder="Enter promo code"
+                  oninput="applyDiscount()">
+              </div>
+
               <!-- GCash Fields -->
               <div id="gcashFields" style="display:none;">
                 <div class="mb-3">
                   <label class="form-label">GCash Mobile Number</label>
                   <input type="tel" name="gcash_number" class="form-control" id="gcashNumber"
-                         placeholder="09XX XXX XXXX"
-                         pattern="^(09|\+639)\d{9}$"
-                         maxlength="13">
+                    placeholder="09XX XXX XXXX"
+                    pattern="^(09|\+639)\d{9}$"
+                    maxlength="13">
                   <small class="form-text">Format: 09XXXXXXXXX</small>
                   <small class="validation-error" id="gcashNumberError"></small>
                 </div>
                 <div class="mb-3">
                   <label class="form-label">Account Name</label>
                   <input type="text" name="gcash_name" class="form-control" id="gcashName"
-                         placeholder="Name registered on GCash">
+                    placeholder="Name registered on GCash">
                   <small class="validation-error" id="gcashNameError"></small>
                 </div>
               </div>
@@ -264,36 +276,36 @@
                 <div class="mb-3">
                   <label class="form-label">Cardholder Name</label>
                   <input type="text" name="card_holder" class="form-control" id="cardHolder"
-                         placeholder="As printed on the card"
-                         autocomplete="cc-name">
+                    placeholder="As printed on the card"
+                    autocomplete="cc-name">
                   <small class="validation-error" id="cardHolderError"></small>
                 </div>
                 <div class="mb-3">
                   <label class="form-label">Card Number</label>
                   <input type="text" name="card_number" class="form-control" id="cardNumber"
-                         placeholder="XXXX XXXX XXXX XXXX"
-                         maxlength="19"
-                         autocomplete="cc-number"
-                         oninput="formatCardNumber(this)">
+                    placeholder="XXXX XXXX XXXX XXXX"
+                    maxlength="19"
+                    autocomplete="cc-number"
+                    oninput="formatCardNumber(this)">
                   <small class="validation-error" id="cardNumberError"></small>
                 </div>
                 <div class="row g-2 mb-3">
                   <div class="col-6">
                     <label class="form-label">Expiry</label>
                     <input type="text" name="card_expiry" class="form-control" id="cardExpiry"
-                           placeholder="MM / YY"
-                           maxlength="7"
-                           autocomplete="cc-exp"
-                           oninput="formatExpiry(this)">
+                      placeholder="MM / YY"
+                      maxlength="7"
+                      autocomplete="cc-exp"
+                      oninput="formatExpiry(this)">
                     <small class="validation-error" id="cardExpiryError"></small>
                   </div>
                   <div class="col-6">
                     <label class="form-label">CVV</label>
                     <input type="password" name="card_cvv" class="form-control" id="cardCvv"
-                           placeholder="•••"
-                           maxlength="4"
-                           autocomplete="cc-csc"
-                           oninput="this.value=this.value.replace(/\D/g,'')">
+                      placeholder="•••"
+                      maxlength="4"
+                      autocomplete="cc-csc"
+                      oninput="this.value=this.value.replace(/\D/g,'')">
                     <small class="validation-error" id="cardCvvError"></small>
                   </div>
                 </div>
@@ -317,6 +329,10 @@
                   <span style="font-size: 0.85rem;">Activities</span>
                   <strong id="actsDisplay">—</strong>
                 </div>
+                <div class="d-flex justify-content-between mb-2" id="discountRow" style="display:none;">
+                  <span style="font-size: 0.85rem; color: #27ae60;">Discount</span>
+                  <strong id="discountDisplay" style="color: #27ae60;">—</strong>
+                </div>
                 <div class="d-flex justify-content-between mb-2">
                   <span style="font-size: 0.85rem;">Taxes &amp; Fees (12%)</span>
                   <strong id="taxDisplay">—</strong>
@@ -328,8 +344,8 @@
               </div>
 
               <input type="hidden" name="total_price" id="totalInput" value="0">
-              <input type="hidden" name="nights"      id="nightsInput" value="0">
-              <input type="hidden" name="acts_total"  id="actsTotalInput" value="0">
+              <input type="hidden" name="nights" id="nightsInput" value="0">
+              <input type="hidden" name="acts_total" id="actsTotalInput" value="0">
 
               <!-- Submit Button -->
               <button type="submit" class="btn btn-primary w-100 btn-lg mb-3" onclick="return prepareSubmit()">
@@ -349,4 +365,3 @@
   </section>
 
 </div><!-- /page-wrapper -->
-

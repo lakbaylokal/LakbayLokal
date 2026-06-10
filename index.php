@@ -1,6 +1,5 @@
 <?php
 require_once 'data.php';
-include 'config/db.php';
 
 $pageTitle  = 'LakbayLokal — Explore the Philippines';
 $activePage = 'home';
@@ -29,6 +28,7 @@ include 'views/home.view.php';
 
 <?php include 'includes/footer.php'; ?>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script></script>
 <script>
   // Inject PHP data for JS use
 window.DESTINATIONS = <?= json_encode($destinations, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;

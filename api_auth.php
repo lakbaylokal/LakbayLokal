@@ -1,5 +1,6 @@
 <?php
-include 'config/db.php';
+require_once 'config/db.php';
+require_once 'database/helpers.php';
 // api_auth.php — LakbayLokal Authentication API
 // Handles login, signup, and logout operations with database persistence
 
@@ -11,6 +12,23 @@ header('Content-Type: application/json');
 
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
+<<<<<<< HEAD
+=======
+// Simple in-memory user database (in production, use a real database)
+// This is stored in session for demo purposes
+if (!isset($_SESSION['users'])) {
+    $_SESSION['users'] = [
+        [
+            'id' => 1,
+            'first_Name' => 'Juan',
+            'last_Name' => 'Dela Cruz',
+            'Email' => 'juan@example.com',
+            'Password' => password_hash('password123', PASSWORD_BCRYPT)
+        ]
+    ];
+}
+
+>>>>>>> 3db191470f2b341d07139009958281966e0541da
 switch ($action) {
     case 'login':
         handleLogin($conn);
@@ -49,6 +67,7 @@ function handleLogin($conn) {
         return;
     }
 
+<<<<<<< HEAD
     $stmt->bind_param('s', $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -56,6 +75,25 @@ function handleLogin($conn) {
     if ($result->num_rows === 0) {
         http_response_code(401);
         echo json_encode(['success' => false, 'message' => 'Incorrect email or password.']);
+=======
+    $user = findUserByEmail($email);
+    if ($user && password_verify($password, $user['Password'])) {
+        $_SESSION['user'] = [
+            'id' => $user['id'],
+            'first_Name' => $user['first_Name'],
+            'last_Name' => $user['last_Name'],
+            'Email' => $user['Email'],
+            'role' => 'user',
+            'name' => $user['first_Name']
+        ];
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'User login successful',
+            'user' => $_SESSION['user']
+        ]);
+
+>>>>>>> 3db191470f2b341d07139009958281966e0541da
         return;
     }
 
@@ -84,6 +122,7 @@ function handleLogin($conn) {
     ]);
 }
 
+<<<<<<< HEAD
 
 
 function handleSignup($conn) {
@@ -95,12 +134,25 @@ function handleSignup($conn) {
 
     if (empty($FName) || empty($LName) || empty($Email) || empty($Password)) {
         http_response_code(400);
+=======
+function handleSignup() {
+    $first_Name = $_POST['first_Name'] ?? '';
+    $last_Name = $_POST['last_Name'] ?? '';
+    $Email = $_POST['email'] ?? '';
+    $Password = $_POST['password'] ?? '';
+
+    if (empty($first_Name) || empty($last_Name) || empty($Email) || empty($Password)) {
+>>>>>>> 3db191470f2b341d07139009958281966e0541da
         echo json_encode(['success' => false, 'message' => 'All fields are required']);
         return;
     }
 
+<<<<<<< HEAD
     if (!isValidName($FName) || !isValidName($LName)) {
         http_response_code(400);
+=======
+    if (!isValidName($first_Name) || !isValidName($last_Name)) {
+>>>>>>> 3db191470f2b341d07139009958281966e0541da
         echo json_encode(['success' => false, 'message' => 'Name must contain letters only.']);
         return;
     }
@@ -132,6 +184,7 @@ function handleSignup($conn) {
         return;
     }
 
+<<<<<<< HEAD
     // Hash the password
     $hashedPassword = password_hash($Password, PASSWORD_BCRYPT);
 
@@ -164,12 +217,38 @@ function handleSignup($conn) {
         'Email' => $Email,
         'role' => 'user',
         'name' => $FName
+=======
+    $newUser = [
+        'id' => count($_SESSION['users']) + 1,
+        'first_Name' => $first_Name,
+        'last_Name' => $last_Name,
+        'Email' => $Email,
+        'Password' => password_hash($Password, PASSWORD_BCRYPT)
+    ];
+
+    $_SESSION['users'][] = $newUser;
+    
+    $_SESSION['user'] = [
+        'id' => $newUser['id'],
+        'first_Name' => $newUser['first_Name'],
+        'last_Name' => $newUser['last_Name'],
+        'Email' => $newUser['Email'],
+        'name' => $newUser['first_Name']
+>>>>>>> 3db191470f2b341d07139009958281966e0541da
     ];
 
     echo json_encode([
         'success' => true,
         'message' => 'Signup successful',
+<<<<<<< HEAD
         'user' => $_SESSION['user']
+=======
+        'user' => [
+            'first_Name' => $newUser['first_Name'],
+            'last_Name' => $newUser['last_Name'],
+            'Email' => $newUser['Email']
+        ]
+>>>>>>> 3db191470f2b341d07139009958281966e0541da
     ]);
 }
 
@@ -183,10 +262,16 @@ function handleGetCurrentUser() {
         echo json_encode([
             'success' => true,
             'user' => [
+<<<<<<< HEAD
                 'FName' => $_SESSION['user']['FName'],
                 'LName' => $_SESSION['user']['LName'],
                 'Email' => $_SESSION['user']['Email'],
                 'role' => $_SESSION['user']['role'] ?? 'user'
+=======
+                'first_Name' => $_SESSION['user']['first_Name'],
+                'last_Name' => $_SESSION['user']['last_Name'],
+                'Email' => $_SESSION['user']['Email']
+>>>>>>> 3db191470f2b341d07139009958281966e0541da
             ]
         ]);
     } else {

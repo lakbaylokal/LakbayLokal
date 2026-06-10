@@ -1,3 +1,21 @@
+<!-- Discount Modal -->
+<div class="modal fade" id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4">
+      <div class="modal-body">
+        <span style="font-size: 3rem;">🎉</span>
+        <h3 class="mt-3">Mabuhay! Narito ang iyong Welcome Gift!</h3>
+        <p class="text-muted">Gamitin ang code na ito para sa bawas-presyo sa iyong unang booking.</p>
+        <div class="p-3 my-3 bg-light border rounded">
+          <strong style="font-size: 1.5rem; color: var(--primary);" id="promoCodeText">LAKBAYLOCAL10</strong>
+        </div>
+        <p class="small text-danger">*Minsan lang ito lalabas. I-copy o i-screenshot mo na!</p>
+        <button type="button" class="btn btn-hero-primary w-100" data-bs-dismiss="modal">Salamat! I-explore ang Pinas</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ======= HOME HERO ======= -->
 <section class="hero">
   <div class="container-fluid px-5">
@@ -594,5 +612,24 @@
   });
   document.addEventListener('mouseup', () => isDragging = false);
 })();
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const today = new Date().toDateString();
+  const lastShown = localStorage.getItem("discountShownDate");
+
+  // I-check kung hindi pa siya naipapakita today
+  if (lastShown !== today) {
+
+    setTimeout(function () {
+      var myModal = new bootstrap.Modal(document.getElementById('discountModal'));
+      myModal.show();
+
+      // i-save yung date today
+      localStorage.setItem("discountShownDate", today);
+    }, 3000);
+
+  }
+});
 </script>
  
