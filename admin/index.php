@@ -1,286 +1,190 @@
 <?php
-session_start();
+// admin/index.php — LakbayLokal Admin Dashboard
+$activePage = 'dashboard';
+require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/db.php';
 
-// 1. Authentication Check (Pansamantalang naka-bypass o naka-check depende sa login mo)
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    // Para sa testing, kung wala pang session user, i-simulate natin para hindi ka ma-kickout:
-    $_SESSION['user'] = ['role' => 'admin', 'name' => 'Admin Tester'];
-}
+// --- Live Stats from DB ---
+$totalBookings    = $pdo->query("SELECT COUNT(*) FROM bookings")->fetchColumn();
+$activeUsers      = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'user'")->fetchColumn();
+$pendingPayments  = $pdo->query("SELECT COUNT(*) FROM bookings WHERE status = 'pending'")->fetchColumn();
+$totalDests       = $pdo->query("SELECT COUNT(*) FROM destinations")->fetchColumn();
+$totalRevenue     = $pdo->query("SELECT COALESCE(SUM(total_price),0) FROM bookings WHERE status IN ('confirmed','approved')")->fetchColumn();
 
-// 2. MAGLAGAY NG DEFAULT DATA KUNG WALANG LAMAN ANG SESSION
-if (!isset($_SESSION['mock_destinations'])) {
-    $_SESSION['mock_destinations'] = [
-        ['id' => 1, 'name' => 'Boracay Island', 'description' => 'Famous for its powdery white sand beaches and crystal clear waters.', 'price' => 5500.00],
-        ['id' => 2, 'name' => 'El Nido, Palawan', 'description' => 'Stunning limestone cliffs, hidden lagoons, and rich marine life.', 'price' => 7500.00],
-        ['id' => 3, 'name' => 'Batanes', 'description' => 'Breathtaking rolling hills, traditional stone houses, and peaceful scenery.', 'price' => 12000.00]
-    ];
-    $_SESSION['next_id'] = 4; // Para sa susunod na idadagdag
-}
+// --- Recent Bookings (last 7) ---
+$recentBookings = $pdo->query("
+    SELECT b.reference_code, b.guest_name, b.status, b.total_price, b.created_at,
+           d.name AS dest_name
+    FROM bookings b
+    LEFT JOIN destinations d ON d.id = b.destination_id
+    ORDER BY b.created_at DESC LIMIT 7
+")->fetchAll();
 
-$message = '';
+// --- Recent Users (last 5) ---
+$recentUsers = $pdo->query("
+    SELECT id, FName, LName, Email, role, created_at
+    FROM users ORDER BY created_at DESC LIMIT 5
+")->fetchAll();
 
-// 3. CRUD LOGIC (CREATE AT UPDATE) VIA POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    
-    // --- CREATE ACTION ---
-    if ($_POST['action'] === 'create_destination') {
-        $name = trim($_POST['name']);
-        $description = trim($_POST['description']);
-        $price = floatval($_POST['price']);
-        
-        if (!empty($name) && !empty($price)) {
-            $new_dest = [
-                'id' => $_SESSION['next_id']++,
-                'name' => $name,
-                'description' => $description,
-                'price' => $price
-            ];
-            $_SESSION['mock_destinations'][] = $new_dest;
-            $message = "Destination successfully added to Session!";
-        }
-    }
-    
-    // --- UPDATE ACTION ---
-    if ($_POST['action'] === 'update_destination') {
-        $id = intval($_POST['id']);
-        $name = trim($_POST['name']);
-        $description = trim($_POST['description']);
-        $price = floatval($_POST['price']);
-        
-        foreach ($_SESSION['mock_destinations'] as $key => $dest) {
-            if ($dest['id'] === $id) {
-                $_SESSION['mock_destinations'][$key]['name'] = $name;
-                $_SESSION['mock_destinations'][$key]['description'] = $description;
-                $_SESSION['mock_destinations'][$key]['price'] = $price;
-                $message = "Destination successfully updated in Session!";
-                break;
-            }
-        }
-    }
-}
+$today = date('l, F j, Y');
 
-// 4. CRUD LOGIC (DELETE) VIA GET
-if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
-    $id = intval($_GET['id']);
-    $page_type = $_GET['page'];
-    
-    if ($page_type === 'destinations') {
-        foreach ($_SESSION['mock_destinations'] as $key => $dest) {
-            if ($dest['id'] === $id) {
-                unset($_SESSION['mock_destinations'][$key]);
-                // I-reindex ang array para walang bakanteng susi
-                $_SESSION['mock_destinations'] = array_values($_SESSION['mock_destinations']);
-                header("Location: ?page=destinations&msg=Deleted from Session successfully");
-                exit;
-            }
-        }
-    }
+function statusBadge(string $s): string {
+    $map = ['pending'=>'badge-pending','confirmed'=>'badge-confirmed','approved'=>'badge-approved','rejected'=>'badge-rejected','cancelled'=>'badge-cancelled'];
+    $cls = $map[strtolower($s)] ?? 'badge-pending';
+    return "<span class=\"badge $cls\">$s</span>";
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>LakbayLokal | Admin Panel (No DB Mockup)</title>
+  <title>Dashboard — LakbayLokal Admin</title>
   <link rel="stylesheet" href="assets/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-  
-  <style>
-    /* UI design elements para maging malinis tingnan */
-    .crud-table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-    .crud-table th, .crud-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
-    .crud-table th { background-color: #f8f9fa; font-weight: 600; color: #333; }
-    .btn { padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; font-size: 14px; display: inline-block; font-family: 'DM Sans', sans-serif; }
-    .btn-add { background: #E8905D; color: white; font-weight: bold; }
-    .btn-edit { background: #4A90E2; color: white; margin-right: 5px; }
-    .btn-delete { background: #D9534F; color: white; }
-    .alert { padding: 12px; background: #E2F0D9; color: #385723; border-radius: 6px; margin-bottom: 20px; border: 1px solid #c3e6cb; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: #333; }
-    .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-family: 'DM Sans', sans-serif; }
-    .badge-mock { background: #6c757d; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: normal; }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
-  <div class="admin-sidebar">
-    <div class="sidebar-brand">
-      <h3>Lakbay<span>Lokal</span></h3>
+
+<?php require_once __DIR__ . '/includes/sidebar.php'; ?>
+
+<div class="adm-main">
+  <!-- TOP BAR -->
+  <header class="adm-topbar">
+    <div class="adm-topbar-left">
+      <h1>Dashboard</h1>
     </div>
-    <ul class="sidebar-menu">
-      <li><a href="?page=dashboard" class="<?php echo (!isset($_GET['page']) || $_GET['page'] == 'dashboard') ? 'active' : ''; ?>">📊 Dashboard</a></li>
-      <li><a href="?page=destinations" class="<?php echo (isset($_GET['page']) && $_GET['page'] == 'destinations') ? 'active' : ''; ?>">🗺️ Destinations</a></li>
-      <li><a href="?page=hotels" class="<?php echo (isset($_GET['page']) && $_GET['page'] == 'hotels') ? 'active' : ''; ?>">🏨 Hotels</a></li>
-      <li><a href="?page=itineraries" class="<?php echo (isset($_GET['page']) && $_GET['page'] == 'itineraries') ? 'active' : ''; ?>">🎯 Itineraries</a></li>
-      <li><a href="?page=bookings" class="<?php echo (isset($_GET['page']) && $_GET['page'] == 'bookings') ? 'active' : ''; ?>">🧾 Bookings List</a></li>
-      <li style="margin-top: auto;"><a href="../index.php" style="color: #E8905D;">🚪 Exit Admin</a></li>
-    </ul>
-  </div>
+    <div class="adm-topbar-right">
+      <div class="adm-date-badge">📅 <?= $today ?></div>
+      <div class="adm-admin-badge">👤 <?= $adminName ?></div>
+    </div>
+  </header>
 
-  <main class="main-content">
-    <div class="page" id="page-admin">
-      
-      <?php if (!empty($message)): ?>
-          <div class="alert">📢 <?php echo htmlspecialchars($message); ?></div>
-      <?php endif; ?>
-      <?php if (isset($_GET['msg'])): ?>
-          <div class="alert">📢 <?php echo htmlspecialchars($_GET['msg']); ?></div>
-      <?php endif; ?>
-      
-      <?php
-      $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
-      $action = isset($_GET['action']) ? $_GET['action'] : 'list';
+  <div class="adm-body">
+    <!-- PAGE HEADER -->
+    <div class="adm-page-header">
+      <h2>Dashboard Overview</h2>
+      <p>Welcome back, <?= $adminName ?>! Here's what's happening with LakbayLokal.</p>
+    </div>
 
-      switch ($page) {
-          
-          case 'dashboard':
-              // Pagkuha ng bilang mula sa Session arrays
-              $countBookings = 0; // Mock data for bookings counter
-              $totalRevenue = 0.00;
-              $countDestinations = count($_SESSION['mock_destinations']);
-              ?>
-              <div class="dash-header">
-                <h1>Admin Dashboard <span class="badge-mock">In-Memory Mode</span></h1>
-                <p>Welcome back! App is currently running on temporary session storage (No database needed).</p>
-              </div>
+    <!-- STAT CARDS -->
+    <div class="adm-stats-grid">
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon stat-icon-primary">🧾</div>
+        <div class="adm-stat-body">
+          <div class="stat-label">Total Bookings</div>
+          <div class="stat-value"><?= number_format($totalBookings) ?></div>
+          <div class="stat-sub">All time reservations</div>
+        </div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon stat-icon-accent">👥</div>
+        <div class="adm-stat-body">
+          <div class="stat-label">Active Users</div>
+          <div class="stat-value"><?= number_format($activeUsers) ?></div>
+          <div class="stat-sub">Registered travelers</div>
+        </div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon stat-icon-gold">⏳</div>
+        <div class="adm-stat-body">
+          <div class="stat-label">Pending Payments</div>
+          <div class="stat-value"><?= number_format($pendingPayments) ?></div>
+          <div class="stat-sub">Need review</div>
+        </div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon stat-icon-muted">🗺️</div>
+        <div class="adm-stat-body">
+          <div class="stat-label">Destinations</div>
+          <div class="stat-value"><?= number_format($totalDests) ?></div>
+          <div class="stat-sub">Listed locations</div>
+        </div>
+      </div>
+    </div>
 
-              <div class="dash-stats">
-                <div class="dash-stat">
-                  <div class="dash-stat-num"><?php echo $countBookings; ?></div>
-                  <div class="dash-stat-label">Global Bookings</div>
-                </div>
-                <div class="dash-stat">
-                  <div class="dash-stat-num">₱<?php echo number_format($totalRevenue, 2); ?></div>
-                  <div class="dash-stat-label">Total Revenue</div>
-                </div>
-                <div class="dash-stat">
-                  <div class="dash-stat-num"><?php echo $countDestinations; ?></div>
-                  <div class="dash-stat-label">Active Destinations</div>
-                </div>
-              </div>
-              <?php
-              break;
+    <!-- REVENUE BANNER -->
+    <div style="background: linear-gradient(135deg, var(--deep) 0%, var(--deep-2) 100%); color:#fff; border-radius: var(--radius); padding: 1.5rem 2rem; margin-bottom: 1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <div style="font-size:0.78rem; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:1px; margin-bottom:0.3rem;">Confirmed Revenue</div>
+        <div style="font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:700;">₱<?= number_format($totalRevenue) ?></div>
+        <div style="font-size:0.82rem; color:rgba(255,255,255,0.5); margin-top:0.2rem;">From confirmed &amp; approved bookings</div>
+      </div>
+      <a href="manage-bookings.php" class="btn btn-primary">View All Bookings →</a>
+    </div>
 
-          case 'destinations':
-              ?>
-              <div class="dash-header">
-                <h1>🗺️ Manage Destinations <span class="badge-mock">Session CRUD</span></h1>
-                <p>Mag-add, mag-edit, o mag-delete nang walang database connection.</p>
-              </div>
-              
-              <div class="dash-content">
-              <?php if ($action === 'add'): ?>
-                  <h2>Add New Destination</h2>
-                  <form method="POST" action="?page=destinations">
-                      <input type="hidden" name="action" value="create_destination">
-                      <div class="form-group">
-                          <label>Destination Name</label>
-                          <input type="text" name="name" placeholder="Halimbawa: Siargao" required>
-                      </div>
-                      <div class="form-group">
-                          <label>Description</label>
-                          <textarea name="description" rows="4" placeholder="Isulat ang detalye dito..."></textarea>
-                      </div>
-                      <div class="form-group">
-                          <label>Price (₱)</label>
-                          <input type="number" step="0.01" name="price" placeholder="4500.00" required>
-                      </div>
-                      <button type="submit" class="btn btn-add">Save Destination</button>
-                      <a href="?page=destinations" class="btn" style="background:#ccc; color: black;">Cancel</a>
-                  </form>
-
-              <?php elseif ($action === 'edit' && isset($_GET['id'])): 
-                  // B. RETRIEVE PARA SA UPDATE
-                  $id = intval($_GET['id']);
-                  $target = null;
-                  foreach ($_SESSION['mock_destinations'] as $dest) {
-                      if ($dest['id'] === $id) {
-                          $target = $dest;
-                          break;
-                      }
-                  }
-                  
-                  if ($target):
-                  ?>
-                  <h2>Edit Destination (ID: <?php echo $target['id']; ?>)</h2>
-                  <form method="POST" action="?page=destinations">
-                      <input type="hidden" name="action" value="update_destination">
-                      <input type="hidden" name="id" value="<?php echo $target['id']; ?>">
-                      <div class="form-group">
-                          <label>Destination Name</label>
-                          <input type="text" name="name" value="<?php echo htmlspecialchars($target['name']); ?>" required>
-                      </div>
-                      <div class="form-group">
-                          <label>Description</label>
-                          <textarea name="description" rows="4"><?php echo htmlspecialchars($target['description']); ?></textarea>
-                      </div>
-                      <div class="form-group">
-                          <label>Price (₱)</label>
-                          <input type="number" step="0.01" name="price" value="<?php echo $target['price']; ?>" required>
-                      </div>
-                      <button type="submit" class="btn btn-add">Update Destination</button>
-                      <a href="?page=destinations" class="btn" style="background:#ccc; color: black;">Cancel</a>
-                  </form>
-                  <?php else: echo "<p>Destination not found in current session.</p>"; endif; ?>
-
+    <!-- BOTTOM GRID -->
+    <div class="adm-dashboard-grid">
+      <!-- Recent Bookings -->
+      <div class="adm-card">
+        <div class="adm-card-header">
+          <h3>Recent Bookings</h3>
+          <a href="manage-bookings.php" class="btn btn-outline btn-sm">View all</a>
+        </div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Guest</th>
+                <th>Destination</th>
+                <th>Status</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if (empty($recentBookings)): ?>
+              <tr><td colspan="5"><div class="adm-empty"><div class="empty-icon">🧾</div><p>No bookings yet.</p></div></td></tr>
               <?php else: ?>
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; align-items: center;">
-                      <h2 class="dash-bookings-title">All Travel Packages (Live Mock Table)</h2>
-                      <a href="?page=destinations&action=add" class="btn btn-add">+ Add Destination</a>
-                  </div>
-                  
-                  <?php if (count($_SESSION['mock_destinations']) > 0): ?>
-                      <table class="crud-table">
-                          <thead>
-                              <tr>
-                                  <th>ID</th>
-                                  <th>Name</th>
-                                  <th>Description</th>
-                                  <th>Price</th>
-                                  <th>Actions</th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              <?php foreach ($_SESSION['mock_destinations'] as $dest): ?>
-                              <tr>
-                                  <td><?php echo $dest['id']; ?></td>
-                                  <td><strong><?php echo htmlspecialchars($dest['name']); ?></strong></td>
-                                  <td><?php echo htmlspecialchars(substr($dest['description'], 0, 70)) . '...'; ?></td>
-                                  <td>₱<?php echo number_format($dest['price'], 2); ?></td>
-                                  <td>
-                                      <a href="?page=destinations&action=edit&id=<?php echo $dest['id']; ?>" class="btn btn-edit">Edit</a>
-                                      <a href="?page=destinations&action=delete&id=<?php echo $dest['id']; ?>" class="btn btn-delete" onclick="return confirm('Sigurado ka bang buburahin mo ito sa session storage?');">Delete</a>
-                                  </td>
-                              </tr>
-                              <?php endforeach; ?>
-                          </tbody>
-                      </table>
-                  <?php else: ?>
-                      <div style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 2rem; text-align: center; color: #777;">
-                          <p>Ubos na ang data sa session array mo! Mag-add ka ulit gamit ang button sa itaas.</p>
-                      </div>
-                  <?php endif; ?>
+              <?php foreach ($recentBookings as $b): ?>
+              <tr onclick="window.location='manage-bookings.php?ref=<?= urlencode($b['reference_code']) ?>'" style="cursor:pointer;">
+                <td><span class="cell-main" style="font-family:monospace;font-size:0.8rem;"><?= htmlspecialchars($b['reference_code']) ?></span></td>
+                <td><?= htmlspecialchars($b['guest_name']) ?></td>
+                <td><?= htmlspecialchars($b['dest_name'] ?? '—') ?></td>
+                <td><?= statusBadge($b['status']) ?></td>
+                <td style="font-weight:700; color:var(--primary);">₱<?= number_format($b['total_price']) ?></td>
+              </tr>
+              <?php endforeach; ?>
               <?php endif; ?>
-              </div>
-              <?php
-              break;
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-          case 'hotels':
-              echo '<div class="dash-header"><h1>🏨 Partner Hotels</h1></div><p style="color:gray;">Naka-focus ang temporary session mockup sa Destinations tab.</p>';
-              break;
-
-          case 'itineraries':
-              echo '<div class="dash-header"><h1>🎯 Activities</h1></div><p style="color:gray;">Maaari mo ring gayahin ang coding logic ng destinations kung gusto mo ng interactive simulations para dito.</p>';
-              break;
-
-          case 'bookings':
-              echo '<div class="dash-header"><h1>🧾 Master Booking Records</h1></div><p style="color:gray;">Naka-pending ang temporary structure nito.</p>';
-              break;
-      }
-      ?>
-
+      <!-- Recent Users -->
+      <div class="adm-card">
+        <div class="adm-card-header">
+          <h3>Recent Users</h3>
+          <a href="manage-users.php" class="btn btn-outline btn-sm">View all</a>
+        </div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if (empty($recentUsers)): ?>
+              <tr><td colspan="3"><div class="adm-empty"><div class="empty-icon">👥</div><p>No users yet.</p></div></td></tr>
+              <?php else: ?>
+              <?php foreach ($recentUsers as $u): ?>
+              <tr>
+                <td>
+                  <div class="cell-main"><?= htmlspecialchars($u['FName'] . ' ' . $u['LName']) ?></div>
+                  <div class="cell-sub"><?= htmlspecialchars($u['Mname'] ?? '') ?></div>
+                </td>
+                <td style="font-size:0.82rem;"><?= htmlspecialchars($u['Email']) ?></td>
+                <td><span class="badge <?= $u['role']==='admin'?'badge-admin':'badge-user' ?>"><?= $u['role'] ?></span></td>
+              </tr>
+              <?php endforeach; ?>
+              <?php endif; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  </main>
+  </div><!-- /adm-body -->
+</div><!-- /adm-main -->
 </body>
 </html>
