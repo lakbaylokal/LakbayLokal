@@ -34,7 +34,7 @@ function closeAuthModal() {
 }
 
 function switchAuthTab(tab) {
-  document.getElementById('authLogin').style.display  = tab === 'login'  ? 'block' : 'none';
+  document.getElementById('authLogin').style.display = tab === 'login' ? 'block' : 'none';
   document.getElementById('authSignup').style.display = tab === 'signup' ? 'block' : 'none';
   clearAuthErrors(tab === 'login' ? 'authLogin' : 'authSignup');
 }
@@ -43,7 +43,7 @@ function switchAuthTab(tab) {
 
 function handleLogin(event) {
   event.preventDefault();
-  const email    = document.getElementById('loginEmail').value.trim();
+  const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value.trim();
 
   if (!email || !password) {
@@ -72,9 +72,12 @@ function handleLogin(event) {
       if (data.success) {
         const user = data.user;
         setLoggedInUser(user);
-        document.getElementById('loginPassword').value = '';
-        closeAuthModal();
+
         showToast('Welcome back, ' + user.FName + '! 👋');
+
+        setTimeout(() => {
+          location.reload();
+        }, 500);
       } else {
         setFieldError('loginPassword', 'Incorrect email or password.');
         showToast(data.message || 'Incorrect email or password.');
@@ -87,9 +90,9 @@ function handleLogin(event) {
 
 function handleSignup(event) {
   event.preventDefault();
-  const FName    = document.getElementById('signupFName').value.trim();
-  const LName    = document.getElementById('signupLName').value.trim();
-  const email    = document.getElementById('signupEmail').value.trim();
+  const FName = document.getElementById('signupFName').value.trim();
+  const LName = document.getElementById('signupLName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
   const password = document.getElementById('signupPassword').value.trim();
 
   if (!FName || !LName || !email || !password) {
@@ -195,23 +198,23 @@ function setLoggedInUser(user) {
 }
 
 function updateAuthNav() {
-  const isLoggedIn  = Boolean(currentUser);
-  const loginBtn    = document.getElementById('navLoginBtn');
-  const signupBtn   = document.getElementById('navSignupBtn');
-  const logoutBtn   = document.getElementById('navLogoutBtn');
-  const userLabel   = document.getElementById('navUserName');
-  const mobileLogin  = document.getElementById('mobileLoginItem');
+  const isLoggedIn = Boolean(currentUser);
+  const loginBtn = document.getElementById('navLoginBtn');
+  const signupBtn = document.getElementById('navSignupBtn');
+  const logoutBtn = document.getElementById('navLogoutBtn');
+  const userLabel = document.getElementById('navUserName');
+  const mobileLogin = document.getElementById('mobileLoginItem');
   const mobileSignup = document.getElementById('mobileSignupItem');
   const mobileLogout = document.getElementById('mobileLogoutItem');
 
-  if (loginBtn)  loginBtn.style.display  = isLoggedIn ? 'none' : 'inline-flex';
+  if (loginBtn) loginBtn.style.display = isLoggedIn ? 'none' : 'inline-flex';
   if (signupBtn) signupBtn.style.display = isLoggedIn ? 'none' : 'inline-flex';
   if (logoutBtn) logoutBtn.style.display = isLoggedIn ? 'inline-flex' : 'none';
   if (userLabel) {
     userLabel.style.display = isLoggedIn ? 'inline-block' : 'none';
-    userLabel.textContent   = isLoggedIn ? ('👤 ' + currentUser.FName) : '';
+    userLabel.textContent = isLoggedIn ? ('👤 ' + currentUser.FName) : '';
   }
-  if (mobileLogin)  mobileLogin.style.display  = isLoggedIn ? 'none' : 'list-item';
+  if (mobileLogin) mobileLogin.style.display = isLoggedIn ? 'none' : 'list-item';
   if (mobileSignup) mobileSignup.style.display = isLoggedIn ? 'none' : 'list-item';
   if (mobileLogout) mobileLogout.style.display = isLoggedIn ? 'list-item' : 'none';
 }
@@ -233,7 +236,7 @@ function showToast(msg) {
 
 /* ─────────────────────── INIT ────────────────────────────────── */
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   // Restore auth state and fetch current user if logged in
   fetchCurrentUser();
 
@@ -246,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
   Object.keys(authValidators).forEach(id => {
     const input = document.getElementById(id);
     if (!input) return;
-    input.addEventListener('input', function() {
+    input.addEventListener('input', function () {
       setFieldError(id, authValidators[id](input.value));
     });
   });
@@ -254,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
   ['loginEmail', 'loginPassword', 'signupEmail'].forEach(id => {
     const input = document.getElementById(id);
     if (!input) return;
-    input.addEventListener('input', function() {
+    input.addEventListener('input', function () {
       setFieldError(id, '');
     });
   });
