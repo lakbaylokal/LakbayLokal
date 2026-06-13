@@ -284,7 +284,7 @@ $destinations = [
       [
         'id' => 'villa-cali-siargao',
         'name' => 'Villa Cali',
-        'image' => 'assets/pics/siargao.jpg',
+        'image' => 'assets\pics\siargao.jpg',
         'stars' => 3, 'price' => 3700, 'rating' => 4.3, 'reviews' => 198,
         'location' => 'General Luna, Siargao Island',
         'desc' => 'A laid-back villa perfect for surf enthusiasts and budget travelers, with cozy rooms, a social common area, and walking distance to Cloud 9 breaks.',
