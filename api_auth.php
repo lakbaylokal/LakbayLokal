@@ -73,7 +73,7 @@ function handleLogin($conn) {
         'FName' => $user['FName'],
         'LName' => $user['LName'],
         'Email' => $user['Email'],
-        'role' => $user['role'] ?? 'user',
+        'role' => strtolower($user['role'] ?? 'user'),
         'name' => $user['FName']
     ];
 
