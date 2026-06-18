@@ -5,6 +5,13 @@ require_once __DIR__ . '/includes/db.php';
 $activePage = 'destinations';
 $msg     = '';
 $msgType = 'success';
+$show_archived = isset($_GET['show_archived']) && $_GET['show_archived'] === '1';
+
+// Ensure destinations supports archiving
+$schemaCheck = $pdo->query("SHOW COLUMNS FROM destinations LIKE 'archived'")->fetch();
+if (!$schemaCheck) {
+    $pdo->exec("ALTER TABLE destinations ADD COLUMN archived TINYINT(1) NOT NULL DEFAULT 0");
+}
 
 // ── Upload helper ─────────────────────────────────────────────────────────
 function handleImageUpload(string $field, ?string $currentUrl = ''): string {
@@ -27,13 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
     $image_url = handleImageUpload('image_file', '');
     $stmt = $pdo->prepare("
         INSERT INTO destinations
-            (name, region, emoji, tagline, description, price, price_from, image_url, gradient_bg)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (name, region, tagline, description, price, price_from, image_url, gradient_bg)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ");
     $stmt->execute([
         trim($_POST['name']),
         trim($_POST['region']),
-        trim($_POST['emoji']),
         trim($_POST['tagline']),
         trim($_POST['description']),
         floatval($_POST['price']),
@@ -54,14 +60,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
     $image_url = handleImageUpload('image_file', $existing);
     $stmt = $pdo->prepare("
         UPDATE destinations
-        SET name=?, region=?, emoji=?, tagline=?, description=?,
+        SET name=?, region=?, tagline=?, description=?,
             price=?, price_from=?, image_url=?, gradient_bg=?
         WHERE id=?
     ");
     $stmt->execute([
         trim($_POST['name']),
         trim($_POST['region']),
-        trim($_POST['emoji']),
         trim($_POST['tagline']),
         trim($_POST['description']),
         floatval($_POST['price']),
@@ -74,11 +79,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
     exit;
 }
 
-// ── DELETE ────────────────────────────────────────────────────────────────
+// ── DELETE/ARCHIVE ───────────────────────────────────────────────────────
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     $id = trim($_GET['id']);
-    $pdo->prepare("DELETE FROM destinations WHERE id = ?")->execute([$id]);
-    header('Location: manage-destinations.php?msg=' . urlencode('Destination deleted.') . '&type=success');
+    $pdo->prepare("UPDATE destinations SET archived = 1 WHERE id = ?")->execute([$id]);
+    header('Location: manage-destinations.php?msg=' . urlencode('Destination archived.') . '&type=success');
+    exit;
+}
+
+if (isset($_GET['action']) && $_GET['action'] === 'unarchive' && isset($_GET['id'])) {
+    $id = trim($_GET['id']);
+    $pdo->prepare("UPDATE destinations SET archived = 0 WHERE id = ?")->execute([$id]);
+    header('Location: manage-destinations.php?show_archived=1&msg=' . urlencode('Destination restored.') . '&type=success');
     exit;
 }
 
@@ -100,8 +112,13 @@ if (isset($_GET['msg'])) {
 $search = trim($_GET['search'] ?? '');
 $params = [];
 $whereSQL = '';
+if ($show_archived) {
+    $whereSQL = 'WHERE archived = 1';
+} else {
+    $whereSQL = 'WHERE archived = 0';
+}
 if ($search !== '') {
-    $whereSQL = "WHERE name LIKE ? OR region LIKE ?";
+    $whereSQL .= $whereSQL ? ' AND (name LIKE ? OR region LIKE ?)' : 'WHERE name LIKE ? OR region LIKE ?';
     $like     = "%$search%";
     $params   = [$like, $like];
 }
@@ -110,7 +127,9 @@ $stmt->execute($params);
 $destinations = $stmt->fetchAll();
 
 $total = $pdo->query("SELECT COUNT(*) FROM destinations")->fetchColumn();
-$regions_count = $pdo->query("SELECT COUNT(DISTINCT region) FROM destinations")->fetchColumn();
+$active_count = $pdo->query("SELECT COUNT(*) FROM destinations WHERE archived = 0")->fetchColumn();
+$archived_count = $pdo->query("SELECT COUNT(*) FROM destinations WHERE archived = 1")->fetchColumn();
+$regions_count = $pdo->query("SELECT COUNT(DISTINCT region) FROM destinations WHERE archived = 0")->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -164,6 +183,13 @@ $regions_count = $pdo->query("SELECT COUNT(DISTINCT region) FROM destinations")-
           <div class="stat-value"><?= $regions_count ?></div>
         </div>
       </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon stat-icon-muted">🗄️</div>
+        <div class="adm-stat-body">
+          <div class="stat-label">Archived Destinations</div>
+          <div class="stat-value"><?= $archived_count ?></div>
+        </div>
+      </div>
     </div>
 
     <!-- SEARCH + GRID -->
@@ -177,9 +203,17 @@ $regions_count = $pdo->query("SELECT COUNT(DISTINCT region) FROM destinations")-
                      placeholder="Search destinations or regions…"
                      value="<?= htmlspecialchars($search) ?>">
             </div>
+            <?php if ($show_archived): ?>
+            <input type="hidden" name="show_archived" value="1">
+            <?php endif; ?>
             <button type="submit" class="btn btn-outline btn-sm">Search</button>
             <?php if ($search): ?>
-            <a href="manage-destinations.php" class="btn btn-ghost btn-sm">✕ Clear</a>
+            <a href="manage-destinations.php<?= $show_archived ? '?show_archived=1' : '' ?>" class="btn btn-ghost btn-sm">✕ Clear</a>
+            <?php endif; ?>
+            <?php if ($show_archived): ?>
+            <a href="manage-destinations.php<?= $search ? '?search=' . urlencode($search) : '' ?>" class="btn btn-ghost btn-sm">Show Active</a>
+            <?php else: ?>
+            <a href="manage-destinations.php?show_archived=1<?= $search ? '&search=' . urlencode($search) : '' ?>" class="btn btn-ghost btn-sm">Show Archived</a>
             <?php endif; ?>
           </div>
         </form>
@@ -188,7 +222,6 @@ $regions_count = $pdo->query("SELECT COUNT(DISTINCT region) FROM destinations")-
       <?php if (empty($destinations)): ?>
       <div class="adm-card-body">
         <div class="adm-empty">
-          <div class="empty-icon">🗺️</div>
           <h4>No destinations found</h4>
           <p><?= $search ? 'Try a different search term.' : 'Click "Add Destination" to get started.' ?></p>
         </div>
@@ -215,11 +248,19 @@ $regions_count = $pdo->query("SELECT COUNT(DISTINCT region) FROM destinations")-
           </div>
           <div class="adm-item-card-footer">
             <button class="btn btn-outline btn-sm" onclick="editDestination('<?= htmlspecialchars($d['id']) ?>')">✏️ Edit</button>
+            <?php if ($show_archived): ?>
+            <a href="manage-destinations.php?action=unarchive&id=<?= $d['id'] ?>"
+               class="btn btn-primary btn-sm"
+               onclick="return confirm('Restore <?= addslashes($d['name']) ?>?')">
+              ↩️ Restore
+            </a>
+            <?php else: ?>
             <a href="manage-destinations.php?action=delete&id=<?= $d['id'] ?>"
                class="btn btn-danger btn-sm"
-               onclick="return confirm('Delete <?= addslashes($d['name']) ?>? This cannot be undone.')">
-              🗑 Delete
+               onclick="return confirm('Archive <?= addslashes($d['name']) ?>?')">
+              🗄️ Archive
             </a>
+            <?php endif; ?>
           </div>
         </div>
         <?php endforeach; ?>
@@ -252,10 +293,6 @@ $regions_count = $pdo->query("SELECT COUNT(DISTINCT region) FROM destinations")-
           <div class="form-group">
             <label for="f-region">Region *</label>
             <input type="text" id="f-region" name="region" required placeholder="e.g. Western Visayas">
-          </div>
-          <div class="form-group">
-            <label for="f-emoji">Emoji</label>
-            <input type="text" id="f-emoji" name="emoji" placeholder="🏖️" maxlength="8">
           </div>
           <div class="form-group">
             <label for="f-price">Base Price (₱) *</label>
@@ -359,7 +396,6 @@ function editDestination(id) {
       }
       document.getElementById('f-name').value       = d.name        || '';
       document.getElementById('f-region').value     = d.region      || '';
-      document.getElementById('f-emoji').value      = d.emoji       || '';
       document.getElementById('f-price').value      = d.price       || '';
       document.getElementById('f-price-from').value = d.price_from  || '';
       document.getElementById('f-gradient').value   = d.gradient_bg || '';

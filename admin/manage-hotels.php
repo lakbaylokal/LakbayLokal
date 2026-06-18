@@ -5,6 +5,13 @@ require_once __DIR__ . '/includes/db.php';
 $activePage = 'hotels';
 $msg        = '';
 $msgType    = 'success';
+$show_archived = isset($_GET['show_archived']) && $_GET['show_archived'] === '1';
+
+// Ensure hotels supports archiving
+$schemaCheck = $pdo->query("SHOW COLUMNS FROM hotels LIKE 'archived'")->fetch();
+if (!$schemaCheck) {
+    $pdo->exec("ALTER TABLE hotels ADD COLUMN archived TINYINT(1) NOT NULL DEFAULT 0");
+}
 
 // ── Upload helper ─────────────────────────────────────────────────────────
 function handleImageUpload(string $field, ?string $currentUrl = ''): string {
@@ -79,10 +86,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
     exit;
 }
 
-// ── DELETE ────────────────────────────────────────────────────────────────
+// ── DELETE/ARCHIVE ───────────────────────────────────────────────────────
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
-    $pdo->prepare("DELETE FROM hotels WHERE id = ?")->execute([trim($_GET['id'])]);
-    header('Location: manage-hotels.php?msg=' . urlencode('Hotel deleted.') . '&type=success');
+    $pdo->prepare("UPDATE hotels SET archived = 1 WHERE id = ?")->execute([trim($_GET['id'])]);
+    header('Location: manage-hotels.php?msg=' . urlencode('Hotel archived.') . '&type=success');
+    exit;
+}
+
+if (isset($_GET['action']) && $_GET['action'] === 'unarchive' && isset($_GET['id'])) {
+    $pdo->prepare("UPDATE hotels SET archived = 0 WHERE id = ?")->execute([trim($_GET['id'])]);
+    header('Location: manage-hotels.php?show_archived=1&msg=' . urlencode('Hotel restored.') . '&type=success');
     exit;
 }
 
@@ -108,12 +121,17 @@ $search   = trim($_GET['search'] ?? '');
 $dest_filter = trim($_GET['destination_id'] ?? '');
 $where    = [];
 $params   = [];
+if ($show_archived) {
+    $where[] = 'h.archived = 1';
+} else {
+    $where[] = 'h.archived = 0';
+}
 if ($search !== '') {
     $where[]  = "(h.name LIKE ? OR h.location LIKE ?)";
     $like     = "%$search%";
     $params   = array_merge($params, [$like, $like]);
 }
-if ($dest_filter > 0) {
+if ($dest_filter !== '') {
     $where[]  = "h.destination_id = ?";
     $params[] = $dest_filter;
 }
@@ -128,6 +146,8 @@ $stmt = $pdo->prepare("
 $stmt->execute($params);
 $hotels = $stmt->fetchAll();
 $total  = $pdo->query("SELECT COUNT(*) FROM hotels")->fetchColumn();
+$active_count = $pdo->query("SELECT COUNT(*) FROM hotels WHERE archived = 0")->fetchColumn();
+$archived_count = $pdo->query("SELECT COUNT(*) FROM hotels WHERE archived = 1")->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -188,6 +208,13 @@ $total  = $pdo->query("SELECT COUNT(*) FROM hotels")->fetchColumn();
           <div class="stat-value"><?= count($hotels) ?></div>
         </div>
       </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon stat-icon-muted">🗄️</div>
+        <div class="adm-stat-body">
+          <div class="stat-label">Archived Hotels</div>
+          <div class="stat-value"><?= $archived_count ?></div>
+        </div>
+      </div>
     </div>
 
     <!-- FILTERS + GRID -->
@@ -207,9 +234,17 @@ $total  = $pdo->query("SELECT COUNT(*) FROM hotels")->fetchColumn();
               <option value="<?= $dd['id'] ?>" <?= $dest_filter===$dd['id']?'selected':'' ?>><?= htmlspecialchars($dd['name']) ?></option>
               <?php endforeach; ?>
             </select>
+            <?php if ($show_archived): ?>
+            <input type="hidden" name="show_archived" value="1">
+            <?php endif; ?>
             <button type="submit" class="btn btn-outline btn-sm">Search</button>
             <?php if ($search || $dest_filter): ?>
-            <a href="manage-hotels.php" class="btn btn-ghost btn-sm">✕ Clear</a>
+            <a href="manage-hotels.php<?= $show_archived ? '?show_archived=1' : '' ?>" class="btn btn-ghost btn-sm">✕ Clear</a>
+            <?php endif; ?>
+            <?php if ($show_archived): ?>
+            <a href="manage-hotels.php<?= $search || $dest_filter ? '?'.http_build_query(array_filter(['search'=>$search,'destination_id'=>$dest_filter])) : '' ?>" class="btn btn-ghost btn-sm">Show Active</a>
+            <?php else: ?>
+            <a href="manage-hotels.php?show_archived=1<?= $search || $dest_filter ? '&'.http_build_query(array_filter(['search'=>$search,'destination_id'=>$dest_filter])) : '' ?>" class="btn btn-ghost btn-sm">Show Archived</a>
             <?php endif; ?>
           </div>
         </form>
@@ -218,7 +253,15 @@ $total  = $pdo->query("SELECT COUNT(*) FROM hotels")->fetchColumn();
       <?php if (empty($hotels)): ?>
       <div class="adm-card-body">
         <div class="adm-empty">
-          <div class="empty-icon">🏨</div>
+          <div class="empty-icon">
+            <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="20" y="35" width="60" height="45" rx="2" stroke="#ccc" stroke-width="2" fill="none"/>
+              <rect x="28" y="45" width="12" height="12" stroke="#ccc" stroke-width="1.5" fill="none"/>
+              <rect x="46" y="45" width="12" height="12" stroke="#ccc" stroke-width="1.5" fill="none"/>
+              <rect x="64" y="45" width="12" height="12" stroke="#ccc" stroke-width="1.5" fill="none"/>
+              <path d="M20 80 L80 80" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
           <h4>No hotels found</h4>
           <p><?= $search || $dest_filter ? 'Try adjusting your filters.' : 'Click "Add Hotel" to get started.' ?></p>
         </div>
@@ -253,11 +296,19 @@ $total  = $pdo->query("SELECT COUNT(*) FROM hotels")->fetchColumn();
           </div>
           <div class="adm-item-card-footer">
             <button class="btn btn-outline btn-sm" onclick="editHotel('<?= htmlspecialchars($h['id']) ?>')">✏️ Edit</button>
+            <?php if ($show_archived): ?>
+            <a href="manage-hotels.php?action=unarchive&id=<?= $h['id'] ?>"
+               class="btn btn-primary btn-sm"
+               onclick="return confirm('Restore <?= addslashes($h['name']) ?>?')">
+              ↩️ Restore
+            </a>
+            <?php else: ?>
             <a href="manage-hotels.php?action=delete&id=<?= $h['id'] ?>"
                class="btn btn-danger btn-sm"
-               onclick="return confirm('Delete <?= addslashes($h['name']) ?>?')">
-              🗑 Delete
+               onclick="return confirm('Archive <?= addslashes($h['name']) ?>?')">
+              🗄️ Archive
             </a>
+            <?php endif; ?>
           </div>
         </div>
         <?php endforeach; ?>
