@@ -69,7 +69,7 @@ $userName = $_SESSION['user']['name'] ?? '';
                href="<?= $rootPath ?? '' ?>index.php#mytrips">My Trips</a>
           </li>
 
-          <?php if (isset($_SESSION['user']) && ($_SESSION['user']['role'] ?? '') === 'admin'): ?>
+          <?php if (isset($_SESSION['user']) && strtolower($_SESSION['user']['role'] ?? '') === 'admin'): ?>
           <li class="nav-item">
             <a class="nav-link lbl-nav-link <?= ($activePage ?? '') === 'dashboard' ? 'active' : '' ?>"
                href="<?= $rootPath ?? '' ?>admin/index.php">Dashboard</a>
