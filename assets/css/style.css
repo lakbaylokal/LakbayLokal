@@ -45,15 +45,15 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .page.active { display: block; }
 
 /* HERO */
-.hero { min-height: calc(100vh - 68px); 
+/* .hero { min-height: calc(100vh - 68px); 
   background: linear-gradient(160deg, #FBF7F0 0%, #F5EDE0 60%, #EAF5EE 100%); display: flex; align-items: 
-  center; padding: 6rem 5% 4rem; position: relative; overflow: hidden; }
+  center; padding: 6rem 5% 4rem; position: relative; overflow: hidden; } */
 
-/* .hero {  */
-  /* min-height: calc(100vh - 68px); 
-  background: linear-gradient(160deg, rgba(251, 247, 240, 0.5) 0%, rgba(245, 237, 224, 0.5) 60%, rgba(234, 245, 238, 0.5) 100%), 
-      url('images/philippines-bg.jpg');
-  background-size: cover; background-position: center; background-repeat: no-repeat; display: flex; align-items: center; padding: 6rem 5% 4rem; position: relative; overflow: hidden; } */
+.hero { 
+  min-height: calc(100vh - 68px); 
+  background: linear-gradient(160deg, rgba(251, 247, 240, 0.3) 0%, rgba(245, 237, 224, 0.3) 60%, rgba(234, 245, 238, 0.5) 100%), 
+      url('https://i.pinimg.com/1200x/80/65/87/8065879dc1a3b0b37cf44950a8859fb8.jpg') no-repeat center center/cover;
+  background-size: cover; background-position: center; background-repeat: no-repeat; display: flex; align-items: center; padding: 6rem 5% 4rem; position: relative; overflow: hidden; }
 
 .hero::before { content: ''; position: absolute; top: -100px; right: -200px; width: 700px; height: 700px; background: radial-gradient(circle, rgba(196,96,42,0.08) 0%, transparent 70%); border-radius: 50%;}
 .hero::after { content: ''; position: absolute; bottom: -150px; left: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(46,107,79,0.08) 0%, transparent 70%); border-radius: 50%;}
@@ -61,16 +61,47 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .hero-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-pale); color: var(--accent); padding: 0.35rem 0.9rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 1.5rem;}
 .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.8rem, 5vw, 4rem); line-height: 1.1; color: var(--deep); margin-bottom: 1.2rem;}
 .hero h1 em { color: var(--primary); font-style: italic; }
-.hero p { font-size: 1.05rem; color: var(--muted); margin-bottom: 2.5rem; max-width: 440px;}
+.hero p { font-size: 1.05rem; color: white; margin-bottom: 2.5rem; max-width: 440px;}
+.hero h1 { 
+  color: var(--white); /* Mas maganda puti kung madilim ang background */
+  text-shadow: 0px 2px 8px rgba(255, 255, 255, 0.5); 
+}
+
+/* Siguraduhing white ang text sa hero-p */
+.hero p { 
+  color: #ffffff; 
+  text-shadow: 0px 1px 4px rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
 .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
 .btn-primary { background: var(--primary); color: white; border: none; border-radius: 50px; padding: 0.85rem 2rem; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 8px; }
 .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(196,96,42,0.3); }
-.btn-outline { background: transparent; color: var(--deep); border: 1.5px solid var(--border); border-radius: 50px; padding: 0.85rem 2rem; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
-.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+.btn-outline { 
+  background: rgba(255, 255, 255, 0.15); /* Naglagay tayo ng konting opacity para hindi siya totally transparent */
+  color: white; /* Gawing puti para kita sa background image */
+  border: 2px solid rgba(255, 255, 255, 0.6); /* Mas makapal na border at mas puti */
+  border-radius: 50px; 
+  padding: 0.85rem 2rem; 
+  font-size: 0.95rem; 
+  font-weight: 500; 
+  cursor: pointer; 
+  transition: all 0.3s; 
+  font-family: 'DM Sans', sans-serif; 
+  backdrop-filter: blur(4px); /* Nagdadagdag ng glass effect */
+}
+
+.btn-outline:hover { 
+  background: white; /* Magiging solid white pag na-hover */
+  border-color: white; 
+  color: var(--primary); /* Magiging kulay primary ang text pag na-hover */
+}
 .hero-stats { display: flex; gap: 2rem; margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--border);}
 .stat-item { text-align: left; }
 .stat-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--primary);}
-.stat-label { font-size: 0.8rem; color: var(--muted); }
+.stat-label { 
+  font-size: 0.8rem; 
+  color: #ffffff !important; /* Pilit na gagawing puti */
+}
 
 .hero-visual { position: absolute; right: 5%; top: 50%; transform: translateY(-50%); width: min(480px, 42%); display: grid; grid-template-columns: 1fr 1fr; gap: 12px;}
 .hero-card { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); transition: transform 0.3s;}
@@ -81,15 +112,6 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .hero-card-body h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 3px; }
 .hero-card-body p { font-size: 0.75rem; color: var(--muted); }
 .hero-card-price { font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-top: 4px;}
-
-/* SEARCH BAR */
-/* .search-section { background: white; padding: 2rem 5%; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-.search-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 4px;}
-.search-group label { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;}
-.search-group select, .search-group input { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 0.65rem 0.9rem; font-size: 0.9rem; font-family: 'DM Sans', sans-serif; color: var(--deep); background: var(--cream); outline: none; transition: border-color 0.2s; appearance: none; }
-.search-group select:focus, .search-group input:focus { border-color: var(--primary); }
-.search-btn { background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); padding: 0.8rem 1.8rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; align-self: flex-end; white-space: nowrap;}
-.search-btn:hover { background: var(--primary-light); } */
 
 /* Custom Container Wrapper (Optional, para sa padding ng buong search area) */
 .search-section-wrapper {
