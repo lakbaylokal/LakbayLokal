@@ -64,7 +64,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .hero p { font-size: 1.05rem; color: white; margin-bottom: 2.5rem; max-width: 440px;}
 .hero h1 { 
   color: var(--white); /* Mas maganda puti kung madilim ang background */
-  text-shadow: 0px 2px 8px rgba(255, 255, 255, 0.5); 
+  text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.5); 
 }
 
 /* Siguraduhing white ang text sa hero-p */
