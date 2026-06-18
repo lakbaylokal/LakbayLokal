@@ -239,7 +239,6 @@ $regions_count = $pdo->query("SELECT COUNT(DISTINCT region) FROM destinations WH
           <?php endif; ?>
           <div class="adm-item-card-body">
             <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.25rem">
-              <span><?= htmlspecialchars($d['emoji'] ?: '') ?></span>
               <h4><?= htmlspecialchars($d['name']) ?></h4>
             </div>
             <p style="font-size:.75rem;color:var(--primary);font-weight:600;margin-bottom:.3rem"><?= htmlspecialchars($d['region']) ?></p>
