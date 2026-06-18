@@ -18,94 +18,242 @@ $rootPath = '';
 include 'includes/header.php';
 ?>
 
-<div class="page-wrapper">
-  <div class="confirm-page">
-    <div class="confirm-card" style="max-width:680px;">
-      <?php if (!$receipt): ?>
-        <div class="confirm-icon">!</div>
-        <p>Receipt not found. Please return to the booking page or complete a new reservation.</p>
-        <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-top:1rem;">
-          <a href="index.php" style="background:var(--primary);color:white;border-radius:50px;padding:0.75rem 1.5rem;text-decoration:none;font-size:0.88rem;font-weight:600;">Go to Home</a>
-          <a href="hotel.php?dest=<?= urlencode($_SESSION['receipt_history'][$ref]['dest_id'] ?? '') ?>&id=<?= urlencode($_SESSION['receipt_history'][$ref]['hotel_id'] ?? '') ?>" style="background:var(--cream);border:1.5px solid var(--border);color:var(--deep);border-radius:50px;padding:0.75rem 1.5rem;text-decoration:none;font-size:0.88rem;font-weight:600;">Back to Hotel</a>
-        </div>
-      <?php else: ?>
-        <div class="confirm-icon"> 🧾 Receipt</div>
-        <p>Your receipt for booking <strong><?= htmlspecialchars($receipt['ref']) ?></strong> is ready. Save it or download it for your records.</p>
+<style>
+  .ll-confirm-wrapper {
+    padding: 3rem 1.5rem;
+    background-color: var(--cream);
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .ll-confirm-card {
+    background: var(--white);
+    max-width: 620px;
+    width: 100%;
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 2.5rem;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .ll-success-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    animation: popScale 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes popScale {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .ll-confirm-card h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--deep);
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+  .ll-confirm-lead {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+  }
+  .ll-badge-ref {
+    display: inline-block;
+    background: var(--primary-pale);
+    color: var(--primary);
+    font-family: monospace;
+    font-size: 1.05rem;
+    font-weight: 700;
+    padding: 0.6rem 1.25rem;
+    border-radius: 50px;
+    border: 1px dashed var(--primary-light);
+    margin-bottom: 2rem;
+  }
+  .ll-details-box {
+    text-align: left;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .ll-section-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    border-bottom: 1.5px solid var(--border);
+    padding-bottom: 4px;
+  }
+  .ll-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(232, 224, 213, 0.5);
+    font-size: 0.92rem;
+  }
+  .ll-row:last-child {
+    border-bottom: none;
+  }
+  .ll-label {
+    color: var(--muted);
+  }
+  .ll-val {
+    font-weight: 600;
+    color: var(--deep);
+    text-align: right;
+  }
+  .ll-btn {
+    border: none;
+    border-radius: 50px;
+    padding: 0.65rem 1.25rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ll-btn-primary { background: var(--primary); color: #fff; }
+  .ll-btn-primary:hover { background: var(--primary-light); }
+  .ll-btn-accent { background: var(--accent); color: #fff; }
+  .ll-btn-accent:hover { background: var(--accent-light); }
+  .ll-btn-outline { background: var(--white); border: 1.5px solid var(--border); color: var(--deep); }
+  .ll-btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+  
+  .ll-footer-text {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+</style>
 
-        <div class="confirm-ref" style="margin-bottom:1rem;">
-          Receipt ID: <strong><?= htmlspecialchars($receipt['ref']) ?></strong>
-        </div>
+<div class="ll-confirm-wrapper">
+  <div class="ll-confirm-card">
+    
+    <?php if (!$receipt): ?>
+      <div class="ll-success-icon" style="color:var(--primary)">⚠️</div>
+      <h2>Receipt Not Found</h2>
+      <p class="ll-confirm-lead">
+        We couldn't retrieve the requested transaction record.<br>
+        Please return to the main station or try another reference code.
+      </p>
+      
+      <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; margin-top:2rem;">
+        <a href="index.php" class="ll-btn ll-btn-primary">Go to Home</a>
+        <a href="hotel.php?dest=<?= urlencode($_SESSION['receipt_history'][$ref]['dest_id'] ?? '') ?>&id=<?= urlencode($_SESSION['receipt_history'][$ref]['hotel_id'] ?? '') ?>" class="ll-btn ll-btn-outline">Back to Hotel</a>
+      </div>
 
-        <div class="confirm-details">
-          <div class="confirm-detail-row"><span>Guest Name</span><strong><?= htmlspecialchars($receipt['guest_name']) ?></strong></div>
-          <div class="confirm-detail-row"><span>Guest Email</span><strong><?= htmlspecialchars($receipt['guest_email']) ?></strong></div>
-          <div class="confirm-detail-row"><span>Destination</span><strong><?= htmlspecialchars($receipt['dest_name']) ?></strong></div>
-          <div class="confirm-detail-row"><span>Hotel</span><strong><?= htmlspecialchars($receipt['hotel_name']) ?></strong></div>
-          <div class="confirm-detail-row"><span>Check-in</span><strong><?= htmlspecialchars($receipt['checkin_fmt']) ?></strong></div>
-          <div class="confirm-detail-row"><span>Check-out</span><strong><?= htmlspecialchars($receipt['checkout_fmt']) ?></strong></div>
-          <div class="confirm-detail-row"><span>Duration</span><strong><?= htmlspecialchars($receipt['nights']) ?> night<?= $receipt['nights'] != 1 ? 's' : '' ?></strong></div>
-          <div class="confirm-detail-row"><span>Rooms</span><strong><?= htmlspecialchars($receipt['rooms']) ?> room<?= $receipt['rooms'] != 1 ? 's' : '' ?></strong></div>
-          <div class="confirm-detail-row"><span>Guests</span><strong><?= htmlspecialchars($receipt['guests']) ?></strong></div>
-          <div class="confirm-detail-row"><span>Payment Method</span><strong><?= htmlspecialchars(preg_replace('/[^\x20-\x7E]/', '', [
+    <?php else: ?>
+      <div class="ll-success-icon">🧾</div>
+      <h2>Booking Receipt</h2>
+      <p class="ll-confirm-lead">
+        Your dynamic receipt for booking <strong><?= htmlspecialchars($receipt['ref']) ?></strong> is loaded.<br>
+        You may download the certified copy or keep this screen active for your logs.
+      </p>
+
+      <div class="ll-badge-ref">
+        Receipt ID: <?= htmlspecialchars($receipt['ref']) ?>
+      </div>
+
+      <div class="ll-details-box">
+        <div class="ll-section-title">Stay Information</div>
+        <div class="ll-row"><span class="ll-label">Guest Name</span><span class="ll-val"><?= htmlspecialchars($receipt['guest_name']) ?></span></div>
+        <div class="ll-row"><span class="ll-label">Guest Email</span><span class="ll-val"><?= htmlspecialchars($receipt['guest_email']) ?></span></div>
+        <div class="ll-row"><span class="ll-label">Destination</span><span class="ll-val"><?= htmlspecialchars($receipt['dest_name']) ?></span></div>
+        <div class="ll-row"><span class="ll-label">Hotel Resort</span><span class="ll-val"><?= htmlspecialchars($receipt['hotel_name']) ?></span></div>
+        <div class="ll-row"><span class="ll-label">Check-in Date</span><span class="ll-val">📅 <?= htmlspecialchars($receipt['checkin_fmt']) ?></span></div>
+        <div class="ll-row"><span class="ll-label">Check-out Date</span><span class="ll-val">📅 <?= htmlspecialchars($receipt['checkout_fmt']) ?></span></div>
+        <div class="ll-row"><span class="ll-label">Duration</span><span class="ll-val"><?= htmlspecialchars($receipt['nights']) ?> night<?= $receipt['nights'] != 1 ? 's' : '' ?></span></div>
+        <div class="ll-row"><span class="ll-label">Rooms / Guests</span><span class="ll-val"><?= htmlspecialchars($receipt['rooms']) ?> Room<?= $receipt['rooms'] != 1 ? 's' : '' ?> · <?= htmlspecialchars($receipt['guests']) ?></span></div>
+        <div class="ll-row">
+          <span class="ll-label">Payment Method</span>
+          <span class="ll-val">
+            💳 <?= htmlspecialchars(preg_replace('/[^\x20-\x7E]/', '', [
               'gcash' => 'GCash',
               'credit_card' => 'Credit Card',
               'debit_card' => 'Debit Card'
-            ][$receipt['payment_method']] ?? $receipt['payment_method'])) ?></strong></div>
+            ][$receipt['payment_method']] ?? $receipt['payment_method'])) ?>
+          </span>
+        </div>
+      </div>
 
-          <?php if (!empty($receipt['selected_activities'])): ?>
-            <div class="confirm-detail-row" style="flex-direction:column;align-items:flex-start;gap:0.3rem;">
-              <span>Selected Activities</span>
-              <?php foreach ($receipt['selected_activities'] as $act): ?>
-                <div style="display:flex;justify-content:space-between;width:100%;font-size:0.85rem;">
-                  <span style="color:var(--deep);"><?= htmlspecialchars($act['name'] ?? '') ?></span>
-                  <strong>₱<?= number_format($act['price'] ?? 0) ?></strong>
-                </div>
-              <?php endforeach; ?>
+      <?php if (!empty($receipt['selected_activities']) || !empty($receipt['special_requests'])): ?>
+      <div class="ll-details-box">
+        <?php if (!empty($receipt['selected_activities'])): ?>
+          <div class="ll-section-title">Add-on Activities</div>
+          <?php foreach ($receipt['selected_activities'] as $act): ?>
+            <div class="ll-row">
+              <span class="ll-label" style="color:var(--deep); font-weight:500;"><?= htmlspecialchars($act['name'] ?? '') ?></span>
+              <span class="ll-val">₱<?= number_format($act['price'] ?? 0) ?></span>
             </div>
-          <?php endif; ?>
+          <?php endforeach; ?>
+          <?php if (!empty($receipt['special_requests'])) echo '<div style="margin-top:1rem;"></div>'; ?>
+        <?php endif; ?>
 
-          <?php if (!empty($receipt['special_requests'])): ?>
-            <div class="confirm-detail-row"><span>Special Requests</span><strong><?= htmlspecialchars($receipt['special_requests']) ?></strong></div>
-          <?php endif; ?>
-
-          <div class="confirm-detail-row" style="margin-top:0.5rem;padding-top:0.5rem;border-top:2px solid var(--border);">
-            <span>Hotel subtotal</span>
-            <strong>₱<?= number_format($receipt['hotel_subtotal']) ?></strong>
+        <?php if (!empty($receipt['special_requests'])): ?>
+          <div class="ll-section-title">Special Requests</div>
+          <div style="font-size:0.88rem; color:var(--deep); background:var(--white); padding:0.75rem; border-radius:8px; border:1px solid var(--border); line-height:1.4;">
+            <?= htmlspecialchars($receipt['special_requests']) ?>
           </div>
-          <?php if ($receipt['activity_total'] > 0): ?>
-          <div class="confirm-detail-row">
-            <span>Activities total</span>
-            <strong>₱<?= number_format($receipt['activity_total']) ?></strong>
-          </div>
-          <?php endif; ?>
-          <?php if ($receipt['discount_amount'] > 0): ?>
-          <div class="confirm-detail-row" style="color:#27ae60;">
-            <span>Discount Applied</span>
-            <strong style="color:#27ae60;">-₱<?= number_format($receipt['discount_amount']) ?> (<?= round($receipt['discount_percent'] * 100) ?>%)</strong>
-          </div>
-          <?php endif; ?>
-          <div class="confirm-detail-row">
-            <span>Taxes & Fees (12%)</span>
-            <strong>₱<?= number_format($receipt['tax']) ?></strong>
-          </div>
-          <div class="confirm-detail-row" style="font-size:1rem;font-weight:700;border-bottom:none;">
-            <span><strong>Total Paid</strong></span>
-            <strong style="color:var(--primary);font-size:1.15rem;">₱<?= number_format($receipt['total']) ?></strong>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-top:0.5rem;">
-          <button id="downloadPdfBtn" type="button" onclick="downloadReceiptPdf()" style="background:var(--primary);color:white;border-radius:50px;padding:0.75rem 1.5rem;border:none;font-size:0.88rem;font-weight:600;cursor:pointer;">Download PDF</button>
-          <a href="index.php" style="background:var(--accent);color:white;border-radius:50px;padding:0.75rem 1.5rem;text-decoration:none;font-size:0.88rem;font-weight:600;">Go to Home</a>
-          <a href="hotel.php?dest=<?= urlencode($receipt['dest_id']) ?>&id=<?= urlencode($receipt['hotel_id']) ?>" style="background:var(--cream);border:1.5px solid var(--border);color:var(--deep);border-radius:50px;padding:0.75rem 1.5rem;text-decoration:none;font-size:0.88rem;font-weight:600;">Back to Hotel</a>
-        </div>
-        <div id="receiptStatus" style="margin-top:1rem;text-align:center;color:var(--primary);font-weight:600;display:none;">Your receipt is ready to download.</div>
-
-        <p style="margin-top:1.5rem;font-size:0.78rem;color:var(--muted);">
-          Generated on <?= htmlspecialchars($receipt['created_at']) ?> · Save this receipt for your records.
-        </p>
+        <?php endif; ?>
+      </div>
       <?php endif; ?>
-    </div>
+
+      <div class="ll-details-box" style="background:var(--white); border-color:var(--primary-light);">
+        <div class="ll-section-title" style="color:var(--primary); border-bottom-color:var(--primary-light);">Payment Breakdown</div>
+        
+        <div class="ll-row">
+          <span class="ll-label">Hotel Subtotal</span>
+          <span class="ll-val">₱<?= number_format($receipt['hotel_subtotal']) ?></span>
+        </div>
+        
+        <?php if ($receipt['activity_total'] > 0): ?>
+        <div class="ll-row">
+          <span class="ll-label">Activities Total</span>
+          <span class="ll-val">₱<?= number_format($receipt['activity_total']) ?></span>
+        </div>
+        <?php endif; ?>
+        
+        <?php if ($receipt['discount_amount'] > 0): ?>
+        <div class="ll-row" style="color:#2E6B4F;">
+          <span class="ll-label" style="color:#2E6B4F;">Promo Discount Applied</span>
+          <span class="ll-val" style="color:#2E6B4F;">-₱<?= number_format($receipt['discount_amount']) ?> (<?= round($receipt['discount_percent'] * 100) ?>%)</span>
+        </div>
+        <?php endif; ?>
+        
+        <div class="ll-row">
+          <span class="ll-label">Taxes &amp; Fees (12%)</span>
+          <span class="ll-val">₱<?= number_format($receipt['tax']) ?></span>
+        </div>
+        
+        <div class="ll-row" style="padding-top:1rem; margin-top:0.5rem; border-top:2px solid var(--border); font-size:1.05rem;">
+          <span class="ll-label" style="color:var(--deep); font-weight:700;">Total Amount Paid</span>
+          <span class="ll-val" style="color:var(--primary); font-size:1.25rem; font-weight:700;">₱<?= number_format($receipt['total']) ?></span>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; margin-top:2rem;">
+        <button id="downloadPdfBtn" type="button" onclick="downloadReceiptPdf()" class="ll-btn ll-btn-primary">Download PDF</button>
+        <a href="index.php" class="ll-btn ll-btn-accent">Go to Home</a>
+        <a href="hotel.php?dest=<?= urlencode($receipt['dest_id']) ?>&id=<?= urlencode($receipt['hotel_id']) ?>" class="ll-btn ll-btn-outline">Back to Hotel</a>
+      </div>
+
+      <div id="receiptStatus" style="margin-top:1.25rem; text-align:center; color:var(--accent); font-size:0.88rem; font-weight:600; display:none;"></div>
+
+      <p class="ll-footer-text">
+        Generated on <?= htmlspecialchars($receipt['created_at']) ?> · Official Digital Log Copy
+      </p>
+    <?php endif; ?>
   </div>
 </div>
 
@@ -128,7 +276,6 @@ include 'includes/header.php';
       'debit_card' => 'Debit Card'
     ][$receipt['payment_method']] ?? $receipt['payment_method']),
     'hotelSubtotal' => $receipt['hotel_subtotal'],
-
     'activityTotal' => $receipt['activity_total'],
     'discountAmount' => $receipt['discount_amount'],
     'discountPercent' => $receipt['discount_percent'],
@@ -192,7 +339,7 @@ include 'includes/header.php';
       doc.text(label, labelX, y);
       doc.setTextColor(23, 29, 39);
       if (bold) doc.setFont('helvetica', 'bold');
-      doc.text(value, valueX, y, { align: 'right' });
+      doc.text(String(value), valueX, y, { align: 'right' });
       if (bold) doc.setFont('helvetica', 'normal');
       y += lineHeight;
     }
@@ -263,12 +410,13 @@ include 'includes/header.php';
     doc.text('Thank you for booking with LakbayLokal!', labelX, y);
 
     doc.save(`LakbayLokal_Receipt_${receiptPayload.ref}.pdf`);
+    
     const statusEl = document.getElementById('receiptStatus');
     if (statusEl) {
-      statusEl.textContent = `Downloaded receipt: LakbayLokal_Receipt_${receiptPayload.ref}.pdf`;
+      statusEl.innerHTML = `✅ Successfully downloaded:<br><strong style="color:var(--deep)">LakbayLokal_Receipt_${receiptPayload.ref}.pdf</strong>`;
       statusEl.style.display = 'block';
     }
   }
 </script>
 
-<?php include 'includes/footer.php';
+<?php include 'includes/footer.php'; ?>

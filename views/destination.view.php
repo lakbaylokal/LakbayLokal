@@ -31,7 +31,7 @@
                     <span class="tag">📍 <?= htmlspecialchars($dest['region']) ?></span>
                     <span class="tag">🏨 <?= count($dest['hotels']) ?> Hotels</span>
                     <span class="tag">💰 From ₱<?= number_format($dest['price_from']) ?>/night</span>
-                    <span class="tag">🎯 <?= count($dest['acts']) ?> Activities</span>
+                    <span class="tag">🎯 <?= count($dest['acts'] ?? []) ?> Activities</span>
                 </div>
             </div>
         </div>
@@ -184,7 +184,7 @@
                             <h3><?= htmlspecialchars($d['name']) ?></h3>
                             <p><?= htmlspecialchars($d['tagline']) ?></p>
                             <div class="dest-meta">
-                                <span class="dest-meta-hotels">🏨 <?= count($d['hotels']) ?> Hotels</span>
+                                <span class="dest-meta-hotels">🏨 <?= $d['hotel_count'] ?> Hotels</span>
                                 <span>Browse →</span>
                             </div>
                         </div>

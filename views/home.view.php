@@ -35,7 +35,7 @@
           <div class="stat-label">Destinations</div>
         </div>
         <div class="stat-item">
-          <div class="stat-num"><?= array_sum(array_map(fn($d) => count($d['hotels']), $destinations)) ?>+</div>
+          <div class="stat-num"><?= array_sum(array_column($destinations, 'hotel_count')) ?>+</div>
           <div class="stat-label">Hotels</div>
         </div>
         <div class="stat-item">
@@ -116,8 +116,11 @@
               <h3><?= htmlspecialchars($d['name']) ?></h3>
               <div class="dest-meta">📍 <?= htmlspecialchars($d['tagline']) ?></div>
               <div class="dest-activities">
-                <?php foreach ($d['activities'] as $a): ?>
-                  <span class="act-tag"><?= htmlspecialchars($a) ?></span>
+                <?php
+                  $previewActs = getActivitiesByDest($conn, $d['id']);
+                  foreach (array_slice($previewActs, 0, 3) as $a):
+                ?>
+                  <span class="act-tag"><?= htmlspecialchars($a['name']) ?></span>
                 <?php endforeach; ?>
               </div>
               <div class="dest-footer">
@@ -632,4 +635,3 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 </script>
- 

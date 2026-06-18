@@ -1,12 +1,7 @@
 <?php
-// admin/includes/sidebar.php — Shared Sidebar Navigation
-// $activePage must be set before including this file
+// admin/includes/sidebar.php — LakbayLokal Admin Sidebar
 $activePage = $activePage ?? '';
 ?>
-<!-- <header>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
-</header> -->
 <aside class="adm-sidebar">
   <div class="adm-sidebar-brand">
     <span class="brand-logo">✈️</span>
@@ -20,38 +15,38 @@ $activePage = $activePage ?? '';
     <div class="adm-nav-group">
       <div class="adm-nav-label">Overview</div>
       <a href="index.php" class="adm-nav-link <?= $activePage==='dashboard'?'active':'' ?>">
-        <i class="bi bi-speedometer2 nav-icon"></i> Dashboard
+        <span class="nav-icon">📊</span> Dashboard
       </a>
     </div>
 
     <div class="adm-nav-group">
       <div class="adm-nav-label">Management</div>
       <a href="manage-bookings.php" class="adm-nav-link <?= $activePage==='bookings'?'active':'' ?>">
-        <i class="bi bi-receipt nav-icon"></i> Bookings
+        <span class="nav-icon">🧾</span> Bookings
       </a>
       <a href="manage-bookings.php?view=calendar" class="adm-nav-link <?= $activePage==='calendar'?'active':'' ?>">
-        <i class="bi bi-calendar nav-icon"></i> Calendar View
+        <span class="nav-icon">📅</span> Calendar View
       </a>
       <a href="manage-users.php" class="adm-nav-link <?= $activePage==='users'?'active':'' ?>">
-        <i class="bi bi-people nav-icon"></i> Users
+        <span class="nav-icon">👥</span> Users
       </a>
     </div>
 
     <div class="adm-nav-group">
       <div class="adm-nav-label">Content</div>
       <a href="manage-destinations.php" class="adm-nav-link <?= $activePage==='destinations'?'active':'' ?>">
-        <i class="bi bi-globe nav-icon"></i> Destinations
+        <span class="nav-icon">🗺️</span> Destinations
       </a>
       <a href="manage-hotels.php" class="adm-nav-link <?= $activePage==='hotels'?'active':'' ?>">
-        <i class="bi bi-building nav-icon"></i> Hotels
+        <span class="nav-icon">🏨</span> Hotels
       </a>
       <a href="manage-activities.php" class="adm-nav-link <?= $activePage==='activities'?'active':'' ?>">
-        <i class="bi bi-star nav-icon"></i> Activities
+        <span class="nav-icon">🎯</span> Activities
       </a>
     </div>
   </nav>
 
   <div class="adm-sidebar-footer">
-    <a href="../index.php" class="adm-exit-link"><i class="bi bi-box-arrow-right"></i> Exit Admin</a>
+    <a href="../index.php" class="adm-exit-link">🚪 Exit Admin</a>
   </div>
 </aside>
