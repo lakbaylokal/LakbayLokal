@@ -7,8 +7,8 @@ $msg     = '';
 $msgType = 'success';
 
 // ── Upload helper ─────────────────────────────────────────────────────────
-function handleImageUpload(string $field, string $currentUrl = ''): string {
-    if (empty($_FILES[$field]['name'])) return $currentUrl;
+function handleImageUpload(string $field, ?string $currentUrl = ''): string {
+    if (empty($_FILES[$field]['name'])) return $currentUrl ?? '';
     $allowed = ['image/jpeg','image/png','image/webp','image/gif'];
     $mime    = mime_content_type($_FILES[$field]['tmp_name']);
     if (!in_array($mime, $allowed)) return $currentUrl;
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
 
 // ── UPDATE ────────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update') {
-    $id = (int)$_POST['id'];
+    $id = trim($_POST['id']);
     $row = $pdo->prepare("SELECT image_url FROM destinations WHERE id = ?");
     $row->execute([$id]);
     $existing = $row->fetchColumn();
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
-    $id = (int)$_GET['id'];
+    $id = trim($_GET['id']);
     $pdo->prepare("DELETE FROM destinations WHERE id = ?")->execute([$id]);
     header('Location: manage-destinations.php?msg=' . urlencode('Destination deleted.') . '&type=success');
     exit;
@@ -86,7 +86,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
 if (isset($_GET['action']) && $_GET['action'] === 'get' && isset($_GET['id'])) {
     header('Content-Type: application/json');
     $stmt = $pdo->prepare("SELECT * FROM destinations WHERE id = ?");
-    $stmt->execute([(int)$_GET['id']]);
+    $stmt->execute([trim($_GET['id'])]);
     echo json_encode($stmt->fetch() ?: ['error' => 'Not found']);
     exit;
 }
@@ -214,7 +214,7 @@ $regions_count = $pdo->query("SELECT COUNT(DISTINCT region) FROM destinations")-
             <p style="margin-top:.4rem;font-weight:700;font-size:.9rem;color:var(--deep)">₱<?= number_format($d['price'], 2) ?></p>
           </div>
           <div class="adm-item-card-footer">
-            <button class="btn btn-outline btn-sm" onclick="editDestination(<?= $d['id'] ?>)">✏️ Edit</button>
+            <button class="btn btn-outline btn-sm" onclick="editDestination('<?= htmlspecialchars($d['id']) ?>')">✏️ Edit</button>
             <a href="manage-destinations.php?action=delete&id=<?= $d['id'] ?>"
                class="btn btn-danger btn-sm"
                onclick="return confirm('Delete <?= addslashes($d['name']) ?>? This cannot be undone.')">
@@ -288,7 +288,7 @@ $regions_count = $pdo->query("SELECT COUNT(DISTINCT region) FROM destinations")-
     </div>
     <div class="adm-modal-footer">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="document.getElementById('dest-form').submit()" id="modal-submit-btn">Save Destination</button>
+      <button class="btn btn-primary" onclick="submitDestinationForm()" id="modal-submit-btn">Save Destination</button>
     </div>
   </div>
 </div>
@@ -311,6 +311,34 @@ function openModal(mode) {
 function closeModal() { modal.classList.remove('open'); }
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
+function submitDestinationForm() {
+  const form = document.getElementById('dest-form');
+  const submitBtn = document.getElementById('modal-submit-btn');
+  
+  // Validate
+  const name = document.getElementById('f-name').value.trim();
+  const region = document.getElementById('f-region').value.trim();
+  const price = document.getElementById('f-price').value.trim();
+  
+  if (!name || !region || !price) {
+    alert('Please fill in all required fields: Destination Name, Region, and Price.');
+    return;
+  }
+  
+  if (isNaN(parseFloat(price)) || parseFloat(price) < 0) {
+    alert('Price must be a valid positive number.');
+    return;
+  }
+  
+  // Show loading
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = '⏳ Saving...';
+  
+  // Submit form
+  form.submit();
+}
+
 function editDestination(id) {
   document.getElementById('dest-form').reset();
   document.getElementById('img-preview').innerHTML = '';
@@ -320,9 +348,15 @@ function editDestination(id) {
   document.getElementById('form-id').value     = id;
 
   fetch(`manage-destinations.php?action=get&id=${id}`)
-    .then(r => r.json())
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
+      return r.json();
+    })
     .then(d => {
-      if (d.error) { alert('Could not load destination.'); return; }
+      if (d.error) { 
+        alert('Could not load destination: ' + (d.error || 'Unknown error'));
+        return; 
+      }
       document.getElementById('f-name').value       = d.name        || '';
       document.getElementById('f-region').value     = d.region      || '';
       document.getElementById('f-emoji').value      = d.emoji       || '';
@@ -337,6 +371,10 @@ function editDestination(id) {
            <p class="form-hint" style="margin-top:.3rem">Current image shown above.</p>`;
       }
       modal.classList.add('open');
+    })
+    .catch(e => {
+      console.error('Error loading destination:', e);
+      alert('Error loading destination. Check console for details.');
     });
 }
 
@@ -351,6 +389,25 @@ document.getElementById('f-image').addEventListener('change', function() {
        <p class="form-hint" style="margin-top:.3rem">New image preview.</p>`;
   };
   reader.readAsDataURL(file);
+});
+
+// Form submit validation
+document.getElementById('dest-form').addEventListener('submit', function(e) {
+  const name = document.getElementById('f-name').value.trim();
+  const region = document.getElementById('f-region').value.trim();
+  const price = document.getElementById('f-price').value.trim();
+  
+  if (!name || !region || !price) {
+    e.preventDefault();
+    alert('Please fill in all required fields: Destination Name, Region, and Price.');
+    return false;
+  }
+  
+  if (isNaN(parseFloat(price)) || parseFloat(price) < 0) {
+    e.preventDefault();
+    alert('Price must be a valid positive number.');
+    return false;
+  }
 });
 </script>
 </body>

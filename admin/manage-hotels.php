@@ -7,8 +7,8 @@ $msg        = '';
 $msgType    = 'success';
 
 // ── Upload helper ─────────────────────────────────────────────────────────
-function handleImageUpload(string $field, string $currentUrl = ''): string {
-    if (empty($_FILES[$field]['name'])) return $currentUrl;
+function handleImageUpload(string $field, ?string $currentUrl = ''): string {
+    if (empty($_FILES[$field]['name'])) return $currentUrl ?? '';
     $allowed = ['image/jpeg','image/png','image/webp','image/gif'];
     $mime    = mime_content_type($_FILES[$field]['tmp_name']);
     if (!in_array($mime, $allowed)) return $currentUrl;
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
     $stmt->execute([
-        (int)$_POST['destination_id'],
+        trim($_POST['destination_id']),
         trim($_POST['name']),
         $image_url,
         trim($_POST['location']),
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
 
 // ── UPDATE ────────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update') {
-    $id = (int)$_POST['id'];
+    $id = trim($_POST['id']);
     $row = $pdo->prepare("SELECT image_url FROM hotels WHERE id = ?");
     $row->execute([$id]);
     $existing  = $row->fetchColumn();
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
         WHERE id=?
     ");
     $stmt->execute([
-        (int)$_POST['destination_id'],
+        trim($_POST['destination_id']),
         trim($_POST['name']),
         $image_url,
         trim($_POST['location']),
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
 
 // ── DELETE ────────────────────────────────────────────────────────────────
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
-    $pdo->prepare("DELETE FROM hotels WHERE id = ?")->execute([(int)$_GET['id']]);
+    $pdo->prepare("DELETE FROM hotels WHERE id = ?")->execute([trim($_GET['id'])]);
     header('Location: manage-hotels.php?msg=' . urlencode('Hotel deleted.') . '&type=success');
     exit;
 }
@@ -90,7 +90,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
 if (isset($_GET['action']) && $_GET['action'] === 'get' && isset($_GET['id'])) {
     header('Content-Type: application/json');
     $stmt = $pdo->prepare("SELECT * FROM hotels WHERE id = ?");
-    $stmt->execute([(int)$_GET['id']]);
+    $stmt->execute([trim($_GET['id'])]);
     echo json_encode($stmt->fetch() ?: ['error' => 'Not found']);
     exit;
 }
@@ -105,7 +105,7 @@ $destinations_all = $pdo->query("SELECT id, name FROM destinations ORDER BY name
 
 // ── FETCH HOTELS ──────────────────────────────────────────────────────────
 $search   = trim($_GET['search'] ?? '');
-$dest_filter = (int)($_GET['destination_id'] ?? 0);
+$dest_filter = trim($_GET['destination_id'] ?? '');
 $where    = [];
 $params   = [];
 if ($search !== '') {
@@ -252,7 +252,7 @@ $total  = $pdo->query("SELECT COUNT(*) FROM hotels")->fetchColumn();
             </div>
           </div>
           <div class="adm-item-card-footer">
-            <button class="btn btn-outline btn-sm" onclick="editHotel(<?= $h['id'] ?>)">✏️ Edit</button>
+            <button class="btn btn-outline btn-sm" onclick="editHotel('<?= htmlspecialchars($h['id']) ?>')">✏️ Edit</button>
             <a href="manage-hotels.php?action=delete&id=<?= $h['id'] ?>"
                class="btn btn-danger btn-sm"
                onclick="return confirm('Delete <?= addslashes($h['name']) ?>?')">
@@ -351,7 +351,7 @@ $total  = $pdo->query("SELECT COUNT(*) FROM hotels")->fetchColumn();
     </div>
     <div class="adm-modal-footer">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="document.getElementById('hotel-form').submit()" id="modal-submit-btn">Save Hotel</button>
+      <button class="btn btn-primary" onclick="submitHotelForm()" id="modal-submit-btn">Save Hotel</button>
     </div>
   </div>
 </div>
@@ -372,6 +372,35 @@ function openModal(mode) {
 function closeModal() { modal.classList.remove('open'); }
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
+function submitHotelForm() {
+  const form = document.getElementById('hotel-form');
+  const submitBtn = document.getElementById('modal-submit-btn');
+  
+  // Validate
+  const name = document.getElementById('f-name').value.trim();
+  const location = document.getElementById('f-location').value.trim();
+  const destination = document.getElementById('f-dest').value.trim();
+  const price = document.getElementById('f-price').value.trim();
+  
+  if (!name || !location || !destination || !price) {
+    alert('Please fill in all required fields: Hotel Name, Location, Destination, and Price.');
+    return;
+  }
+  
+  if (isNaN(parseFloat(price)) || parseFloat(price) < 0) {
+    alert('Price must be a valid positive number.');
+    return;
+  }
+  
+  // Show loading
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = '⏳ Saving...';
+  
+  // Submit form
+  form.submit();
+}
+
 function editHotel(id) {
   document.getElementById('hotel-form').reset();
   document.getElementById('img-preview').innerHTML = '';
@@ -381,9 +410,15 @@ function editHotel(id) {
   document.getElementById('form-id').value     = id;
 
   fetch(`manage-hotels.php?action=get&id=${id}`)
-    .then(r => r.json())
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
+      return r.json();
+    })
     .then(h => {
-      if (h.error) { alert('Could not load hotel data.'); return; }
+      if (h.error) { 
+        alert('Could not load hotel: ' + (h.error || 'Unknown error'));
+        return; 
+      }
       document.getElementById('f-dest').value     = h.destination_id || '';
       document.getElementById('f-name').value     = h.name           || '';
       document.getElementById('f-location').value = h.location       || '';
@@ -400,6 +435,10 @@ function editHotel(id) {
            <p class="form-hint" style="margin-top:.3rem">Current image shown above.</p>`;
       }
       modal.classList.add('open');
+    })
+    .catch(e => {
+      console.error('Error loading hotel:', e);
+      alert('Error loading hotel. Check console for details.');
     });
 }
 

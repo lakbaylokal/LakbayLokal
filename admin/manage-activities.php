@@ -8,11 +8,27 @@ $msgType    = 'success';
 
 // ── CREATE ────────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'create') {
+    $destination_id = trim($_POST['destination_id'] ?? '');
+    $name = trim($_POST['name'] ?? '');
+    $price = floatval($_POST['price'] ?? 0);
+
+    if ($destination_id === '' || $name === '' || $price <= 0) {
+        header('Location: manage-activities.php?msg=' . urlencode('Please select a destination and enter a valid activity name and price.') . '&type=error');
+        exit;
+    }
+
+    $destCheck = $pdo->prepare("SELECT COUNT(*) FROM destinations WHERE id = ?");
+    $destCheck->execute([$destination_id]);
+    if ($destCheck->fetchColumn() == 0) {
+        header('Location: manage-activities.php?msg=' . urlencode('Selected destination does not exist.') . '&type=error');
+        exit;
+    }
+
     $stmt = $pdo->prepare("INSERT INTO activities (destination_id, name, price) VALUES (?, ?, ?)");
     $stmt->execute([
-        (int)$_POST['destination_id'],
-        trim($_POST['name']),
-        floatval($_POST['price']),
+        $destination_id,
+        $name,
+        $price,
     ]);
     header('Location: manage-activities.php?msg=' . urlencode('Activity added successfully.') . '&type=success');
     exit;
@@ -20,12 +36,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
 
 // ── UPDATE ────────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update') {
+    $destination_id = trim($_POST['destination_id'] ?? '');
+    $name = trim($_POST['name'] ?? '');
+    $price = floatval($_POST['price'] ?? 0);
+    $id = (int)($_POST['id'] ?? 0);
+
+    if ($id <= 0 || $destination_id === '' || $name === '' || $price <= 0) {
+        header('Location: manage-activities.php?msg=' . urlencode('Please select a destination and enter a valid activity name and price.') . '&type=error');
+        exit;
+    }
+
+    $destCheck = $pdo->prepare("SELECT COUNT(*) FROM destinations WHERE id = ?");
+    $destCheck->execute([$destination_id]);
+    if ($destCheck->fetchColumn() == 0) {
+        header('Location: manage-activities.php?msg=' . urlencode('Selected destination does not exist.') . '&type=error');
+        exit;
+    }
+
     $stmt = $pdo->prepare("UPDATE activities SET destination_id=?, name=?, price=? WHERE id=?");
     $stmt->execute([
-        (int)$_POST['destination_id'],
-        trim($_POST['name']),
-        floatval($_POST['price']),
-        (int)$_POST['id'],
+        $destination_id,
+        $name,
+        $price,
+        $id,
     ]);
     header('Location: manage-activities.php?msg=' . urlencode('Activity updated successfully.') . '&type=success');
     exit;
@@ -58,14 +91,14 @@ $dest_map = array_column($destinations_all, 'name', 'id');
 
 // ── FETCH ACTIVITIES ──────────────────────────────────────────────────────
 $search      = trim($_GET['search'] ?? '');
-$dest_filter = (int)($_GET['destination_id'] ?? 0);
+$dest_filter = trim($_GET['destination_id'] ?? '');
 $where  = [];
 $params = [];
 if ($search !== '') {
     $where[]  = "a.name LIKE ?";
     $params[] = "%$search%";
 }
-if ($dest_filter > 0) {
+if ($dest_filter !== '') {
     $where[]  = "a.destination_id = ?";
     $params[] = $dest_filter;
 }
