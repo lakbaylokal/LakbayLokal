@@ -29,6 +29,58 @@ function handleImageUpload(string $field, ?string $currentUrl = ''): string {
     return $currentUrl;
 }
 
+function resolveDestinationImageSrc(array $destination): string {
+    $imageUrl = trim((string)($destination['image_url'] ?? ''));
+    $fallbackImages = [
+        'baguio' => 'assets/pics/Baguio.jpg',
+        'vigan' => 'assets/pics/vigan.jpg',
+        'palawan' => 'assets/pics/palawan.jpg',
+        'cebu' => 'assets/pics/Cebu2.jpg',
+        'boracay' => 'assets/pics/boracay.jpg',
+        'siargao' => 'assets/pics/siargao.jpg',
+        'bukidnon' => 'assets/pics/bukidno.jpg',
+        'camiguin' => 'assets/pics/camiguin.jpg',
+    ];
+
+    if ($imageUrl === '' && !empty($destination['gradient_bg'])) {
+        if (preg_match('/url\((["\']?)(.*?)\1\)/', (string)$destination['gradient_bg'], $matches)) {
+            $imageUrl = trim($matches[2]);
+        }
+    }
+
+    $normalizedImageUrl = str_replace('\\', '/', $imageUrl);
+    $isExternalImage = preg_match('/^(https?:)?\/\//i', $normalizedImageUrl) || str_starts_with($normalizedImageUrl, 'data:') || str_starts_with($normalizedImageUrl, '/');
+    $id = (string)($destination['id'] ?? '');
+    if (
+        !$isExternalImage
+        && $id !== ''
+        && isset($fallbackImages[$id])
+        && !is_file(__DIR__ . '/' . $normalizedImageUrl)
+        && !is_file(dirname(__DIR__) . '/' . $normalizedImageUrl)
+    ) {
+        $imageUrl = $fallbackImages[$id];
+    }
+
+    if ($imageUrl === '') {
+        return '';
+    }
+
+    $imageUrl = str_replace('\\', '/', $imageUrl);
+    if (preg_match('/^(https?:)?\/\//i', $imageUrl) || str_starts_with($imageUrl, 'data:') || str_starts_with($imageUrl, '/')) {
+        return $imageUrl;
+    }
+
+    if (is_file(__DIR__ . '/' . $imageUrl)) {
+        return $imageUrl;
+    }
+
+    if (is_file(dirname(__DIR__) . '/' . $imageUrl)) {
+        return '../' . $imageUrl;
+    }
+
+    return $imageUrl;
+}
+
 // ── CREATE ────────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'create') {
     $image_url = handleImageUpload('image_file', '');
@@ -99,7 +151,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'get' && isset($_GET['id'])) {
     header('Content-Type: application/json');
     $stmt = $pdo->prepare("SELECT * FROM destinations WHERE id = ?");
     $stmt->execute([trim($_GET['id'])]);
-    echo json_encode($stmt->fetch() ?: ['error' => 'Not found']);
+    $destination = $stmt->fetch();
+    if ($destination) {
+        $destination['image_src'] = resolveDestinationImageSrc($destination);
+    }
+    echo json_encode($destination ?: ['error' => 'Not found']);
     exit;
 }
 
@@ -230,8 +286,9 @@ $regions_count = $pdo->query("SELECT COUNT(DISTINCT region) FROM destinations WH
       <div class="adm-content-grid" style="padding:1.25rem">
         <?php foreach ($destinations as $d): ?>
         <div class="adm-item-card">
-          <?php if (!empty($d['image_url'])): ?>
-          <img src="<?= htmlspecialchars($d['image_url']) ?>" alt="<?= htmlspecialchars($d['name']) ?>" class="adm-item-card-img">
+          <?php $imageSrc = resolveDestinationImageSrc($d); ?>
+          <?php if ($imageSrc !== ''): ?>
+          <img src="<?= htmlspecialchars($imageSrc) ?>" alt="<?= htmlspecialchars($d['name']) ?>" class="adm-item-card-img">
           <?php else: ?>
           <div class="adm-item-card-img-placeholder" style="background:<?= htmlspecialchars($d['gradient_bg'] ?: 'linear-gradient(135deg,#FFF3E6,#FFE4CC)') ?>">
             <span><?= htmlspecialchars($d['emoji'] ?: '🗺️') ?></span>
@@ -400,9 +457,9 @@ function editDestination(id) {
       document.getElementById('f-gradient').value   = d.gradient_bg || '';
       document.getElementById('f-tagline').value    = d.tagline     || '';
       document.getElementById('f-desc').value       = d.description || '';
-      if (d.image_url) {
+      if (d.image_src || d.image_url) {
         document.getElementById('img-preview').innerHTML =
-          `<img src="${d.image_url}" style="max-height:120px;border-radius:8px;border:1px solid var(--border)" alt="Current image">
+          `<img src="${d.image_src || d.image_url}" style="max-height:120px;border-radius:8px;border:1px solid var(--border)" alt="Current image">
            <p class="form-hint" style="margin-top:.3rem">Current image shown above.</p>`;
       }
       modal.classList.add('open');
