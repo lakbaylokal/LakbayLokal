@@ -40,21 +40,65 @@ function resolveAdminImageSrc(?string $imageUrl): string {
     return $imageUrl;
 }
 
+// Helper para i-save ang relational tags (Amenities & Policies)
+function saveHotelRelations($pdo, $hotelId, $amenities, $policies) {
+    // 1. I-clear ang lumang entries
+    $stmt1 = $pdo->prepare("DELETE FROM hotel_amenities WHERE hotel_id = ?");
+    $stmt1->execute([$hotelId]);
+    $stmt2 = $pdo->prepare("DELETE FROM hotel_policies WHERE hotel_id = ?");
+    $stmt2->execute([$hotelId]);
+
+    // 2. Ipasok ang mga bagong Amenities
+    if (!empty($amenities)) {
+        $stmt = $pdo->prepare("INSERT INTO hotel_amenities (hotel_id, amenity_name) VALUES (?, ?)");
+        foreach ($amenities as $amenity) {
+            $amenity = trim($amenity);
+            if ($amenity !== '') $stmt->execute([$hotelId, $amenity]);
+        }
+    }
+
+    // 3. Ipasok ang mga bagong Policies
+    if (!empty($policies)) {
+        $stmt = $pdo->prepare("INSERT INTO hotel_policies (hotel_id, policy) VALUES (?, ?)");
+        foreach ($policies as $policy) {
+            $policy = trim($policy);
+            if ($policy !== '') $stmt->execute([$hotelId, $policy]);
+        }
+    }
+}
+
 // ── CRUD ──────────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'create') {
+    $hotel_id = 'hotel_' . uniqid(); // Gumawa ng unique custom string ID
     $image_url = handleImageUpload('image_file', '');
-    $stmt = $pdo->prepare("INSERT INTO hotels (destination_id,name,image_url,location,description,stars,price,rating,reviews_count,checkin_time,checkout_time) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
-    $stmt->execute([trim($_POST['destination_id']),trim($_POST['name']),$image_url,trim($_POST['location']),trim($_POST['description']),(int)$_POST['stars'],floatval($_POST['price']),floatval($_POST['rating']),(int)$_POST['reviews_count'],trim($_POST['checkin_time']),trim($_POST['checkout_time'])]);
+    
+    $stmt = $pdo->prepare("INSERT INTO hotels (id,destination_id,name,image_url,location,description,stars,price,rating,reviews_count,checkin_time,checkout_time) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
+    $stmt->execute([$hotel_id,trim($_POST['destination_id']),trim($_POST['name']),$image_url,trim($_POST['location']),trim($_POST['description']),(int)$_POST['stars'],floatval($_POST['price']),floatval($_POST['rating']),(int)$_POST['reviews_count'],trim($_POST['checkin_time']),trim($_POST['checkout_time'])]);
+    
+    // Kunin ang arrays galing sa dynamic tagging inputs
+    $amenities = $_POST['amenities'] ?? [];
+    $policies = $_POST['policies'] ?? [];
+    saveHotelRelations($pdo, $hotel_id, $amenities, $policies);
+
     header('Location: manage-hotels.php?msg='.urlencode('Hotel added successfully.').'&type=success'); exit;
 }
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update') {
     $id = trim($_POST['id']);
     $row = $pdo->prepare("SELECT image_url FROM hotels WHERE id=?"); $row->execute([$id]);
     $image_url = handleImageUpload('image_file', $row->fetchColumn());
+    
     $stmt = $pdo->prepare("UPDATE hotels SET destination_id=?,name=?,image_url=?,location=?,description=?,stars=?,price=?,rating=?,reviews_count=?,checkin_time=?,checkout_time=? WHERE id=?");
     $stmt->execute([trim($_POST['destination_id']),trim($_POST['name']),$image_url,trim($_POST['location']),trim($_POST['description']),(int)$_POST['stars'],floatval($_POST['price']),floatval($_POST['rating']),(int)$_POST['reviews_count'],trim($_POST['checkin_time']),trim($_POST['checkout_time']),$id]);
+    
+    // Kunin at i-update ang relasyon ng tags
+    $amenities = $_POST['amenities'] ?? [];
+    $policies = $_POST['policies'] ?? [];
+    saveHotelRelations($pdo, $id, $amenities, $policies);
+
     header('Location: manage-hotels.php?msg='.urlencode('Hotel updated.').'&type=success'); exit;
 }
+
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     $pdo->prepare("UPDATE hotels SET archived=1 WHERE id=?")->execute([trim($_GET['id'])]);
     header('Location: manage-hotels.php?msg='.urlencode('Hotel archived.').'&type=success'); exit;
@@ -63,11 +107,25 @@ if (isset($_GET['action']) && $_GET['action'] === 'unarchive' && isset($_GET['id
     $pdo->prepare("UPDATE hotels SET archived=0 WHERE id=?")->execute([trim($_GET['id'])]);
     header('Location: manage-hotels.php?show_archived=1&msg='.urlencode('Hotel restored.').'&type=success'); exit;
 }
+
+// API endpoint para sa AJAX load details ng modal edit
 if (isset($_GET['action']) && $_GET['action'] === 'get' && isset($_GET['id'])) {
     header('Content-Type: application/json');
     $stmt = $pdo->prepare("SELECT * FROM hotels WHERE id=?"); $stmt->execute([trim($_GET['id'])]);
     $hotel = $stmt->fetch();
-    if ($hotel) $hotel['image_src'] = resolveAdminImageSrc($hotel['image_url'] ?? '');
+    if ($hotel) {
+        $hotel['image_src'] = resolveAdminImageSrc($hotel['image_url'] ?? '');
+        
+        // Isama ang mga Amenities
+        $amStmt = $pdo->prepare("SELECT amenity_name FROM hotel_amenities WHERE hotel_id = ?");
+        $amStmt->execute([$hotel['id']]);
+        $hotel['amenities'] = $amStmt->fetchAll(PDO::FETCH_COLUMN);
+
+        // Isama ang mga Policies
+        $polStmt = $pdo->prepare("SELECT policy FROM hotel_policies WHERE hotel_id = ?");
+        $polStmt->execute([$hotel['id']]);
+        $hotel['policies'] = $polStmt->fetchAll(PDO::FETCH_COLUMN);
+    }
     echo json_encode($hotel ?: ['error'=>'Not found']); exit;
 }
 
@@ -98,6 +156,57 @@ $avg_price      = $pdo->query("SELECT AVG(price) FROM hotels WHERE archived=0")-
   <title>Hotels – LakbayLokal Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
+  
+  <style>
+    /* Estilo para sa Dynamic Tag Generator Controls */
+    .tag-input-container {
+        border: 1px solid var(--border, #ccc);
+        border-radius: 6px;
+        padding: 0.5rem;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .tag-field-row {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .tag-field-row input {
+        flex: 1;
+        margin-bottom: 0 !important;
+    }
+    .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.25rem;
+    }
+    .tag-item {
+        background: var(--bg-tint, #f1f5f9);
+        color: var(--deep, #1e293b);
+        border: 1px solid var(--border, #cbd5e1);
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .tag-item .remove-tag-btn {
+        color: #ef4444;
+        cursor: pointer;
+        font-weight: bold;
+        border: none;
+        background: transparent;
+        padding: 0;
+        font-size: 0.85rem;
+    }
+    .tag-item .remove-tag-btn:hover {
+        color: #b91c1c;
+    }
+  </style>
 </head>
 <body>
 <?php include __DIR__ . '/includes/sidebar.php'; ?>
@@ -336,6 +445,30 @@ $avg_price      = $pdo->query("SELECT AVG(price) FROM hotels WHERE archived=0")-
             <input type="text" id="f-checkout" name="checkout_time" placeholder="e.g. 12:00 PM">
           </div>
 
+          <!-- DYNAMIC AMENITIES INCLUSION -->
+          <div class="form-group form-span-2">
+            <label>Hotel Amenities</label>
+            <div class="tag-input-container">
+              <div class="tag-field-row">
+                <input type="text" id="amenity-input" placeholder="Type an amenity (e.g. Free Swimming Pool, Rooftop Bar)">
+                <button type="button" class="btn btn-outline btn-sm" onclick="addTag('amenity')">＋ Add</button>
+              </div>
+              <div id="amenity-list" class="tag-list"></div>
+            </div>
+          </div>
+
+          <!-- DYNAMIC POLICIES INCLUSION -->
+          <div class="form-group form-span-2">
+            <label>Hotel Policies</label>
+            <div class="tag-input-container">
+              <div class="tag-field-row">
+                <input type="text" id="policy-input" placeholder="Type a policy (e.g. No pets allowed, 100% Non-Smoking)">
+                <button type="button" class="btn btn-outline btn-sm" onclick="addTag('policy')">＋ Add</button>
+              </div>
+              <div id="policy-list" class="tag-list"></div>
+            </div>
+          </div>
+
           <div class="form-group form-span-2">
             <label for="f-desc">Description</label>
             <textarea id="f-desc" name="description" rows="3" placeholder="Brief description of the hotel, amenities, and what makes it special…"></textarea>
@@ -361,9 +494,12 @@ $avg_price      = $pdo->query("SELECT AVG(price) FROM hotels WHERE archived=0")-
 <script>
 const modal = document.getElementById('hotel-modal');
 
+// Buksan ang modal at i-reset ang listahan ng custom tags
 function openModal(mode) {
   document.getElementById('hotel-form').reset();
   document.getElementById('img-preview').innerHTML = '';
+  document.getElementById('amenity-list').innerHTML = '';
+  document.getElementById('policy-list').innerHTML = '';
   document.getElementById('modal-title').textContent      = 'Add Hotel';
   document.getElementById('modal-submit-btn').textContent = 'Save Hotel';
   document.getElementById('form-action').value = 'create';
@@ -373,6 +509,47 @@ function openModal(mode) {
 
 function closeModal() { modal.classList.remove('open'); }
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+// ── TAGS UTILITIES ENGINE ──────────────────────────────────────────────────
+// Uri: 'amenity' o 'policy'
+function addTag(type, value = null) {
+  const inputEl = document.getElementById(`${type}-input`);
+  const listEl = document.getElementById(`${type}-list`);
+  const textValue = value ? value.trim() : inputEl.value.trim();
+
+  if (textValue === "") return;
+
+  // Iwasan ang duplicate entries sa listahan
+  const existingInputs = listEl.querySelectorAll(`input[name="${type}s[]"]`);
+  for (let input of existingInputs) {
+    if (input.value.toLowerCase() === textValue.toLowerCase()) {
+      if(!value) inputEl.value = "";
+      return;
+    }
+  }
+
+  // Gumawa ng Tag element framework
+  const tagItem = document.createElement('div');
+  tagItem.className = 'tag-item';
+  tagItem.innerHTML = `
+    <span>${escapeHTML(textValue)}</span>
+    <input type="hidden" name="${type}s[]" value="${escapeHTML(textValue)}">
+    <button type="button" class="remove-tag-btn" onclick="this.parentElement.remove()">✕</button>
+  `;
+
+  listEl.appendChild(tagItem);
+  if (!value) inputEl.value = ""; // Linisin ang input box kapag tapos na
+}
+
+// Suporta para sa enter key triggering sa input elements
+document.getElementById('amenity-input').addEventListener('keydown', e => { if(e.key === 'Enter') { e.preventDefault(); addTag('amenity'); } });
+document.getElementById('policy-input').addEventListener('keydown', e => { if(e.key === 'Enter') { e.preventDefault(); addTag('policy'); } });
+
+function escapeHTML(str) {
+  return str.replace(/[&<>'"]/g, 
+    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+  );
+}
 
 function submitHotelForm() {
   const name   = document.getElementById('f-name').value.trim();
@@ -390,6 +567,9 @@ function submitHotelForm() {
 function editHotel(id) {
   document.getElementById('hotel-form').reset();
   document.getElementById('img-preview').innerHTML = '';
+  document.getElementById('amenity-list').innerHTML = '';
+  document.getElementById('policy-list').innerHTML = '';
+  
   document.getElementById('modal-title').textContent      = 'Edit Hotel';
   document.getElementById('modal-submit-btn').textContent = 'Update Hotel';
   document.getElementById('form-action').value = 'update';
@@ -409,6 +589,17 @@ function editHotel(id) {
       document.getElementById('f-checkin').value  = h.checkin_time   || '';
       document.getElementById('f-checkout').value = h.checkout_time  || '';
       document.getElementById('f-desc').value     = h.description    || '';
+      
+      // I-populate ang mga Amenity Tags galing database gamit ang JS loop
+      if (h.amenities && Array.isArray(h.amenities)) {
+        h.amenities.forEach(amenity => addTag('amenity', amenity));
+      }
+
+      // I-populate ang mga Policy Tags galing database gamit ang JS loop
+      if (h.policies && Array.isArray(h.policies)) {
+        h.policies.forEach(policy => addTag('policy', policy));
+      }
+
       if (h.image_src || h.image_url) {
         document.getElementById('img-preview').innerHTML =
           `<img src="${h.image_src || h.image_url}" style="max-height:120px;border-radius:8px;border:1px solid var(--border)" alt="Current">
