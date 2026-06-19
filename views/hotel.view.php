@@ -266,6 +266,18 @@
                   <span style="font-size: 0.85rem;">Rooms</span>
                   <strong id="roomsDisplay">1</strong>
                 </div>
+                <div id="actsRow" class="d-flex justify-content-between mb-2" style="display:none;">
+                  <span style="font-size: 0.85rem;">Activities</span>
+                  <strong id="actsDisplay">—</strong>
+                </div>
+                <div id="discountRow" class="d-flex justify-content-between mb-2" style="display:none; color: var(--danger);">
+                  <span style="font-size: 0.85rem;">Discount</span>
+                  <strong id="discountDisplay">—</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span style="font-size: 0.85rem;">Tax (12%)</span>
+                  <strong id="taxDisplay">—</strong>
+                </div>
                 <div class="d-flex justify-content-between fw-bold" style="font-size: 0.95rem; color: var(--primary);">
                   <span>Total</span>
                   <strong id="totalDisplay">—</strong>
