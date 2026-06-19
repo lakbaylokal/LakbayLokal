@@ -224,6 +224,10 @@
                   <label class="form-label">GCash Mobile Number</label>
                   <input type="tel" name="gcash_number" class="form-control" id="gcashNumber" placeholder="09XX XXX XXXX">
                 </div>
+                <div class="mb-3">
+                  <label class="form-label">GCash Account Name</label>
+                  <input type="text" name="gcash_name" class="form-control" id="gcashName" placeholder="Juan dela Cruz">
+                </div>
               </div>
 
               <!-- Card Fields -->
@@ -231,6 +235,20 @@
                 <div class="mb-3">
                   <label class="form-label">Cardholder Name</label>
                   <input type="text" name="card_holder" class="form-control" id="cardHolder">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Card Number</label>
+                  <input type="text" name="card_number" class="form-control" id="cardNumber" maxlength="19" placeholder="1234 5678 9012 3456" oninput="formatCardNumber(this)">
+                </div>
+                <div class="row g-2 mb-3">
+                  <div class="col-6">
+                    <label class="form-label">Expiry Date</label>
+                    <input type="text" name="card_expiry" class="form-control" id="cardExpiry" maxlength="7" placeholder="MM / YY" oninput="formatExpiry(this)">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">CVV</label>
+                    <input type="text" name="card_cvv" class="form-control" id="cardCvv" maxlength="4" placeholder="123">
+                  </div>
                 </div>
               </div>
 

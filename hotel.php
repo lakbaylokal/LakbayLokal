@@ -269,5 +269,8 @@ include 'includes/footer.php';
           ci && co && new Date(co) <= new Date(ci) ? 'Check-out must be after check-in.' : '');
       });
     });
+
+    showPaymentFields();
+    calcTotal();
   });
 </script>
