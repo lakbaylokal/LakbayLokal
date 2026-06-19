@@ -210,7 +210,7 @@
               <div class="mb-3">
                 <label class="form-label">Payment Method</label>
                 <select name="payment_method" class="form-select" id="paymentMethodSelect" required onchange="showPaymentFields()">
-                  <option value="">Select Payment Method</option>
+             
                   <option value="gcash">GCash</option>
                   <option value="credit_card">Credit Card</option>
                   <option value="debit_card">Debit Card</option>
