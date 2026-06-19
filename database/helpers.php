@@ -106,8 +106,8 @@ function getHotelsByDest($conn, string $destId): array {
         SELECT id, destination_id, name, image_url AS image,
                location, description AS `desc`,
                stars, price, rating, reviews_count AS reviews,
-               TIME_FORMAT(checkin_time,  '%H:%i') AS checkin,
-               TIME_FORMAT(checkout_time, '%H:%i') AS checkout
+               checkin_time  AS checkin,
+               checkout_time AS checkout
         FROM hotels
         WHERE destination_id = ? AND archived = 0
         ORDER BY price ASC
@@ -136,8 +136,8 @@ function getHotelById($conn, string $destId, string $hotelId): ?array {
         SELECT id, destination_id, name, image_url AS image,
                location, description AS `desc`,
                stars, price, rating, reviews_count AS reviews,
-               TIME_FORMAT(checkin_time,  '%H:%i') AS checkin,
-               TIME_FORMAT(checkout_time, '%H:%i') AS checkout
+               checkin_time  AS checkin,
+               checkout_time AS checkout
         FROM hotels
         WHERE destination_id = ? AND id = ? AND archived = 0
     ");

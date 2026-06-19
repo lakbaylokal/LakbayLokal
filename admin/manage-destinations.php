@@ -18,15 +18,28 @@ function handleImageUpload(string $field, ?string $currentUrl = ''): string {
     if (empty($_FILES[$field]['name'])) return $currentUrl ?? '';
     $allowed = ['image/jpeg','image/png','image/webp','image/gif'];
     $mime    = mime_content_type($_FILES[$field]['tmp_name']);
-    if (!in_array($mime, $allowed)) return $currentUrl;
-    $ext  = pathinfo($_FILES[$field]['name'], PATHINFO_EXTENSION);
-    $name = 'dest_' . uniqid() . '.' . strtolower($ext);
-    $dir  = dirname(__DIR__) . '/assets/pics/';
+    if (!in_array($mime, $allowed)) return $currentUrl ?? '';
+    $ext  = strtolower(pathinfo($_FILES[$field]['name'], PATHINFO_EXTENSION));
+    $name = 'dest_' . uniqid() . '.' . $ext;
+    $dir  = __DIR__ . '/../assets/pics/';
     if (!is_dir($dir)) mkdir($dir, 0755, true);
-    if (move_uploaded_file($_FILES[$field]['tmp_name'], $dir . $name)) {
-        return 'assets/pics/' . $name;
+    if (move_uploaded_file($_FILES[$field]['tmp_name'], $dir . $name)) return 'assets/pics/' . $name;
+    return $currentUrl ?? '';
+}
+
+function generateSlug(string $name, $pdo, string $table): string {
+    $base = strtolower(trim($name));
+    $base = preg_replace('/[^a-z0-9\s-]/', '', $base);
+    $base = trim(preg_replace('/[\s-]+/', '-', $base), '-');
+    $slug = $base;
+    $i = 2;
+    while (true) {
+        $chk = $pdo->prepare("SELECT id FROM {$table} WHERE id = ?");
+        $chk->execute([$slug]);
+        if (!$chk->fetch()) break;
+        $slug = $base . '-' . $i++;
     }
-    return $currentUrl;
+    return $slug;
 }
 
 function resolveDestinationImageSrc(array $d): string {
@@ -56,17 +69,18 @@ function resolveDestinationImageSrc(array $d): string {
 
 // ── CRUD ──────────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'create') {
+    $dest_id   = generateSlug(trim($_POST['name']), $pdo, 'destinations');
     $image_url = handleImageUpload('image_file', '');
-    $stmt = $pdo->prepare("INSERT INTO destinations (name,region,tagline,description,price,price_from,image_url,gradient_bg) VALUES (?,?,?,?,?,?,?,?)");
-    $stmt->execute([trim($_POST['name']),trim($_POST['region']),trim($_POST['tagline']),trim($_POST['description']),floatval($_POST['price']),trim($_POST['price_from']),$image_url,trim($_POST['gradient_bg'])]);
+    $stmt = $pdo->prepare("INSERT INTO destinations (id,name,region,tagline,description,price,price_from,image_url,gradient_bg,emoji) VALUES (?,?,?,?,?,?,?,?,?,?)");
+    $stmt->execute([$dest_id,trim($_POST['name']),trim($_POST['region']),trim($_POST['tagline']),trim($_POST['description']),floatval($_POST['price']),trim($_POST['price_from']),$image_url,trim($_POST['gradient_bg']),trim($_POST['emoji'] ?? '')]);
     header('Location: manage-destinations.php?msg='.urlencode('Destination added successfully.').'&type=success'); exit;
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update') {
     $id = trim($_POST['id']);
     $row = $pdo->prepare("SELECT image_url FROM destinations WHERE id=?"); $row->execute([$id]);
     $image_url = handleImageUpload('image_file', $row->fetchColumn());
-    $stmt = $pdo->prepare("UPDATE destinations SET name=?,region=?,tagline=?,description=?,price=?,price_from=?,image_url=?,gradient_bg=? WHERE id=?");
-    $stmt->execute([trim($_POST['name']),trim($_POST['region']),trim($_POST['tagline']),trim($_POST['description']),floatval($_POST['price']),trim($_POST['price_from']),$image_url,trim($_POST['gradient_bg']),$id]);
+    $stmt = $pdo->prepare("UPDATE destinations SET name=?,region=?,tagline=?,description=?,price=?,price_from=?,image_url=?,gradient_bg=?,emoji=? WHERE id=?");
+    $stmt->execute([trim($_POST['name']),trim($_POST['region']),trim($_POST['tagline']),trim($_POST['description']),floatval($_POST['price']),trim($_POST['price_from']),$image_url,trim($_POST['gradient_bg']),trim($_POST['emoji'] ?? ''),$id]);
     header('Location: manage-destinations.php?msg='.urlencode('Destination updated.').'&type=success'); exit;
 }
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
