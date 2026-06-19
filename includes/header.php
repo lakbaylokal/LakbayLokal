@@ -279,6 +279,14 @@ $userName = $_SESSION['user']['name'] ?? '';
             <label>Password</label>
             <input type="password" id="signupPassword" required>
             <small class="validation-error" id="signupPasswordError"></small>
+            <div class="password-requirements">
+              <p>Password must:</p>
+              <ul>
+                <li data-rule="minLength">Be at least 9 characters long</li>
+                <li data-rule="hasUppercase">Include at least one uppercase letter</li>
+                <li data-rule="hasSpecialChar">Include at least one special character</li>
+              </ul>
+            </div>
           </div>
           <button class="btn-primary auth-submit" type="submit">Create Account</button>
         </form>

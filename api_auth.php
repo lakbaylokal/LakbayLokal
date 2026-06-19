@@ -105,9 +105,9 @@ function handleSignup($conn) {
         return;
     }
 
-    if (strlen($Password) < 6) {
+    if (!isValidPassword($Password)) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Password must be at least 6 characters long.']);
+        echo json_encode(['success' => false, 'message' => 'Password must be at least 9 characters long, include one uppercase letter, and include one special character.']);
         return;
     }
 
@@ -183,4 +183,17 @@ function handleGetCurrentUser() {
 
 function isValidName($name) {
     return preg_match("/^[\\p{L}]+(?:[ '\\-][\\p{L}]+)*$/u", trim($name));
+}
+
+function isValidPassword($password) {
+    if (strlen($password) < 9) {
+        return false;
+    }
+    if (!preg_match('/[A-Z]/', $password)) {
+        return false;
+    }
+    if (!preg_match('/[!@#$%^&*()_+\-=[\]{};\'":\\|,.<>\/\?]/', $password)) {
+        return false;
+    }
+    return true;
 }

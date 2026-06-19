@@ -22,6 +22,37 @@ function clearAuthErrors(containerId) {
   });
 }
 
+function getPasswordRules(password) {
+  return {
+    minLength: password.length >= 9,
+    hasUppercase: /[A-Z]/.test(password),
+    hasSpecialChar: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>\/?]/.test(password)
+  };
+}
+
+function validateSignupPassword(password) {
+  const rules = getPasswordRules(password);
+
+  if (!rules.minLength) {
+    return 'Password must be at least 9 characters long.';
+  }
+  if (!rules.hasUppercase) {
+    return 'Password must include at least one uppercase letter.';
+  }
+  if (!rules.hasSpecialChar) {
+    return 'Password must include at least one special character.';
+  }
+  return '';
+}
+
+function updateSignupPasswordRequirements(password) {
+  const rules = getPasswordRules(password);
+  document.querySelectorAll('.password-requirements li').forEach(li => {
+    const rule = li.dataset.rule;
+    li.classList.toggle('completed', Boolean(rules[rule]));
+  });
+}
+
 /* ─────────────────────── AUTH MODAL ────────────────────────── */
 
 function openAuthModal(tab) {
@@ -119,9 +150,11 @@ function handleSignup(event) {
     showToast('Please enter a valid email address.');
     return;
   }
-  if (password.length < 6) {
-    setFieldError('signupPassword', 'Password must be at least 6 characters long.');
-    showToast('Password must be at least 6 characters long.');
+  updateSignupPasswordRequirements(password);
+  const passwordError = validateSignupPassword(password);
+  if (passwordError) {
+    setFieldError('signupPassword', passwordError);
+    showToast(passwordError);
     return;
   }
 
@@ -243,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const authValidators = {
     signupFName: value => namePattern.test(value.trim()) ? '' : 'Name must contain letters only.',
     signupLName: value => namePattern.test(value.trim()) ? '' : 'Name must contain letters only.',
-    signupPassword: value => value.length >= 6 ? '' : 'Password must be at least 6 characters long.'
+    signupPassword: value => validateSignupPassword(value.trim())
   };
 
   Object.keys(authValidators).forEach(id => {
@@ -251,6 +284,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!input) return;
     input.addEventListener('input', function () {
       setFieldError(id, authValidators[id](input.value));
+      if (id === 'signupPassword') {
+        updateSignupPasswordRequirements(input.value);
+      }
     });
   });
 

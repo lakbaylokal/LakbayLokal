@@ -60,6 +60,38 @@
 .validation-error.show {
   display: block;
 }
+.password-requirements {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+.password-requirements p {
+  margin: 0 0 0.3rem;
+  font-weight: 600;
+}
+.password-requirements ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.password-requirements li {
+  margin-bottom: 0.2rem;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+.password-requirements li::before {
+  content: '•';
+  display: inline-block;
+  width: 1.1rem;
+  color: var(--muted);
+}
+.password-requirements li.completed {
+  color: var(--success);
+}
+.password-requirements li.completed::before {
+  content: '\2713';
+  color: var(--success);
+}
 .auth-switch {
   display: flex;
   justify-content: center;
