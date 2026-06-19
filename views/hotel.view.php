@@ -222,11 +222,13 @@
               <div id="gcashFields" style="display:none;">
                 <div class="mb-3">
                   <label class="form-label">GCash Mobile Number</label>
-                  <input type="tel" name="gcash_number" class="form-control" id="gcashNumber" placeholder="09XX XXX XXXX">
+                  <input type="tel" name="gcash_number" class="form-control" id="gcashNumber" placeholder="09XXXXXXXXX" inputmode="tel" maxlength="12">
+                  <small class="validation-error" id="gcashNumberError"></small>
                 </div>
                 <div class="mb-3">
                   <label class="form-label">GCash Account Name</label>
                   <input type="text" name="gcash_name" class="form-control" id="gcashName" placeholder="Juan dela Cruz">
+                  <small class="validation-error" id="gcashNameError"></small>
                 </div>
               </div>
 
@@ -235,19 +237,23 @@
                 <div class="mb-3">
                   <label class="form-label">Cardholder Name</label>
                   <input type="text" name="card_holder" class="form-control" id="cardHolder">
+                  <small class="validation-error" id="cardHolderError"></small>
                 </div>
                 <div class="mb-3">
                   <label class="form-label">Card Number</label>
                   <input type="text" name="card_number" class="form-control" id="cardNumber" maxlength="19" placeholder="1234 5678 9012 3456" oninput="formatCardNumber(this)">
+                  <small class="validation-error" id="cardNumberError"></small>
                 </div>
                 <div class="row g-2 mb-3">
                   <div class="col-6">
                     <label class="form-label">Expiry Date</label>
                     <input type="text" name="card_expiry" class="form-control" id="cardExpiry" maxlength="7" placeholder="MM / YY" oninput="formatExpiry(this)">
+                    <small class="validation-error" id="cardExpiryError"></small>
                   </div>
                   <div class="col-6">
                     <label class="form-label">CVV</label>
                     <input type="text" name="card_cvv" class="form-control" id="cardCvv" maxlength="4" placeholder="123">
+                    <small class="validation-error" id="cardCvvError"></small>
                   </div>
                 </div>
               </div>
@@ -265,18 +271,6 @@
                 <div class="d-flex justify-content-between mb-2">
                   <span style="font-size: 0.85rem;">Rooms</span>
                   <strong id="roomsDisplay">1</strong>
-                </div>
-                <div id="actsRow" class="d-flex justify-content-between mb-2" style="display:none;">
-                  <span style="font-size: 0.85rem;">Activities</span>
-                  <strong id="actsDisplay">—</strong>
-                </div>
-                <div id="discountRow" class="d-flex justify-content-between mb-2" style="display:none; color: var(--danger);">
-                  <span style="font-size: 0.85rem;">Discount</span>
-                  <strong id="discountDisplay">—</strong>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                  <span style="font-size: 0.85rem;">Tax (12%)</span>
-                  <strong id="taxDisplay">—</strong>
                 </div>
                 <div class="d-flex justify-content-between fw-bold" style="font-size: 0.95rem; color: var(--primary);">
                   <span>Total</span>

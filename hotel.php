@@ -245,6 +245,25 @@ include 'includes/footer.php';
       input.addEventListener('input', () => setBookingError(id, fieldValidators[id](input.value)));
     });
 
+    const gcashNumberInput = document.getElementById('gcashNumber');
+    if (gcashNumberInput) {
+      gcashNumberInput.addEventListener('input', function (e) {
+        const raw = e.target.value;
+        const hasPlus = raw.startsWith('+');
+        let digits = raw.replace(/\D/g, '');
+        if (digits.length > 11) {
+          digits = digits.slice(0, 11);
+        }
+        const filtered = hasPlus ? '+' + digits : digits;
+        if (raw !== filtered) {
+          e.target.value = filtered;
+          setBookingError('gcashNumber', 'GCash number must be 11 digits.');
+        } else {
+          setBookingError('gcashNumber', '');
+        }
+      });
+    }
+
     document.getElementById('cardExpiry')?.addEventListener('input', function (e) {
       const expiry = e.target.value.replace(/\s/g, '');
       let msg = '';
