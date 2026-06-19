@@ -103,6 +103,7 @@ CREATE TABLE `activities` (
   `destination_id` INT NOT NULL,
   `name` VARCHAR(150) NOT NULL,
   `price` INT DEFAULT 0,
+  `archived` TINYINT(1) NOT NULL DEFAULT 0,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`destination_id`) REFERENCES `destinations`(`id`) ON DELETE CASCADE,
   KEY `idx_destination` (`destination_id`)

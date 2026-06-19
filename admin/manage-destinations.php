@@ -21,7 +21,7 @@ function handleImageUpload(string $field, ?string $currentUrl = ''): string {
     if (!in_array($mime, $allowed)) return $currentUrl;
     $ext  = pathinfo($_FILES[$field]['name'], PATHINFO_EXTENSION);
     $name = 'dest_' . uniqid() . '.' . strtolower($ext);
-    $dir  = __DIR__ . '/assets/pics/';
+    $dir  = dirname(__DIR__) . '/assets/pics/';
     if (!is_dir($dir)) mkdir($dir, 0755, true);
     if (move_uploaded_file($_FILES[$field]['tmp_name'], $dir . $name)) {
         return 'assets/pics/' . $name;

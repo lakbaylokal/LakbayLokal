@@ -1,6 +1,6 @@
 <?php
-require_once 'data.php';
 require_once 'config/db.php';
+require_once 'database/helpers.php';
 
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
@@ -91,6 +91,14 @@ function detectCardBrand($number) {
     return 'Discover';
   }
   return 'Card';
+}
+
+// Block bookings for archived or unavailable destinations/hotels.
+$activeDest = $destId ? getDestById($conn, $destId) : null;
+$activeHotel = ($activeDest && $hotelId) ? getHotelById($conn, $destId, $hotelId) : null;
+if (!$activeDest || !$activeHotel) {
+  header('Location: destinations.php');
+  exit;
 }
 
 // Validate

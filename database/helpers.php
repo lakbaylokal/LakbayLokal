@@ -6,6 +6,31 @@
  */
 
 // ============================================================================
+// MEDIA
+// ============================================================================
+
+function resolvePublicImageUrl(?string $imageUrl): string {
+    $imageUrl = trim((string)($imageUrl ?? ''));
+    if ($imageUrl === '') return '';
+
+    $imageUrl = str_replace('\\', '/', $imageUrl);
+    if (preg_match('/^(https?:)?\/\//i', $imageUrl) || str_starts_with($imageUrl, 'data:') || str_starts_with($imageUrl, '/')) {
+        return $imageUrl;
+    }
+
+    $rootDir = dirname(__DIR__);
+    if (is_file($rootDir . '/' . $imageUrl)) {
+        return $imageUrl;
+    }
+
+    if (is_file($rootDir . '/admin/' . $imageUrl)) {
+        return 'admin/' . $imageUrl;
+    }
+
+    return $imageUrl;
+}
+
+// ============================================================================
 // DESTINATIONS
 // ============================================================================
 
@@ -18,12 +43,16 @@ function getAllDestinations($conn) {
         SELECT
             d.id, d.name, d.region, d.emoji, d.tagline,
             d.description AS `desc`,
-            d.price, d.price_from, d.gradient_bg AS gradient,
+            d.price, d.price_from, d.image_url AS image,
+            d.gradient_bg AS gradient,
             COUNT(DISTINCT h.id)   AS hotel_count,
             COUNT(DISTINCT a.id)   AS acts_count
         FROM destinations d
-        LEFT JOIN hotels   h ON h.destination_id = d.id
-        LEFT JOIN activities a ON a.destination_id = d.id
+        LEFT JOIN hotels h
+            ON h.destination_id = d.id AND h.archived = 0
+        LEFT JOIN activities a
+            ON a.destination_id = d.id AND a.archived = 0
+        WHERE d.archived = 0
         GROUP BY d.id
         ORDER BY d.name
     ";
@@ -33,6 +62,7 @@ function getAllDestinations($conn) {
     $rows = [];
     while ($row = $result->fetch_assoc()) {
         // Keep a flat array; views access count via hotel_count / acts_count
+        $row['image'] = resolvePublicImageUrl($row['image'] ?? '');
         $rows[] = $row;
     }
     return $rows;
@@ -46,8 +76,10 @@ function getDestById($conn, string $id): ?array {
     $stmt = $conn->prepare("
         SELECT id, name, region, emoji, tagline,
                description AS `desc`,
-               price, price_from, gradient_bg AS gradient
-        FROM destinations WHERE id = ?
+               price, price_from, image_url AS image,
+               gradient_bg AS gradient
+        FROM destinations
+        WHERE id = ? AND archived = 0
     ");
     if (!$stmt) return null;
     $stmt->bind_param('s', $id);
@@ -55,6 +87,7 @@ function getDestById($conn, string $id): ?array {
     $dest = $stmt->get_result()->fetch_assoc();
     $stmt->close();
     if (!$dest) return null;
+    $dest['image'] = resolvePublicImageUrl($dest['image'] ?? '');
 
     $dest['hotels'] = getHotelsByDest($conn, $id);
     $dest['acts']   = getActivitiesByDest($conn, $id);
@@ -76,7 +109,7 @@ function getHotelsByDest($conn, string $destId): array {
                TIME_FORMAT(checkin_time,  '%H:%i') AS checkin,
                TIME_FORMAT(checkout_time, '%H:%i') AS checkout
         FROM hotels
-        WHERE destination_id = ?
+        WHERE destination_id = ? AND archived = 0
         ORDER BY price ASC
     ");
     if (!$stmt) return [];
@@ -85,6 +118,7 @@ function getHotelsByDest($conn, string $destId): array {
     $result = $stmt->get_result();
     $hotels = [];
     while ($h = $result->fetch_assoc()) {
+        $h['image'] = resolvePublicImageUrl($h['image'] ?? '');
         $h['amenities'] = getHotelAmenities($conn, $h['id']);
         $h['policies']  = getHotelPolicies($conn, $h['id']);
         $hotels[] = $h;
@@ -105,7 +139,7 @@ function getHotelById($conn, string $destId, string $hotelId): ?array {
                TIME_FORMAT(checkin_time,  '%H:%i') AS checkin,
                TIME_FORMAT(checkout_time, '%H:%i') AS checkout
         FROM hotels
-        WHERE destination_id = ? AND id = ?
+        WHERE destination_id = ? AND id = ? AND archived = 0
     ");
     if (!$stmt) return null;
     $stmt->bind_param('ss', $destId, $hotelId);
@@ -113,6 +147,7 @@ function getHotelById($conn, string $destId, string $hotelId): ?array {
     $hotel = $stmt->get_result()->fetch_assoc();
     $stmt->close();
     if (!$hotel) return null;
+    $hotel['image'] = resolvePublicImageUrl($hotel['image'] ?? '');
 
     $hotel['amenities'] = getHotelAmenities($conn, $hotel['id']);
     $hotel['policies']  = getHotelPolicies($conn, $hotel['id']);
@@ -161,7 +196,7 @@ function getHotelPolicies($conn, string $hotelId): array {
 
 function getActivitiesByDest($conn, string $destId): array {
     $stmt = $conn->prepare(
-        "SELECT id, name, price FROM activities WHERE destination_id = ? ORDER BY id"
+        "SELECT id, name, price FROM activities WHERE destination_id = ? AND archived = 0 ORDER BY id"
     );
     if (!$stmt) return [];
     $stmt->bind_param('s', $destId);
@@ -177,7 +212,7 @@ function getActivitiesByDest($conn, string $destId): array {
 
 function getActivityById($conn, int $activityId): ?array {
     $stmt = $conn->prepare(
-        "SELECT id, destination_id, name, price FROM activities WHERE id = ?"
+        "SELECT id, destination_id, name, price FROM activities WHERE id = ? AND archived = 0"
     );
     if (!$stmt) return null;
     $stmt->bind_param('i', $activityId);

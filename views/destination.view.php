@@ -19,7 +19,12 @@
         </div>
 
         <!-- Destination Hero -->
-        <div class="hotels-page-hero" style="background: <?= $dest['gradient'] ?>;">
+        <?php
+            $destHeroBackground = !empty($dest['image'])
+                ? "linear-gradient(to top, rgba(26,18,8,0.72) 0%, rgba(26,18,8,0.2) 60%), url('" . htmlspecialchars($dest['image'], ENT_QUOTES) . "') center/cover no-repeat"
+                : $dest['gradient'];
+        ?>
+        <div class="hotels-page-hero" style="background: <?= $destHeroBackground ?>;">
             <div class="hero-overlay"></div>
             <div class="hero-inner">
                 <h1><?= $dest['emoji'] ?> Hotels in <?= htmlspecialchars($dest['name']) ?></h1>
@@ -109,7 +114,7 @@
 
                     foreach ($hotels as $h):
                         $stars = str_repeat('★', $h['stars']) . str_repeat('☆', 5 - $h['stars']);
-                        $hotelBackground = isset($h['image'])
+                        $hotelBackground = !empty($h['image'])
                             ? "linear-gradient(135deg, rgba(0,0,0,0.25), rgba(0,0,0,0.05)), url('{$h['image']}') center/cover no-repeat"
                             : $dest['gradient'];
                     ?>
@@ -175,8 +180,15 @@
             <div class="dest-grid">
                 <?php foreach ($filteredDests as $d): ?>
                     <a href="destinations.php?dest=<?= $d['id'] ?>" class="dest-card">
-                        <div class="dest-img" style="background: <?= $d['gradient'] ?>;">
+                        <?php
+                            $destCardBackground = !empty($d['image'])
+                                ? "linear-gradient(135deg, rgba(0,0,0,0.18), rgba(0,0,0,0.02)), url('" . htmlspecialchars($d['image'], ENT_QUOTES) . "') center/cover no-repeat"
+                                : $d['gradient'];
+                        ?>
+                        <div class="dest-img" style="background: <?= $destCardBackground ?>;">
+                            <?php if (empty($d['image'])): ?>
                             <div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:4rem"><?= $d['emoji'] ?></div>
+                            <?php endif; ?>
                             <div class="dest-badge"><?= htmlspecialchars($d['region']) ?></div>
                             <div class="dest-price-badge">From ₱<?= number_format($d['price_from']) ?></div>
                         </div>

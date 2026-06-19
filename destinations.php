@@ -15,7 +15,7 @@ $dest = $destId ? getDestById($conn, $destId) : null;
 if (!$dest) {
 
     // Build WHERE clauses for budget filter
-    $where  = ['1=1'];
+    $where  = ['d.archived = 0'];
     $params = [];
     $types  = '';
 
@@ -35,10 +35,11 @@ if (!$dest) {
 
     $sql = "
         SELECT d.id, d.name, d.region, d.emoji, d.tagline,
-               d.price, d.price_from, d.gradient_bg AS gradient,
+               d.price, d.price_from, d.image_url AS image,
+               d.gradient_bg AS gradient,
                COUNT(DISTINCT h.id) AS hotel_count
         FROM destinations d
-        LEFT JOIN hotels h ON h.destination_id = d.id
+        LEFT JOIN hotels h ON h.destination_id = d.id AND h.archived = 0
         WHERE " . implode(' AND ', $where) . "
         GROUP BY d.id
         ORDER BY d.name
@@ -55,6 +56,7 @@ if (!$dest) {
 
     $filteredDests = [];
     while ($row = $result->fetch_assoc()) {
+        $row['image'] = resolvePublicImageUrl($row['image'] ?? '');
         $filteredDests[] = $row;
     }
 

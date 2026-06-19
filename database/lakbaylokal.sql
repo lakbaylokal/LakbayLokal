@@ -438,3 +438,7 @@ ADD COLUMN `archived` TINYINT(1) NOT NULL DEFAULT 0 AFTER `checkout_time`;
 -- Idagdag din sa destinations para safe ang buong admin panel
 ALTER TABLE `destinations` 
 ADD COLUMN `archived` TINYINT(1) NOT NULL DEFAULT 0 AFTER `gradient_bg`;
+
+-- Idagdag din sa activities para hindi lumabas sa users kapag archived
+ALTER TABLE `activities`
+ADD COLUMN `archived` TINYINT(1) NOT NULL DEFAULT 0 AFTER `price`;

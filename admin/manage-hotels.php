@@ -19,10 +19,25 @@ function handleImageUpload(string $field, ?string $currentUrl = ''): string {
     if (!in_array($mime, $allowed)) return $currentUrl;
     $ext  = pathinfo($_FILES[$field]['name'], PATHINFO_EXTENSION);
     $name = 'hotel_' . uniqid() . '.' . strtolower($ext);
-    $dir  = __DIR__ . '/assets/pics/';
+    $dir  = dirname(__DIR__) . '/assets/pics/';
     if (!is_dir($dir)) mkdir($dir, 0755, true);
     if (move_uploaded_file($_FILES[$field]['tmp_name'], $dir . $name)) return 'assets/pics/' . $name;
     return $currentUrl;
+}
+
+function resolveAdminImageSrc(?string $imageUrl): string {
+    $imageUrl = trim((string)($imageUrl ?? ''));
+    if ($imageUrl === '') return '';
+
+    $imageUrl = str_replace('\\', '/', $imageUrl);
+    if (preg_match('/^(https?:)?\/\//i', $imageUrl) || str_starts_with($imageUrl, 'data:') || str_starts_with($imageUrl, '/')) {
+        return $imageUrl;
+    }
+
+    if (is_file(__DIR__ . '/' . $imageUrl)) return $imageUrl;
+    if (is_file(dirname(__DIR__) . '/' . $imageUrl)) return '../' . $imageUrl;
+
+    return $imageUrl;
 }
 
 // ── CRUD ──────────────────────────────────────────────────────────────────
@@ -51,7 +66,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'unarchive' && isset($_GET['id
 if (isset($_GET['action']) && $_GET['action'] === 'get' && isset($_GET['id'])) {
     header('Content-Type: application/json');
     $stmt = $pdo->prepare("SELECT * FROM hotels WHERE id=?"); $stmt->execute([trim($_GET['id'])]);
-    echo json_encode($stmt->fetch() ?: ['error'=>'Not found']); exit;
+    $hotel = $stmt->fetch();
+    if ($hotel) $hotel['image_src'] = resolveAdminImageSrc($hotel['image_url'] ?? '');
+    echo json_encode($hotel ?: ['error'=>'Not found']); exit;
 }
 
 if (isset($_GET['msg'])) { $msg = htmlspecialchars($_GET['msg']); $msgType = ($_GET['type']??'success')==='error'?'error':'success'; }
@@ -195,10 +212,12 @@ $avg_price      = $pdo->query("SELECT AVG(price) FROM hotels WHERE archived=0")-
       </div>
       <?php else: ?>
       <div class="adm-content-grid" style="padding:1.25rem">
-        <?php foreach ($hotels as $h): ?>
+        <?php foreach ($hotels as $h):
+          $imageSrc = resolveAdminImageSrc($h['image_url'] ?? '');
+        ?>
         <div class="adm-item-card">
-          <?php if (!empty($h['image_url'])): ?>
-          <img src="<?= htmlspecialchars($h['image_url']) ?>" alt="<?= htmlspecialchars($h['name']) ?>" class="adm-item-card-img">
+          <?php if ($imageSrc !== ''): ?>
+          <img src="<?= htmlspecialchars($imageSrc) ?>" alt="<?= htmlspecialchars($h['name']) ?>" class="adm-item-card-img">
           <?php else: ?>
           <div class="adm-item-card-img-placeholder"><span>🏨</span></div>
           <?php endif; ?>
@@ -390,9 +409,9 @@ function editHotel(id) {
       document.getElementById('f-checkin').value  = h.checkin_time   || '';
       document.getElementById('f-checkout').value = h.checkout_time  || '';
       document.getElementById('f-desc').value     = h.description    || '';
-      if (h.image_url) {
+      if (h.image_src || h.image_url) {
         document.getElementById('img-preview').innerHTML =
-          `<img src="${h.image_url}" style="max-height:120px;border-radius:8px;border:1px solid var(--border)" alt="Current">
+          `<img src="${h.image_src || h.image_url}" style="max-height:120px;border-radius:8px;border:1px solid var(--border)" alt="Current">
            <p class="form-hint" style="margin-top:.3rem">Current image — upload a new file to replace it.</p>`;
       }
       modal.classList.add('open');
