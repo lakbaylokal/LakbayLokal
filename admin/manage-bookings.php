@@ -2,8 +2,8 @@
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
 
-$activePage = 'bookings';
 $view       = isset($_GET['view']) && $_GET['view'] === 'calendar' ? 'calendar' : 'table';
+$activePage = $view === 'calendar' ? 'calendar' : 'bookings';
 
 // ── AJAX: Booking detail panel ──────────────────────────────────────────────
 if (isset($_GET['action']) && $_GET['action'] === 'get_booking' && isset($_GET['id'])) {
