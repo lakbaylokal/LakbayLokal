@@ -30,7 +30,6 @@ CREATE TABLE `destinations` (
   `id` VARCHAR(50) PRIMARY KEY,
   `name` VARCHAR(100) NOT NULL,
   `region` VARCHAR(100) NOT NULL,
-  `emoji` VARCHAR(10),
   `tagline` VARCHAR(255),
   `description` TEXT,
   `price` INT DEFAULT 0,
@@ -208,7 +207,7 @@ INSERT INTO `users` (`FName`, `LName`, `Mname`, `Email`, `Password`, `role`) VAL
 ('Juan', 'Dela Cruz', 'Sample', 'juan@example.com', '$2y$10$YQv8XqPjKsKYlM.F4zZ6K.AW8l7G.5Xz0P5KpS8r9Q0Q0Q0Q0Q0Qq', 'user');
 
 -- ============================================================================
--- DATA: Destinations (Eksaktong sunod sa data.php)
+-- DATA: Destinations 
 -- ============================================================================
 
 INSERT INTO `destinations` (`id`, `name`, `region`, `emoji`, `tagline`, `description`, `price`, `price_from`, `gradient_bg`) VALUES
@@ -222,7 +221,7 @@ INSERT INTO `destinations` (`id`, `name`, `region`, `emoji`, `tagline`, `descrip
 ('camiguin', 'Camiguin Island', 'Mindanao', '', 'Island Born of Fire', 'This tiny island has more volcanoes per square kilometer than anywhere on Earth, plus stunning waterfalls and turquoise springs.', 5800, 3500, 'linear-gradient(135deg, rgba(0,0,0,0.32), rgba(0,0,0,0.08)), url(\'assets/pics/camiguin.jpg\') center/cover no-repeat');
 
 -- ============================================================================
--- DATA: Hotels (Eksaktong sunod sa data.php kasama ang mga naitamang IDs at Pics)
+-- DATA: Hotels 
 -- ============================================================================
 
 INSERT INTO `hotels` (`id`, `destination_id`, `name`, `image_url`, `location`, `description`, `stars`, `price`, `rating`, `reviews_count`, `checkin_time`, `checkout_time`) VALUES
@@ -230,37 +229,44 @@ INSERT INTO `hotels` (`id`, `destination_id`, `name`, `image_url`, `location`, `
 ('sotogrande-baguio', 'baguio', 'Sotogrande Hotel Baguio', 'assets/pics/sotogrande.jpg', 'Session Road, Baguio City', 'A modern boutique hotel nestled in the heart of Baguio, offering luxurious rooms with stunning mountain views and world-class amenities.', 4, 5200, 4.6, 312, '14:00:00', '11:00:00'),
 ('microtel-baguio', 'baguio', 'Microtel by Wyndham Baguio', 'assets/pics/microtel3.jpg', 'Legarda Road, Baguio City', 'Comfortable and affordable rooms with reliable service, conveniently located near SM City Baguio and key tourist spots.', 3, 3600, 4.3, 205, '14:00:00', '12:00:00'),
 ('travelite-baguio', 'baguio', 'Travelite Express Hotel', 'assets/pics/travellite2.jpg', 'Magsaysay Avenue, Baguio City', 'A budget-friendly option with clean, cozy rooms ideal for solo travelers and backpackers exploring the City of Pines.', 2, 2800, 4.1, 148, '13:00:00', '11:00:00'),
+
 -- Vigan
 ('hotel-luna-vigan', 'vigan', 'Hotel Luna', 'assets/pics/hotelluna2.jpg', 'Crisologo St., Vigan City', 'An award-winning boutique hotel housed in a century-old ancestral mansion, blending heritage architecture with modern luxury on the famous Calle Crisologo.', 4, 5800, 4.8, 421, '14:00:00', '11:00:00'),
 ('hotel-felicidad', 'vigan', 'Hotel Felicidad Vigan', 'assets/pics/hotelfelicidad2.jpg', 'Quirino Blvd, Vigan City', 'A charming heritage hotel offering comfortable rooms with period-inspired décor, located steps away from Vigan\'s famous plazas and churches.', 3, 4200, 4.4, 186, '14:00:00', '12:00:00'),
 ('paradores-vigan', 'vigan', 'Paradores de Vigan', 'assets/pics/paradores de.jpg', 'Mena Crisologo St., Vigan City', 'Experience the warmth of Ilocano hospitality in this cozy, family-run hotel set in a restored colonial building within the heritage zone.', 3, 3500, 4.2, 97, '13:00:00', '11:00:00'),
+
 -- Palawan
 ('seda-lio', 'palawan', 'Seda Lio – El Nido', 'assets/pics/sedalio2.jpg', 'Lio Tourism Estate, El Nido, Palawan', 'A stunning eco-luxury resort set on the shores of El Nido\'s Lio Beach, offering sustainable luxury with panoramic views of the Bacuit Archipelago.', 5, 12500, 4.9, 534, '15:00:00', '12:00:00'),
 ('hue-hotels-pp', 'palawan', 'Hue Hotels – Puerto Princesa', 'assets/pics/huehotel2.jpg', 'Rizal Avenue, Puerto Princesa City', 'A vibrant, design-forward hotel in the heart of Puerto Princesa, offering colorful rooms, an excellent restaurant, and easy access to the city\'s attractions.', 4, 7200, 4.6, 298, '14:00:00', '12:00:00'),
 ('two-seasons-coron', 'palawan', 'Two Seasons Coron Island Resort', 'assets/pics/two seasons.jpg', 'Malaroyroy Peninsula, Coron, Palawan', 'Perched on a private peninsula overlooking the famous Coron Bay, this overwater resort offers an intimate island experience with world-class diving access.', 4, 9800, 4.7, 187, '14:00:00', '11:00:00'),
--- Cebu (Inayos mula radisson-cebu/sunburst para tumugma sa data.php)
+
+-- Cebu
 ('radisson-blu-cebu', 'cebu', 'Radisson Blu Cebu', 'assets/pics/radisson.jpg', 'Sergio Osmeña Blvd, Cebu City', 'A five-star landmark in the heart of Cebu City, offering elegant rooms, multiple dining venues, a rooftop pool, and a world-class spa.', 5, 9500, 4.7, 689, '15:00:00', '12:00:00'),
 ('quest-hotel-cebu', 'cebu', 'Quest Hotel Cebu', 'assets/pics/questhotel.jpg', 'Archbishop Reyes Ave, Cebu City', 'A contemporary hotel known for its vibrant social spaces, spectacular pool area, and easy access to Cebu\'s business and leisure districts.', 4, 5500, 4.4, 412, '14:00:00', '12:00:00'),
 ('bayfront-cebu', 'cebu', 'Bayfront Hotel Cebu', 'assets/pics/bayfront.jpg', 'Manalili St, Cebu City', 'A reliable mid-range option in Cebu City offering clean, comfortable rooms with great city views and close proximity to Carbon Market and Colon Street.', 3, 3200, 4.2, 253, '14:00:00', '11:00:00'),
--- Boracay (Inayos mula shangri-la/henann para tumugma sa assets/pics/boracay.jpg)
+
+-- Boracay
 ('henann-crystal', 'boracay', 'Henann Crystal Sands Resort', 'assets/pics/boracay.jpg', 'Station 1, White Beach, Boracay', 'An iconic beachfront resort on the finest stretch of White Beach, offering breathtaking sunsets, multiple pools, and world-class island dining.', 5, 11800, 4.8, 876, '14:00:00', '12:00:00'),
 ('fairways-boracay', 'boracay', 'Fairways and Bluewater Boracay', 'assets/pics/boracay.jpg', 'Newcoast, Boracay Island', 'Boracay\'s only golf resort, offering sprawling tropical villas, championship fairways, and direct access to a pristine private beach.', 5, 14500, 4.9, 432, '14:00:00', '12:00:00'),
 ('la-sirena-boracay', 'boracay', 'La Sirena Resort', 'assets/pics/boracay.jpg', 'Station 3, White Beach, Boracay', 'A cozy, native-style boutique beachfront resort offering a peaceful escape on the quieter side of Boracay\'s world-famous shore.', 3, 5500, 4.3, 198, '13:00:00', '11:00:00'),
+
 -- Siargao (Inayos para tumugma sa assets/pics/siargao.jpg)
 ('nay-palad-siargao', 'siargao', 'Nay Palad Hideaway', 'assets/pics/siargao.jpg', 'Pacifico, Siargao Island', 'An ultra-exclusive eco-luxury hideaway on Siargao\'s wild northern shore, offering just 10 private beachfront cottages with personalized butler service.', 5, 18000, 4.9, 156, '15:00:00', '12:00:00'),
 ('kalinaw-siargao', 'siargao', 'Kalinaw Resort', 'assets/pics/siargao.jpg', 'General Luna, Siargao Island', 'A tranquil boutique resort tucked among coconut palms near Cloud 9, offering stunning lagoon views and a genuine island atmosphere.', 4, 7500, 4.7, 289, '14:00:00', '12:00:00'),
 ('cloud9-resort-siargao', 'siargao', 'Cloud 9 Surf Resort', 'assets/pics/siargao.jpg', 'Cloud 9, General Luna, Siargao', 'The ultimate surfer\'s lodge located directly in front of the world-famous Cloud 9 boardwalk, featuring rustic rooms and an iconic view.', 3, 3700, 4.5, 342, '13:00:00', '11:00:00'),
+
 -- Bukidnon
 ('dahilayan-resort', 'bukidnon', 'Dahilayan Forest Park Resort', 'assets/pics/bukidno.jpg', 'Dahilayan, Manolo Fortich, Bukidnon', 'Stay right at the adventure park and wake up to misty mountain views. Direct access to all zipline and extreme adventure facilities.', 4, 4500, 4.5, 312, '14:00:00', '11:00:00'),
 ('ultrawinds-resort', 'bukidnon', 'Ultrawinds Mountain Resort', 'assets/pics/bukidno.jpg', 'Manolo Fortich, Bukidnon', 'A scenic highland resort with comfortable accommodations and stunning views of Bukidnon\'s pine-covered mountains.', 3, 3200, 4.3, 198, '13:00:00', '11:00:00'),
 ('secret-haven-bukidnon', 'bukidnon', 'Secret Haven Private Resort', 'assets/pics/bukidno.jpg', 'Bukidnon Province', 'An intimate private resort surrounded by nature, perfect for group getaways with exclusive use of the property.', 3, 2100, 4.1, 145, '13:00:00', '11:00:00'),
+
 -- Camiguin
 ('bintana-paraiso', 'camiguin', 'Bintana sa Paraiso', 'assets/pics/camiguin.jpg', 'Mambajao, Camiguin Island', 'A picturesque resort with sea-facing cottages and direct beach access, offering a genuine island paradise experience in Camiguin.', 4, 5800, 4.7, 203, '14:00:00', '11:00:00'),
 ('paras-beach', 'camiguin', 'Paras Beach Resort', 'assets/pics/camiguin.jpg', 'Guinsiliban, Camiguin Island', 'A beloved beachside resort known for its warm hospitality, well-kept grounds, and stunning views of the island\'s volcanic peaks.', 3, 4200, 4.4, 178, '14:00:00', '12:00:00'),
 ('balai-baibai', 'camiguin', 'Balai sa Baibai', 'assets/pics/camiguin.jpg', 'Mambajao, Camiguin Island', 'A cozy family-run beachside inn offering affordable comfort and genuine Camiguinon hospitality just steps from the beach.', 3, 3500, 4.2, 134, '13:00:00', '11:00:00');
 
 -- ============================================================================
--- DATA: Hotel Amenities (Eksaktong sunod sa data.php)
+-- DATA: Hotel Amenities 
 -- ============================================================================
 
 INSERT INTO `hotel_amenities` (`hotel_id`, `amenity_name`) VALUES
@@ -314,7 +320,7 @@ INSERT INTO `hotel_amenities` (`hotel_id`, `amenity_name`) VALUES
 ('balai-baibai', 'Free WiFi'), ('balai-baibai', 'Beach Access'), ('balai-baibai', 'Breakfast Available'), ('balai-baibai', 'Communal Kitchen'), ('balai-baibai', 'Hammocks');
 
 -- ============================================================================
--- DATA: Hotel Policies (Eksaktong sunod sa data.php)
+-- DATA: Hotel Policies
 -- ============================================================================
 
 INSERT INTO `hotel_policies` (`hotel_id`, `policy`) VALUES
