@@ -12,21 +12,21 @@
       <span class="breadcrumb-sep">›</span>
       <a href="destinations.php">Destinations</a>
       <span class="breadcrumb-sep">›</span>
-      <a href="destinations.php?dest=<?= $destId ?>"><?= htmlspecialchars($dest['name']) ?></a>
+      <a href="destinations.php?dest=<?= htmlspecialchars($destId ?? ($dest['id'] ?? '')) ?>"><?= htmlspecialchars($dest['name'] ?? '') ?></a>
       <span class="breadcrumb-sep">›</span>
-      <span><?= htmlspecialchars($hotel['name']) ?></span>
+      <span><?= htmlspecialchars($hotel['name'] ?? '') ?></span>
     </div>
   </div>
 
   <!-- Hotel Hero -->
-  <div class="hotel-detail-hero" style="background: <?= $hotelBackground ?>;">
+  <div class="hotel-detail-hero" style="background: <?= htmlspecialchars($hotelBackground ?? '', ENT_QUOTES) ?>;">
     <div class="hotel-detail-hero-overlay"></div>
     <div class="hotel-detail-hero-content">
-      <div class="hotel-stars-big"><?= $stars ?></div>
-      <h1><?= htmlspecialchars($hotel['name']) ?></h1>
+      <div class="hotel-stars-big"><?= htmlspecialchars($stars ?? '') ?></div>
+      <h1><?= htmlspecialchars($hotel['name'] ?? '') ?></h1>
       <div class="hotel-loc">
-        📍 <?= htmlspecialchars($hotel['location']) ?>
-        <span class="hotel-rating-pill">⭐ <?= $hotel['rating'] ?> (<?= $hotel['reviews_count'] ?? $hotel['reviews'] ?? 0 ?> reviews)</span>
+        📍 <?= htmlspecialchars($hotel['location'] ?? '') ?>
+        <span class="hotel-rating-pill">⭐ <?= htmlspecialchars($hotel['rating'] ?? '') ?> (<?= htmlspecialchars($hotel['reviews_count'] ?? $hotel['reviews'] ?? 0) ?> reviews)</span>
       </div>
     </div>
   </div>
@@ -89,7 +89,7 @@
 
           <!-- Activities Section -->
           <div class="hotel-info-section mb-5" id="activitiesSection">
-            <h2 class="mb-3">🎯 Activities in <?= htmlspecialchars($dest['name']) ?></h2>
+            <h2 class="mb-3">🎯 Activities in <?= htmlspecialchars($dest['name'] ?? 'this destination' ?? 'this destination') ?></h2>
             <p style="color:var(--muted);font-size:0.88rem;margin-bottom:1.2rem;">Select activities to add to your booking. Prices will be reflected in your total.</p>
             <div id="activityList" class="d-flex flex-column gap-2">
               <?php foreach (($dest['acts'] ?? []) as $i => $act): ?>
@@ -132,7 +132,7 @@
 
             <div class="booking-price-preview mb-4">
               <span class="price-big" style="font-size: 2rem; color: var(--primary); font-weight: 700;">
-                ₱<?= number_format($hotel['price']) ?>
+                ₱<?= number_format((int) ($hotel['price'] ?? 0)) ?>
               </span>
               <span class="price-unit" style="color: var(--muted); font-size: 0.9rem;">/ night</span>
             </div>
@@ -140,9 +140,9 @@
             <form action="booking_confirm.php" method="POST" id="bookingForm" onsubmit="return prepareSubmit()">
               <input type="hidden" name="dest_id" value="<?= htmlspecialchars($destId) ?>">
               <input type="hidden" name="hotel_id" value="<?= htmlspecialchars($hotelId) ?>">
-              <input type="hidden" name="dest_name" value="<?= htmlspecialchars($dest['name']) ?>">
-              <input type="hidden" name="hotel_name" value="<?= htmlspecialchars($hotel['name']) ?>">
-              <input type="hidden" name="price_per_night" value="<?= $hotel['price'] ?>">
+              <input type="hidden" name="dest_name" value="<?= htmlspecialchars($dest['name'] ?? '') ?>">
+              <input type="hidden" name="hotel_name" value="<?= htmlspecialchars($hotel['name'] ?? '') ?>">
+              <input type="hidden" name="price_per_night" value="<?= htmlspecialchars((string) ($hotel['price'] ?? 0)) ?>">
               <input type="hidden" name="dest_gradient" value="<?= htmlspecialchars($dest['gradient_bg'] ?? $dest['gradient'] ?? '') ?>">
               <input type="hidden" name="dest_emoji" value="<?= $dest['emoji'] ?>">
               <input type="hidden" name="selected_acts" id="selectedActsInput" value="">
@@ -262,12 +262,11 @@
               <div class="booking-summary-breakdown p-3 rounded mb-4" style="background: var(--primary-pale); border: 1px solid var(--border);">
                 <div class="d-flex justify-content-between mb-2 pb-2" style="border-bottom: 1px solid var(--border);">
                   <span style="font-size: 0.85rem;">Price per night</span>
-                  <strong>₱<?= number_format($hotel['price']) ?></strong>
+                  <strong>₱<?= number_format((int) ($hotel['price'] ?? 0)) ?></strong>
                 </div>
                 <div class="d-flex justify-content-between mb-2">
                   <span style="font-size: 0.85rem;">Nights</span>
                   <strong id="nightsDisplay">—</strong>
-                </div>
                 <div class="d-flex justify-content-between mb-2">
                   <span style="font-size: 0.85rem;">Rooms</span>
                   <strong id="roomsDisplay">1</strong>
