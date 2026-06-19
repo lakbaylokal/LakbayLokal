@@ -138,13 +138,13 @@
             </div>
 
             <form action="booking_confirm.php" method="POST" id="bookingForm" onsubmit="return prepareSubmit()">
-              <input type="hidden" name="dest_id" value="<?= htmlspecialchars($destId) ?>">
-              <input type="hidden" name="hotel_id" value="<?= htmlspecialchars($hotelId) ?>">
+              <input type="hidden" name="dest_id" value="<?= htmlspecialchars($dest['id'] ?? '') ?>">
+              <input type="hidden" name="hotel_id" value="<?= htmlspecialchars($hotel['id'] ?? '') ?>">
               <input type="hidden" name="dest_name" value="<?= htmlspecialchars($dest['name'] ?? '') ?>">
               <input type="hidden" name="hotel_name" value="<?= htmlspecialchars($hotel['name'] ?? '') ?>">
               <input type="hidden" name="price_per_night" value="<?= htmlspecialchars((string) ($hotel['price'] ?? 0)) ?>">
               <input type="hidden" name="dest_gradient" value="<?= htmlspecialchars($dest['gradient_bg'] ?? $dest['gradient'] ?? '') ?>">
-              <input type="hidden" name="dest_emoji" value="<?= $dest['emoji'] ?>">
+              <input type="hidden" name="dest_emoji" value="<?= htmlspecialchars($dest['emoji'] ?? '') ?>">
               <input type="hidden" name="selected_acts" id="selectedActsInput" value="">
               <input type="hidden" name="discount_amount" id="discountAmountInput" value="0">
               <input type="hidden" name="discount_percent" id="discountPercentInput" value="0">
@@ -267,9 +267,22 @@
                 <div class="d-flex justify-content-between mb-2">
                   <span style="font-size: 0.85rem;">Nights</span>
                   <strong id="nightsDisplay">—</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2" id="actsRow" style="display:none;">
+                  <span style="font-size: 0.85rem;">Activities</span>
+                  <strong id="actsDisplay">0 selected</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2" id="discountRow" style="display:none;">
+                  <span style="font-size: 0.85rem;">Discount</span>
+                  <strong id="discountDisplay">-₱0</strong>
+                </div>
                 <div class="d-flex justify-content-between mb-2">
                   <span style="font-size: 0.85rem;">Rooms</span>
                   <strong id="roomsDisplay">1</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span style="font-size: 0.85rem;">Tax</span>
+                  <strong id="taxDisplay">—</strong>
                 </div>
                 <div class="d-flex justify-content-between fw-bold" style="font-size: 0.95rem; color: var(--primary);">
                   <span>Total</span>
