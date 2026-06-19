@@ -141,7 +141,39 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
   color: var(--deep);
   background-color: var(--cream);
   box-shadow: none; /* Tinatanggal ang default glow ng bootstrap */
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.search-group .form-select:hover,
+.search-group .form-control:hover,
+.search-group textarea:hover,
+.search-group input:hover,
+.form-control:hover,
+.form-select:hover,
+input:hover,
+textarea:hover,
+select:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.1rem rgba(196,96,42,0.16);
+  transform: translateY(-1px) scale(1.002);
+}
+
+.form-control:hover::placeholder,
+.form-select:hover::placeholder,
+input:hover::placeholder,
+textarea:hover::placeholder {
+  color: var(--primary);
+  opacity: 1;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+input::placeholder,
+textarea::placeholder,
+.form-control::placeholder,
+.form-select::placeholder {
+  color: rgba(26, 18, 8, 0.55);
+  transition: color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
 }
 
 /* Kapag clinick ang input or select box */
