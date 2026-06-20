@@ -206,6 +206,16 @@
                 <input type="text" name="requests" class="form-control" placeholder="e.g. early check-in, high floor...">
               </div>
 
+              <!-- Promo Code -->
+              <div class="mb-3">
+                <label class="form-label">Promo Code</label>
+                <div class="input-group">
+                  <input type="text" name="discount_code" class="form-control" id="discountCode" placeholder="Enter promo code">
+                  <button type="button" class="btn btn-outline-secondary" onclick="applyDiscount()">Apply</button>
+                </div>
+                <small class="validation-error" id="discountCodeError"></small>
+              </div>
+
               <!-- Payment Method -->
               <div class="mb-3">
                 <label class="form-label">Payment Method</label>
