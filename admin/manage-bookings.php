@@ -304,7 +304,7 @@ function openPanel(id) {
       if (b.payment_method === 'gcash') {
         payHtml  = `<div class="info-row"><span class="info-label">GCash Number</span><span class="info-value mono">${b.gcash_number||'—'}</span></div>`;
         payHtml += `<div class="info-row"><span class="info-label">Account Name</span><span class="info-value">${b.gcash_account_name||'—'}</span></div>`;
-      } else if (b.payment_method === 'card') {
+      } else if (b.payment_method === 'card' || b.payment_method === 'credit_card' || b.payment_method === 'debit_card') {
         payHtml  = `<div class="info-row"><span class="info-label">Card Holder</span><span class="info-value">${b.card_holder_name||'—'}</span></div>`;
         payHtml += `<div class="info-row"><span class="info-label">Card</span><span class="info-value mono">${b.card_brand||''} •••• ${b.card_last_four||'—'}</span></div>`;
       }

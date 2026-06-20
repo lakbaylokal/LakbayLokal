@@ -85,16 +85,25 @@ function saveHotelRelations($pdo, $hotelId, $amenities, $policies) {
 
 // ── CRUD Operations ───────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'create') {
-    $hotel_id = generateSlug(trim($_POST['name']), $pdo, 'hotels');
     $image_url = handleImageUpload('image_file', '');
-    
-    $stmt = $pdo->prepare("INSERT INTO hotels (id,destination_id,name,image_url,location,description,stars,price,rating,reviews_count,checkin_time,checkout_time) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
-    $stmt->execute([$hotel_id,trim($_POST['destination_id']),trim($_POST['name']),$image_url,trim($_POST['location']),trim($_POST['description']),(int)$_POST['stars'],floatval($_POST['price']),floatval($_POST['rating']),(int)$_POST['reviews_count'],trim($_POST['checkin_time']),trim($_POST['checkout_time'])]);
-    
-    // Kunin ang tags array mula sa dynamic input elements
-    $amenities = $_POST['amenities'] ?? [];
-    $policies = $_POST['policies'] ?? [];
-    saveHotelRelations($pdo, $hotel_id, $amenities, $policies);
+
+    try {
+        $pdo->beginTransaction();
+
+        $stmt = $pdo->prepare("INSERT INTO hotels (destination_id,name,image_url,location,description,stars,price,rating,reviews_count,checkin_time,checkout_time) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+        $stmt->execute([(int)$_POST['destination_id'],trim($_POST['name']),$image_url,trim($_POST['location']),trim($_POST['description']),(int)$_POST['stars'],floatval($_POST['price']),floatval($_POST['rating']),(int)$_POST['reviews_count'],trim($_POST['checkin_time']),trim($_POST['checkout_time'])]);
+        $hotel_id = (int)$pdo->lastInsertId();
+
+        // Kunin ang tags array mula sa dynamic input elements
+        $amenities = $_POST['amenities'] ?? [];
+        $policies = $_POST['policies'] ?? [];
+        saveHotelRelations($pdo, $hotel_id, $amenities, $policies);
+
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        header('Location: manage-hotels.php?msg='.urlencode('Hotel could not be saved. Please check the selected destination and try again.').'&type=error'); exit;
+    }
 
     header('Location: manage-hotels.php?msg='.urlencode('Hotel added successfully.').'&type=success'); exit;
 }

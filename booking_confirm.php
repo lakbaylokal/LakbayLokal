@@ -41,6 +41,7 @@ $cardHolder   = $_POST['card_holder'] ?? '';
 $cardNumber   = $_POST['card_number'] ?? '';
 $cardExpiry   = $_POST['card_expiry'] ?? '';
 $cardCvv      = $_POST['card_cvv'] ?? '';
+$currentUserId = isset($_SESSION['user']['id']) ? (int)$_SESSION['user']['id'] : null;
 
 function isValidName($name) {
   return preg_match("/^[\\p{L}]+(?:[ '\\-][\\p{L}]+)*$/u", trim($name));
@@ -188,7 +189,7 @@ $bookingStmt = $conn->prepare(
       number_of_guests, number_of_rooms, subtotal,
       activities_total, tax_amount, total_price,
       payment_method, special_requests, status
-    ) VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmed')"
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmed')"
 );
 if ($bookingStmt) {
   $guestNameClean = trim($guestName);
@@ -199,8 +200,9 @@ if ($bookingStmt) {
   $roomCount = (int)$rooms;
 
   $bookingStmt->bind_param(
-    str_repeat('s', 7) . str_repeat('i', 6) . str_repeat('s', 2),
+    str_repeat('s', 1) . str_repeat('i', 1) . str_repeat('s', 6) . str_repeat('i', 6) . str_repeat('s', 2),
     $ref,
+    $currentUserId,
     $guestNameClean,
     $guestEmailClean,
     $destId,

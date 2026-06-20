@@ -106,11 +106,13 @@
         <div class="col-12 col-md-6 col-lg-4">
           <a href="destinations.php?dest=<?= $d['id'] ?>" class="dest-card">
             <?php
-              $destCardBackground = !empty($d['image'])
-                ? "linear-gradient(135deg, rgba(0,0,0,0.18), rgba(0,0,0,0.02)), url('" . htmlspecialchars($d['image'], ENT_QUOTES) . "') center/cover no-repeat"
+              $destImage = trim((string)($d['image'] ?? ''));
+              $destCardBackground = $destImage
+                ? "linear-gradient(135deg, rgba(0,0,0,0.18), rgba(0,0,0,0.02)), url('" . htmlspecialchars($destImage, ENT_QUOTES) . "') center/cover no-repeat"
                 : $d['gradient'];
+              $destImgClass = $destImage ? 'dest-img' : 'dest-img dest-img--placeholder';
             ?>
-            <div class="dest-img" style="background: <?= $destCardBackground ?>;">
+            <div class="<?= $destImgClass ?>" style="background: <?= $destCardBackground ?>;">
               <?php if (empty($d['image'])): ?>
               <div class="dest-img-emoji">
                 <?= $d['emoji'] ?>

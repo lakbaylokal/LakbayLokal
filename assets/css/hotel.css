@@ -160,6 +160,17 @@
   height: 200px;
   background-size: cover; background-position: center;
   position: relative;
+  background-color: rgba(245, 247, 250, 0.95);
+  background-repeat: no-repeat;
+}
+
+.dest-img--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(245, 247, 250, 1);
+  color: var(--deep);
+  font-size: 3.5rem;
 }
 .dest-badge {
   position: absolute; top: 12px; left: 12px;

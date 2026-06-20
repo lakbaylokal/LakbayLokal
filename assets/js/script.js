@@ -205,23 +205,24 @@ function logoutUser() {
 /* ─────────────────────── NAV STATE ──────────────────────────── */
 
 function fetchCurrentUser() {
-  // Check if user is stored in sessionStorage
-  if (currentUser) {
-    updateAuthNav();
-    return;
-  }
-
-  // Fetch from server if session exists (on page reload)
+  // Always verify the PHP session. sessionStorage can outlive the server session,
+  // which makes the UI look logged in while bookings are saved without user_id.
   fetch(API_URL + '?action=getCurrentUser')
     .then(res => res.json())
     .then(data => {
       if (data.success && data.user) {
         setLoggedInUser(data.user);
       } else {
+        currentUser = null;
+        sessionStorage.removeItem('lbl_user');
         updateAuthNav();
       }
     })
-    .catch(() => updateAuthNav());
+    .catch(() => {
+      currentUser = null;
+      sessionStorage.removeItem('lbl_user');
+      updateAuthNav();
+    });
 }
 
 function setLoggedInUser(user) {

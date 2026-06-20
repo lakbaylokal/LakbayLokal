@@ -11,7 +11,7 @@ $destinations = getAllDestinations($conn);
 
 // ── AUTOMATIC SESSION DETECTOR ──
 // Titingnan natin kung may kahit anong login indicator sa session mo (user_id, user, o username)
-$currentUserId = $_SESSION['user_id'] ?? $_SESSION['user'] ?? $_SESSION['username'] ?? null; 
+$currentUserId = $_SESSION['user']['id'] ?? $_SESSION['user_id'] ?? $_SESSION['username'] ?? null; 
 
 $userBookings = [];
 if ($currentUserId) {

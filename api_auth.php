@@ -171,6 +171,7 @@ function handleLogout() {
 function handleGetCurrentUser() {
     if (isset($_SESSION['user'])) {
         echo json_encode(['success' => true, 'user' => [
+            'id' => $_SESSION['user']['id'],
             'FName' => $_SESSION['user']['FName'],
             'LName' => $_SESSION['user']['LName'],
             'Email' => $_SESSION['user']['Email'],

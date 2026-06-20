@@ -14,11 +14,18 @@ function resolvePublicImageUrl(?string $imageUrl): string {
     if ($imageUrl === '') return '';
 
     $imageUrl = str_replace('\\', '/', $imageUrl);
-    if (preg_match('/^(https?:)?\/\//i', $imageUrl) || str_starts_with($imageUrl, 'data:') || str_starts_with($imageUrl, '/')) {
+    if (preg_match('/^(https?:)?\/\//i', $imageUrl) || str_starts_with($imageUrl, 'data:')) {
         return $imageUrl;
     }
 
     $rootDir = dirname(__DIR__);
+    if (str_starts_with($imageUrl, '/')) {
+        if (is_file($rootDir . $imageUrl)) {
+            return $imageUrl;
+        }
+        return '';
+    }
+
     if (is_file($rootDir . '/' . $imageUrl)) {
         return $imageUrl;
     }
@@ -27,7 +34,7 @@ function resolvePublicImageUrl(?string $imageUrl): string {
         return 'admin/' . $imageUrl;
     }
 
-    return $imageUrl;
+    return '';
 }
 
 // ============================================================================
