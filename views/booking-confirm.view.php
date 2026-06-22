@@ -25,6 +25,7 @@ $destGradient = $destGradient ?? '';
 $destEmoji = $destEmoji ?? '';
 ?>
 
+
 <style>
   .ll-confirm-wrapper {
     padding: 3rem 1.5rem;
