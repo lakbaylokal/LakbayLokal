@@ -9,7 +9,6 @@ This package contains everything needed to convert your PHP-based data structure
 3. **This README** - Setup and integration instructions
 
 ---
- 
 ## 🚀 QUICK START (5 minutes)
 
 ### Step 1: Import the Database into XAMPP
