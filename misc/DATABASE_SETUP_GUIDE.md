@@ -8,7 +8,6 @@ This package contains everything needed to convert your PHP-based data structure
 2. **data-db.php** - Database-connected PHP file that replaces your hardcoded `data.php`
 3. **This README** - Setup and integration instructions
 
-
 ---
 ## 🚀 QUICK START (5 minutes)
 
