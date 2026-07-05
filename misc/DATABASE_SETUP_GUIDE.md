@@ -32,7 +32,6 @@ This package contains everything needed to convert your PHP-based data structure
      - `hotel_policies` (50+ policies)
      - `activities` (40+ activities)
 
-
 ---
 
 ## 📝 Step 2: Update Your PHP Files
